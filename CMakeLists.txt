@@ -1,7 +1,7 @@
 # 指定CMake的最低版本
 cmake_minimum_required(VERSION 3.5)
 
-# 指定功成名
+# 指定工程名
 project(name VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
