@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # 指定工程名
-project(BTS VERSION 0.1 LANGUAGES CXX)
+project(win VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -11,7 +11,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 执行程序生成路径
@@ -26,8 +26,8 @@ else(UNIX)
 endif()
 
 # 查找 Qt 库
-find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Network PATHS /opt/homebrew/Cellar/qt@5/5.15.10_1)
-#find_package(Qt6 REQUIRED COMPONENTS Widgets SerialPort Network LinguistTools PATHS /opt/homebrew/Cellar/qt/6.5.2)
+#find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Network PATHS /opt/homebrew/Cellar/qt@5/5.15.10_1)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 # 设置 Boost 的路径
 # set(BOOST_ROOT /opt/homebrew/Cellar/boost/1.83.0) # Boost 库的安装路径（根据你的实际安装路径设置）
@@ -36,7 +36,6 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Network PATHS /opt/homeb
 # set(Boost_USE_MULTITHREADED ON)  # 设置为 ON 表示启用多线程支持
 
 # find_package(Boost REQUIRED COMPONENTS thread )  # 指定你需要的 Boost 组件
-
 
 # set(CMAKE_SYSTEM_NAME Linux)
 # set(CMAKE_SYSTEM_PROCESSOR arm)
@@ -48,6 +47,7 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Network PATHS /opt/homeb
 # set(CMAKE_CXX_COMPILER ${COMPILE}/arm-linux-g++)
 
 add_subdirectory(app)
+add_subdirectory(main)
 
 # # 安装
 # set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/linux)

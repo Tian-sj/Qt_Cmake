@@ -1,23 +1,13 @@
 set(CMAKE_AUTOUIC_SEARCH_PATHS ui)
+file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h ui/*.ui qrc/*.qrc)
 
-file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h ui/*ui qrc/*.qrc)
-
-# 生成
-add_executable(${PROJECT_NAME}
-    main/main.cpp
+add_library(app SHARED
     ${srcs}
-    ${qrc_FILES}
+    #${qrc_FILES}
 )
 
-#qt_add_translations(${PROJECT_NAME} TS_FILES zh_CN.ts)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt::Widgets
+target_link_libraries(app PUBLIC
+    Qt6::Widgets
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC include)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    WIN32_EXECUTABLE ON
-    MACOSX_BUNDLE ON
-)
+target_include_directories(app PUBLIC include)
