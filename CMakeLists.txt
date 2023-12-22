@@ -18,7 +18,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(BOOST_ROOT /opt/homebrew/Cellar/boost/1.83.0) # Boost 库的安装路径（根据你的实际安装路径设置）
 # set(Boost_USE_STATIC_LIBS ON)  # 设置为 OFF 表示使用动态链接库
 
-# find_package(Boost REQUIRED COMPONENTS system )  # 指定你需要的 Boost 组件
 
 add_subdirectory(app)
 add_subdirectory(main)
