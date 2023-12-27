@@ -12,6 +12,7 @@ endif()
 # 生成
 add_executable(${PROJECT_NAME}
     main.cpp
+    "app_win32.rc"
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
