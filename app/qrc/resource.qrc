@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>css/LoginDialog.css</file>
+        <file>images/close_hover.png</file>
+        <file>images/close.png</file>
+        <file>images/Logo.png</file>
+        <file>images/down_arrow.png</file>
+        <file>languages/login_en.qm</file>
+        <file>languages/login_cn.qm</file>
+        <file>images/LoginBackground.png</file>
+    </qresource>
+</RCC>

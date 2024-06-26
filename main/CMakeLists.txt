@@ -1,4 +1,4 @@
-# 执行程序生成路径
+﻿# 执行程序生成路径
 if(WIN32)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/windows)
 #windows系统动态库生成lib文件命令

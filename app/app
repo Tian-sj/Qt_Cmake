@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1">
+<context>
+    <name>LoginDialog</name>
+    <message>
+        <location filename="ui/logindialog.ui" line="26"/>
+        <source>LoginPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="78"/>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="79"/>
+        <source>Username does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="80"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="81"/>
+        <source>Password error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="82"/>
+        <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="84"/>
+        <source>Administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="85"/>
+        <source>Ordinary user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/logindialog.cpp" line="86"/>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="ui/mainwindow.ui" line="14"/>
+        <source>Widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui/mainwindow.ui" line="26"/>
+        <source>❌</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+</TS>

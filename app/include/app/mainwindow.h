@@ -1,13 +1,15 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class FramelessWidget;
+
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
@@ -16,7 +18,12 @@ public:
     ~MainWindow();
 
 private:
+    void init_widget();
+
+private:
     Ui::MainWindow *ui;
+
+    FramelessWidget* frameless_widget;
 };
 
 #endif // MAINWINDOW_H
