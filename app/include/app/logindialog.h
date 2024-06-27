@@ -14,8 +14,11 @@ class LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit LoginDialog(QWidget *parent = nullptr);
+    // explicit LoginDialog(QWidget *parent = nullptr);
     ~LoginDialog();
+
+    // test
+    LoginDialog(int& role, QWidget *parent = nullptr);
 
     /*!
      * @brief         Loading Language
@@ -67,6 +70,9 @@ private:
     Ui::LoginDialog *ui;
 
     QTranslator* translator;
+
+    // test
+    int &m_role;
 };
 
 #endif // LOGINDIALOG_H

@@ -9,42 +9,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="78"/>
+        <location filename="src/logindialog.cpp" line="92"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="79"/>
+        <location filename="src/logindialog.cpp" line="93"/>
         <source>Username does not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="80"/>
+        <location filename="src/logindialog.cpp" line="94"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="81"/>
+        <location filename="src/logindialog.cpp" line="95"/>
         <source>Password error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="82"/>
+        <location filename="src/logindialog.cpp" line="96"/>
         <source>Role</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="84"/>
+        <location filename="src/logindialog.cpp" line="98"/>
         <source>Administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="85"/>
+        <location filename="src/logindialog.cpp" line="99"/>
         <source>Ordinary user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/logindialog.cpp" line="86"/>
+        <location filename="src/logindialog.cpp" line="100"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -54,11 +54,6 @@
     <message>
         <location filename="ui/mainwindow.ui" line="14"/>
         <source>Widget</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui/mainwindow.ui" line="26"/>
-        <source>❌</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

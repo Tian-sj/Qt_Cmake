@@ -5,6 +5,7 @@
 #include <QListView>
 #include <QLineEdit>
 
+/*
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
     translator(new QTranslator),
@@ -15,11 +16,24 @@ LoginDialog::LoginDialog(QWidget *parent) :
     initUI();
     initUIText();
 }
+*/
 
 LoginDialog::~LoginDialog()
 {
     delete translator;
     delete ui;
+}
+
+LoginDialog::LoginDialog(int& role, QWidget *parent) :
+    m_role(role),
+    QDialog(parent),
+    translator(new QTranslator),
+    ui(new Ui::LoginDialog)
+{
+    ui->setupUi(this);
+
+    initUI();
+    initUIText();
 }
 
 void LoginDialog::loadLanguage(int language)
@@ -81,8 +95,10 @@ void LoginDialog::initUIText()
     ui->lab_error_password->setText(tr("Password error"));
     ui->lab_role->setText(tr("Role"));
     ui->role->clear();
+    ui->role->addItem(tr("SuperAdministrator"));
     ui->role->addItem(tr("Administrator"));
     ui->role->addItem(tr("Ordinary user"));
+    ui->role->setCurrentIndex(2);
     ui->btn_login->setText(tr("Login"));
 }
 
@@ -115,6 +131,7 @@ void LoginDialog::on_btn_login_clicked()
         ui->lab_error_password->setVisible(true);
         return;
     }
+    m_role = ui->role->currentIndex();
     return accept();
 }
 

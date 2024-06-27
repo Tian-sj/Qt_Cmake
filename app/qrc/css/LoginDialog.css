@@ -110,12 +110,6 @@
 
 #btn_close {
     border-image: url(:/images/close.png);
-    background-color: transparent;
-    border: none;
-    width: 20px;
-    height: 20px;
-    margin: 0px;
-    padding: 0px;
 }
 
 #btn_close:hover {

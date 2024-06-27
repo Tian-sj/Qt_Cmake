@@ -3,10 +3,6 @@
 
 #include <QWidget>
 
-namespace Ui {
-class MainWindow;
-}
-
 class FramelessWidget;
 
 class MainWindow : public QWidget
@@ -17,12 +13,15 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private:
-    void init_widget();
+    static MainWindow* create(int role);
+
+protected:
+    virtual void initUI();
+    virtual void initUIText();
+
+    virtual void loadCSS(const QString &cssFile);
 
 private:
-    Ui::MainWindow *ui;
-
     FramelessWidget* frameless_widget;
 };
 

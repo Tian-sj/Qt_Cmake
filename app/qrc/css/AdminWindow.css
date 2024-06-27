@@ -1,0 +1,65 @@
+﻿#background {
+    border: none;
+    border-image: url(:/images/MainBackground.png);
+    background-color: transparent;
+}
+
+#background_top {
+    border: none;
+}
+
+#group_btn {
+    border: none;
+}
+
+#group_logo {
+    border: none;
+}
+
+#lab_logo {
+    border-image: url(:/images/Logo.png);
+}
+
+#group_list {
+    border: none;
+}
+
+#btn_info {
+    border-image: url(:/images/info.png);
+}
+
+#btn_setting {
+    border-image: url(:/images/setting.png);
+}
+
+#btn_close {
+    border-image: url(:/images/close.png);
+}
+
+#btn_close:hover {
+    border-image: url(:/images/close_hover.png);
+}
+
+#btn_min {
+    border-image: url(:/images/min.png);
+}
+
+#btn_min:hover {
+    border-image: url(:/images/min_hover.png);
+}
+
+#btn_max {
+    border-image: url(:/images/max.png);
+}
+
+#btn_max:hover {
+    border-image: url(:/images/max_hover.png);
+}
+
+#btn_max2 {
+    border-image: url(:/images/max2.png);
+}
+
+#btn_max2:hover {
+    border-image: url(:/images/max2_hover.png);
+}

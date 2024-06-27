@@ -9,7 +9,7 @@ else(UNIX)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/linux)
 endif()
 
-set(CMAKE_AUTOUIC_SEARCH_PATHS ui)
+set(CMAKE_AUTOUIC_SEARCH_PATHS ui ui/SuperAdmin ui/Admin ui/User)
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h ui/*.ui qrc/*.qrc)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)

@@ -8,5 +8,15 @@
         <file>languages/login_en.qm</file>
         <file>languages/login_cn.qm</file>
         <file>images/LoginBackground.png</file>
+        <file>css/AdminWindow.css</file>
+        <file>images/MainBackground.png</file>
+        <file>images/setting.png</file>
+        <file>images/info.png</file>
+        <file>images/min_hover.png</file>
+        <file>images/min.png</file>
+        <file>images/max_hover.png</file>
+        <file>images/max.png</file>
+        <file>images/max2.png</file>
+        <file>images/max2_hover.png</file>
     </qresource>
 </RCC>
