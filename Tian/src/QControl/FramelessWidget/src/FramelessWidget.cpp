@@ -6,7 +6,7 @@
 
 FramelessWidget::FramelessWidget(QObject *parent) : QObject(parent)
 {
-    padding = 12;
+    padding = 8;
     moveEnable = true;
     resizeEnable = true;
     widget = NULL;

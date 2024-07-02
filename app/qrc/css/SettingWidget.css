@@ -1,0 +1,12 @@
+﻿#SettingWidgetBackground {
+    border-image: url(:/images/SettingWidgetBackground.png);
+}
+
+#setting_widget_btn_close {
+    border-image: url(:/images/fanhui.png);
+    background-color: transparent;
+}
+
+#setting_widget_btn_close:hover {
+    border-image: url(:/images/fanhui_hover.png);
+}

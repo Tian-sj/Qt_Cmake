@@ -15,25 +15,22 @@ MainWindow::~MainWindow()
 {
 }
 
-MainWindow *MainWindow::create(int role)
+std::unique_ptr<MainWindow> MainWindow::create(int role)
 {
     switch (role) {
     case 0:
-        return new SurperAdmin::SurperAdminWindow();
-        break;
+        return std::make_unique<SurperAdmin::SurperAdminWindow>();
     case 1:
-        return new Admin::AdminWindow();
-        break;
+        return std::make_unique<Admin::AdminWindow>();
     case 2:
-        return new User::UserWindow();
-        break;
+        return std::make_unique<User::UserWindow>();
+    default:
+        return std::make_unique<MainWindow>();
     }
-    return new MainWindow();
 }
 
 void MainWindow::initUI()
 {
-
 }
 
 void MainWindow::initUIText()

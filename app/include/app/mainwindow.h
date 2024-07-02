@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <memory>
 
 class FramelessWidget;
 
@@ -13,7 +14,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    static MainWindow* create(int role);
+    static std::unique_ptr<MainWindow> create(int role);
 
 protected:
     virtual void initUI();

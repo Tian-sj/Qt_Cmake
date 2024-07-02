@@ -18,5 +18,10 @@
         <file>images/max.png</file>
         <file>images/max2.png</file>
         <file>images/max2_hover.png</file>
+        <file>images/btn_change_user.png</file>
+        <file>css/SettingWidget.css</file>
+        <file>images/SettingWidgetBackground.png</file>
+        <file>images/fanhui.png</file>
+        <file>images/fanhui_hover.png</file>
     </qresource>
 </RCC>

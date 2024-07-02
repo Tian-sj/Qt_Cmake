@@ -2,6 +2,7 @@
 #include <app/logindialog.h>
 #include <app/mainwindow.h>
 #include <QProcess>
+#include <memory>
 
 const int RESTART_EXIT_CODE = 100;
 
