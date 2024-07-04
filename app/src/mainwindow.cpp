@@ -15,7 +15,7 @@ MainWindow::~MainWindow()
 {
 }
 
-std::unique_ptr<MainWindow> MainWindow::create(int role)
+std::unique_ptr<MainWindow> MainWindow::create(int role, QString username)
 {
     switch (role) {
     case 0:
@@ -23,7 +23,7 @@ std::unique_ptr<MainWindow> MainWindow::create(int role)
     case 1:
         return std::make_unique<Admin::AdminWindow>();
     case 2:
-        return std::make_unique<User::UserWindow>();
+        return std::make_unique<User::UserWindow>(username);
     default:
         return std::make_unique<MainWindow>();
     }
@@ -35,7 +35,10 @@ void MainWindow::initUI()
 
 void MainWindow::initUIText()
 {
+}
 
+void MainWindow::initConnect()
+{
 }
 
 void MainWindow::loadCSS(const QString &cssFile)

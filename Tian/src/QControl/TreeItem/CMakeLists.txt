@@ -10,4 +10,4 @@ target_link_libraries(TreeItem PRIVATE
     Qt6::Widgets
 )
 
-target_include_directories(TreeItem PRIVATE include)
+target_include_directories(TreeItem PUBLIC include)

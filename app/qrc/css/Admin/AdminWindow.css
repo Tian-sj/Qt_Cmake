@@ -1,0 +1,126 @@
+﻿#background {
+    border: none;
+    border-image: url(:/images/MainBackground.png);
+    background-color: transparent;
+}
+
+#background_top {
+    border: none;
+}
+
+#group_btn {
+    border: none;
+}
+
+#group_logo {
+    border: none;
+}
+
+#lab_logo {
+    border-image: url(:/images/Logo.png);
+}
+
+#btn_info {
+    border-image: url(:/images/info.png);
+}
+
+#btn_setting {
+    border-image: url(:/images/setting.png);
+}
+
+#btn_close {
+    border-image: url(:/images/close.png);
+}
+
+#btn_close:hover {
+    border-image: url(:/images/close_hover.png);
+}
+
+#btn_min {
+    border-image: url(:/images/min.png);
+}
+
+#btn_min:hover {
+    border-image: url(:/images/min_hover.png);
+}
+
+#btn_max {
+    border-image: url(:/images/max.png);
+}
+
+#btn_max:hover {
+    border-image: url(:/images/max_hover.png);
+}
+
+#btn_max2 {
+    border-image: url(:/images/max2.png);
+}
+
+#btn_max2:hover {
+    border-image: url(:/images/max2_hover.png);
+}
+
+#btn_change_user {
+    background-color: #ffffff;
+    color: #333333;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+}
+
+#btn_change_user::menu-indicator {
+    border-image: url(:/images/btn_change_user.png);
+    width: 20px;
+    height: 12px;
+}
+
+#menu_change_user {
+    background-color: white;
+    color: black;
+    border: 1px solid #3498db;
+    padding: 5px;
+}
+
+#menu_change_user::item {
+    background-color: transparent;
+    padding: 5px 10px;
+}
+
+#menu_change_user::item:selected {
+    background-color: #2980b9;
+    color: white;
+}
+
+
+#group_list {
+    border: none;
+}
+
+#group_list QAbstractButton {
+    min-width: 100px;
+    max-width: 100px;
+
+    min-height: 115px;
+    max-height: 115px;
+}
+
+#group_list QToolButton {
+    color: #333333;
+    border: none;
+}
+
+#btn1:hover, #btn3:hover, #btn5:hover, #btn6:hover {
+    background-color: #f0f0f0;
+    color: black;
+}
+
+#btn2:hover, #btn4:hover {
+    background-color: qlineargradient(spread:reflect, x1:0.537771, y1:0, x2:0.567353, y2:1, stop:0 rgba(101, 195, 207, 255), stop:0.910448 rgba(151, 255, 197, 255));
+    color: white;
+}
+
+#btn1:checked, #btn3:checked, #btn5:checked, #btn6:checked,
+#btn1:checked:hover, #btn3:checked:hover, #btn5:checked:hover, #btn6:checked:hover {
+    background-color: qlineargradient(spread:reflect, x1:0.537771, y1:0, x2:0.567353, y2:1, stop:0.0895522 rgba(105, 127, 228, 255), stop:0.910448 rgba(151, 230, 255, 255));
+    color: white;
+}

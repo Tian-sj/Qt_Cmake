@@ -10,15 +10,20 @@
 
 namespace Admin {
 
-AdminWindow::AdminWindow(QWidget *parent) :
-    MainWindow(parent),
-    is_show_setting_widget(false),
-    ui(new Ui::AdminWindow)
+AdminWindow::AdminWindow(QWidget *parent)
+    : MainWindow(parent)
+    , is_show_setting_widget(false)
+    , DVW(new DeviceViewWidget(this))
+    , DMW(new DeviceManagementWidget(this))
+    , UMW(new UserManagementWidget(this))
+    , SSW(new SystemSettingWidget(this))
+    , ui(new Ui::AdminWindow)
 {
     ui->setupUi(this);
 
     initUI();
     initUIText();
+    initConnect();
 }
 
 AdminWindow::~AdminWindow()
@@ -43,9 +48,14 @@ AdminWindow::~AdminWindow()
 
 void AdminWindow::initUI()
 {
-    loadCSS(":/css/AdminWindow.css");
+    loadCSS(":/css/Admin/AdminWindow.css");
 
     set_btn_max_visible(true);
+
+    ui->WINDOWS->addWidget(qobject_cast<QWidget *>(DVW));
+    ui->WINDOWS->addWidget(qobject_cast<QWidget *>(DMW));
+    ui->WINDOWS->addWidget(qobject_cast<QWidget *>(UMW));
+    ui->WINDOWS->addWidget(qobject_cast<QWidget *>(SSW));
 
     menu_change_user = new QMenu(this);
     act1_change_user = new QAction("", this);
@@ -85,6 +95,8 @@ void AdminWindow::initUI()
         b->setCheckable(true);
     }
 
+    ui->btn1->setChecked(true);
+
     set_widget = new SettingWidget(this);
     set_widget->setObjectName("SettingWidget");
     set_widget->raise();
@@ -95,12 +107,11 @@ void AdminWindow::initUI()
 
     animation_stop = new QPropertyAnimation(set_widget, "geometry");
     animation_stop->setDuration(300);
-
-    initConnect();
 }
 
 void AdminWindow::initUIText()
 {
+    ui->btn_change_user->setText(tr("Administrator"));
     act1_change_user->setText(tr("Change User"));
     act2_change_user->setText(tr("Exit"));
 
@@ -197,18 +208,32 @@ void AdminWindow::on_gtoup_list_btn_clicked()
     QAbstractButton *btn = qobject_cast<QAbstractButton *>(sender());
 
     switch (btn_group_map[btn->objectName()]) {
-        case BtnGroupType::DeviceView:
+        case BtnGroupType::DeviceView: {
+            ui->WINDOWS->setCurrentWidget(DVW);
             break;
-        case BtnGroupType::DataAnalysis:
+        }
+        case BtnGroupType::DataAnalysis: {
+            DataAnalysisWidget* DAW = new DataAnalysisWidget;
+            DAW->show();
             break;
-        case BtnGroupType::DeviceManagement:
+        }
+        case BtnGroupType::DeviceManagement: {
+            ui->WINDOWS->setCurrentWidget(DMW);
             break;
-        case BtnGroupType::LogManagement:
+        }
+        case BtnGroupType::LogManagement: {
+            LogManagementWidget* LMW = new LogManagementWidget;
+            LMW->show();
             break;
-        case BtnGroupType::UserManagement: 
+        }
+        case BtnGroupType::UserManagement: {
+            ui->WINDOWS->setCurrentWidget(UMW);
             break;
-        case BtnGroupType::SystemSetting:
+        }
+        case BtnGroupType::SystemSetting: {
+            ui->WINDOWS->setCurrentWidget(SSW);
             break;
+        }
         default:
             break;
     }
@@ -223,6 +248,10 @@ void AdminWindow::on_setting_widget_close_clicked()
 {
     is_show_setting_widget = false;
     animation_stop->start();
+}
+
+void AdminWindow::set_test() {
+
 }
 
 }

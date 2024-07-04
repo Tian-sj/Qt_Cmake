@@ -16,7 +16,7 @@ class UserWindow : public MainWindow
     Q_OBJECT
 
 public:
-    explicit UserWindow(QWidget *parent = nullptr);
+    explicit UserWindow(QString username, QWidget *parent = nullptr);
     ~UserWindow();
 
 protected:
@@ -25,6 +25,8 @@ protected:
 
 private:
     Ui::UserWindow *ui;
+
+    QString m_username;
 };
 
 }

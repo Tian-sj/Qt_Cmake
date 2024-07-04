@@ -6,6 +6,16 @@
     border: none;
 }
 
+#group_in_left {
+    border: none;
+    border-image: url(:/images/group_in_left.png);
+}
+
+#group_in_right {
+    border: none;
+    border-image: url(:/images/group_in_right.png);
+}
+
 #lab_logo {
     border-image: url(:/images/Logo.png);
 }

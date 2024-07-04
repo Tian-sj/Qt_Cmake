@@ -14,11 +14,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    static std::unique_ptr<MainWindow> create(int role);
+    static std::unique_ptr<MainWindow> create(int role, QString username);
 
 protected:
     virtual void initUI();
     virtual void initUIText();
+    virtual void initConnect();
 
     virtual void loadCSS(const QString &cssFile);
 

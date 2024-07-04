@@ -4,7 +4,8 @@
 
 namespace User {
 
-UserWindow::UserWindow(QWidget *parent) :
+UserWindow::UserWindow(QString username, QWidget *parent) :
+    m_username(username),
     MainWindow(parent),
     ui(new Ui::UserWindow)
 {

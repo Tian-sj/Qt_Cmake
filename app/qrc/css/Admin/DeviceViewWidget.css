@@ -1,0 +1,14 @@
+#DVW_tree_item::item {
+    padding: 15px;
+}
+
+#DVW_tree_item::item:selected, #DVW_tree_item::item:selected:hover {
+    background-color: qlineargradient(spread:reflect, x1:0.537771, y1:0, x2:0.567353, y2:1, stop:0.0895522 rgba(105, 127, 228, 255), stop:0.910448 rgba(151, 230, 255, 255));
+    margin-bottom : 7px;
+    color: white;
+}
+
+#DVW_tree_item::item:hover {
+    background-color: #f0f0f0;
+    margin-bottom : 7px;
+}

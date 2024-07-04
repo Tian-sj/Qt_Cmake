@@ -2,6 +2,12 @@
 #define ADMINWINDOW_H
 
 #include <app/mainwindow.h>
+#include <app/Admin/deviceviewwidget.h>
+#include <app/Admin/dataanalysiswidget.h>
+#include <app/Admin/devicemanagementwidget.h>
+#include <app/Admin/logmanagementwidget.h>
+#include <app/Admin/usermanagementwidget.h>
+#include <app/Admin/systemsettingwidget.h>
 
 #include <QMenu>
 #include <QButtonGroup>
@@ -24,10 +30,12 @@ public:
     explicit AdminWindow(QWidget *parent = nullptr);
     ~AdminWindow();
 
+    void set_test();
+
 protected:
-    void initUI();
-    void initUIText();
-    void initConnect();
+    void initUI() override;
+    void initUIText() override;
+    void initConnect() override;
 
     void resizeEvent(QResizeEvent *event) override;
 
@@ -80,6 +88,11 @@ private:
     QPropertyAnimation *animation_stop;
 
     bool is_show_setting_widget;
+
+    DeviceViewWidget* DVW;
+    DeviceManagementWidget* DMW;
+    UserManagementWidget* UMW;
+    SystemSettingWidget* SSW;
 };
 
 }

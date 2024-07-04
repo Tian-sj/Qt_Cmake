@@ -8,7 +8,6 @@
         <file>languages/login_en.qm</file>
         <file>languages/login_cn.qm</file>
         <file>images/LoginBackground.png</file>
-        <file>css/AdminWindow.css</file>
         <file>images/MainBackground.png</file>
         <file>images/setting.png</file>
         <file>images/info.png</file>
@@ -23,5 +22,14 @@
         <file>images/SettingWidgetBackground.png</file>
         <file>images/fanhui.png</file>
         <file>images/fanhui_hover.png</file>
+        <file>images/group_in_left.png</file>
+        <file>images/group_in_right.png</file>
+        <file>images/yonghutubiao.png</file>
+        <file>images/fram_hide.png</file>
+        <file>images/fram_show.png</file>
+        <file>css/Admin/AdminWindow.css</file>
+        <file>css/Admin/DeviceViewWidget.css</file>
+        <file>css/Admin/DeviceViewWidget/btn-hide.css</file>
+        <file>css/Admin/DeviceViewWidget/btn-show.css</file>
     </qresource>
 </RCC>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1320</width>
+    <width>1353</width>
     <height>879</height>
    </rect>
   </property>
@@ -488,18 +488,28 @@
              <widget class="QPushButton" name="btn_change_user">
               <property name="minimumSize">
                <size>
-                <width>130</width>
+                <width>150</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>130</width>
+                <width>150</width>
                 <height>16777215</height>
                </size>
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/yonghutubiao.png</normaloff>:/images/yonghutubiao.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -510,51 +520,16 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QStackedWidget" name="stackedWidget">
-        <widget class="QWidget" name="page">
-         <layout class="QGridLayout" name="gridLayout_7">
-          <property name="leftMargin">
-           <number>5</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>5</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QListWidget" name="listWidget"/>
-          </item>
-          <item row="0" column="1">
-           <widget class="QMdiArea" name="mdiArea">
-            <widget class="QWidget" name="subwindow">
-             <property name="windowTitle">
-              <string>子窗口</string>
-             </property>
-            </widget>
-            <widget class="QWidget" name="subwindow_2">
-             <property name="windowTitle">
-              <string>子窗口</string>
-             </property>
-            </widget>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
+       <widget class="QStackedWidget" name="WINDOWS"/>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../qrc/resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>btn_close</sender>

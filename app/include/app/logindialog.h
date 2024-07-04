@@ -4,6 +4,11 @@
 #include <QDialog>
 #include <QFocusEvent>
 #include <QTranslator>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
+#include <memory>
+#include <QTimer>
+#include <app/mainwindow.h>
 
 namespace Ui {
 class LoginDialog;
@@ -14,11 +19,8 @@ class LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    // explicit LoginDialog(QWidget *parent = nullptr);
+    explicit LoginDialog(QWidget *parent = nullptr);
     ~LoginDialog();
-
-    // test
-    LoginDialog(int& role, QWidget *parent = nullptr);
 
     /*!
      * @brief         Loading Language
@@ -26,6 +28,8 @@ public:
      * @param         language  0-English， 1-Chinese
      */
     void loadLanguage(int language);
+
+    std::unique_ptr<MainWindow> get_windows();
 
 protected:
     void changeEvent(QEvent *event) override;
@@ -50,6 +54,10 @@ private slots:
      */
     void on_password_textEdited(const QString &arg1);
 
+    void on_login_successful();
+
+    void on_load_successful();
+
 private:
 
     /*!
@@ -58,6 +66,8 @@ private:
     void initUI();
 
     void initUIText();
+
+    void initConnect();
 
     /*!
      * @brief         Loading CSS styles
@@ -72,7 +82,18 @@ private:
     QTranslator* translator;
 
     // test
-    int &m_role;
+    QString m_username;
+    int m_role;
+
+    QPropertyAnimation *animation_left;
+    QPropertyAnimation *animation_right;
+
+    QPropertyAnimation *animation_label;
+    QGraphicsOpacityEffect *effect_label;
+
+    std::unique_ptr<MainWindow> m_windows;
+
+    QTimer* create_timer;
 };
 
 #endif // LOGINDIALOG_H

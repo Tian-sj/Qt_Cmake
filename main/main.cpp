@@ -1,6 +1,5 @@
 ﻿#include <QApplication>
 #include <app/logindialog.h>
-#include <app/mainwindow.h>
 #include <QProcess>
 #include <memory>
 
@@ -12,15 +11,17 @@ int main(int argc, char *argv[])
 
     int exitCode;
 
-    int role = -1;
+    LoginDialog *login = new LoginDialog();
 
-    LoginDialog login(role);
-
-    if (login.exec() == QDialog::Accepted) {
-        auto m = MainWindow::create(role);
+    if (login->exec() == QDialog::Accepted) {
+        auto m = login->get_windows();
+        delete login;
+        login = nullptr;
         m->show();
         exitCode = a.exec();
     } else {
+        delete login;
+        login = nullptr;
         return 0;
     }
 
