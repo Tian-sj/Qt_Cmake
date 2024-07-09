@@ -2,6 +2,7 @@
 #define DATAANALYSISWIDGET_H
 
 #include <QWidget>
+#include <QCalendarWidget>
 
 namespace Admin {
 
@@ -24,6 +25,12 @@ private:
 
     void initConnect();
 
+    void initCalendarWidget(QCalendarWidget* calendar);
+
+    void loadCSS(const QString &cssFile, QWidget* w = nullptr);
+
+private slots:
+    void on_page_change(int index);
 private:
     Ui::DataAnalysisWidget *ui;
 };

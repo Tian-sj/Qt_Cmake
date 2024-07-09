@@ -1,0 +1,69 @@
+QDateEdit {
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+    selection-color: white;
+    selection-background-color: #0078d7;
+}
+
+QDateEdit:focus {
+    border: 1px solid #0078d7;
+}
+
+QDateEdit::drop-down {
+    border: none;
+}
+
+QDateEdit::down-arrow {
+    border-image: url(:/images/down_arrow.png);
+    border: none;
+}
+
+QCalendarWidget {
+    background-color: #FFFFFF;
+    border: 1px solid #c3ab5b;
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    color: #000000;
+    background-color: #ffffff;
+    selection-color: white;
+    selection-background-color: #c3ab5b;
+}
+
+QCalendarWidget QSpinBox#qt_calendar_yearedit {
+    background: #ffffff;
+    height: 34px;
+    width: 125px;
+    selection-background-color: #c3ab5b;
+}
+
+QCalendarWidget QToolButton {
+    background-color: #FFFFFF;
+    height: 34px;
+    width: 125px;
+    color: #000000;
+}
+
+QCalendarWidget QToolButton:hover {
+    border: 1px solid #c3ab5b;
+}
+
+QCalendarWidget QToolButton::menu-indicator#qt_calendar_monthbutton {
+    subcontrol-position: right center;
+    subcontrol-origin: padding;
+}
+
+QCalendarWidget QToolButton QMenu {
+    background-color: #FFFFFF;
+    width: 125px;
+    border: 1px solid #c3ab5b;
+}
+
+QCalendarWidget QToolButton QMenu::item:selected {
+    color: #FFFFFF;
+    background: #c3ab5b;
+}
