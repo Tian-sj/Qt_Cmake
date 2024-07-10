@@ -34,5 +34,14 @@
         <file>css/Admin/DataAnalysisWidget.css</file>
         <file>images/left-arrow.png</file>
         <file>images/right-arrow.png</file>
+        <file>images/logo_btn1.png</file>
+        <file>images/logo_btn2.png</file>
+        <file>images/logo_btn3.png</file>
+        <file>images/logo_btn4.png</file>
+        <file>images/logo_btn5.png</file>
+        <file>images/logo_btn6.png</file>
+        <file>images/icon-oc-date.png</file>
+        <file>images/sousuo.png</file>
+        <file>images/daochu.png</file>
     </qresource>
 </RCC>

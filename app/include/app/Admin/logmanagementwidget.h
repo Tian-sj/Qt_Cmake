@@ -24,6 +24,9 @@ private:
 
     void initConnect();
 
+public slots:
+    void windows_close();
+
 private:
     Ui::LogManagementWidget *ui;
 };

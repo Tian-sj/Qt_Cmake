@@ -214,6 +214,7 @@ void AdminWindow::on_gtoup_list_btn_clicked()
         }
         case BtnGroupType::DataAnalysis: {
             DataAnalysisWidget* DAW = new DataAnalysisWidget;
+            connect(this, &AdminWindow::_close_, DAW, &DataAnalysisWidget::windows_close);
             DAW->show();
             break;
         }
@@ -223,6 +224,7 @@ void AdminWindow::on_gtoup_list_btn_clicked()
         }
         case BtnGroupType::LogManagement: {
             LogManagementWidget* LMW = new LogManagementWidget;
+            connect(this, &AdminWindow::_close_, LMW, &LogManagementWidget::windows_close);
             LMW->show();
             break;
         }
@@ -253,5 +255,12 @@ void AdminWindow::on_setting_widget_close_clicked()
 void AdminWindow::set_test() {
 
 }
+
+void AdminWindow::on_btn_close_clicked()
+{
+    emit _close_();
+    this->close();
+}
+
 
 }

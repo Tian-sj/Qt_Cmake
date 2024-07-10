@@ -182,6 +182,19 @@
               <property name="text">
                <string/>
               </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/logo_btn1.png</normaloff>:/images/logo_btn1.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
+              <property name="autoRaise">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -194,6 +207,16 @@
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/logo_btn2.png</normaloff>:/images/logo_btn2.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -208,6 +231,16 @@
               <property name="text">
                <string/>
               </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/logo_btn3.png</normaloff>:/images/logo_btn3.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
              </widget>
             </item>
             <item>
@@ -220,6 +253,16 @@
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/logo_btn4.png</normaloff>:/images/logo_btn4.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -234,6 +277,16 @@
               <property name="text">
                <string/>
               </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/logo_btn5.png</normaloff>:/images/logo_btn5.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
+              </property>
              </widget>
             </item>
             <item>
@@ -246,6 +299,16 @@
               </property>
               <property name="text">
                <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../../qrc/resource.qrc">
+                <normaloff>:/images/logo_btn6.png</normaloff>:/images/logo_btn6.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>64</width>
+                <height>64</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -531,22 +594,6 @@
   <include location="../../qrc/resource.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>btn_close</sender>
-   <signal>clicked()</signal>
-   <receiver>Admin::AdminWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1469</x>
-     <y>19</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>744</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>btn_min</sender>
    <signal>clicked()</signal>

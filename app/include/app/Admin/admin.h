@@ -43,6 +43,9 @@ protected:
 
     void mousePressEvent(QMouseEvent *event) override;
 
+signals:
+    void _close_();
+
 private slots:
     void on_btn_max_clicked();
 
@@ -59,6 +62,8 @@ private slots:
     void on_btn_setting_clicked();
 
     void on_setting_widget_close_clicked();
+
+    void on_btn_close_clicked();
 
 private:
     void set_btn_max_visible(bool visible);

@@ -35,4 +35,9 @@ void LogManagementWidget::initConnect()
 
 }
 
+void LogManagementWidget::windows_close()
+{
+    this->close();
+}
+
 }
