@@ -2,9 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
-#include <memory>
+#include <QTreeView>
+#include <QStandardItemModel>
 
-class FramelessWidget;
+namespace Ui {
+class MainWindow;
+}
 
 class MainWindow : public QWidget
 {
@@ -14,17 +17,14 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    static std::unique_ptr<MainWindow> create(int role, QString username);
-
 protected:
-    virtual void initUI();
-    virtual void initUIText();
-    virtual void initConnect();
-
     virtual void loadCSS(const QString &cssFile);
 
 private:
-    FramelessWidget* frameless_widget;
+    Ui::MainWindow *ui;
+
+    QTreeView *treeView;
+    QStandardItemModel *model;
 };
 
 #endif // MAINWINDOW_H

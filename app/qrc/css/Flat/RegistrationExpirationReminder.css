@@ -1,0 +1,33 @@
+QWidget {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+QLabel#lab_message {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333333;
+    padding: 10px;
+}
+
+QCheckBox#checkBox {
+    font-size: 12px;
+    color: #666666;
+    margin: 10px;
+}
+
+QPushButton#btn_verify {
+    width: 70px;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    padding: 5px;
+}
+
+QPushButton#btn_verify:hover {
+    background-color: #45a049;
+}
+
+QPushButton#btn_verify:pressed {
+    background-color: #3e8e41;
+}

@@ -1,0 +1,19 @@
+#lab_logo {
+    border: none;
+    border-image: url(:/images/Logo.png);
+}
+
+#lab_app_name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#lab_regist {
+    color: darkgray;
+    font-size: 12px;
+}
+
+#btn_close {
+    background-color: #0078d7;
+    color: white;
+}

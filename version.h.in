@@ -1,0 +1,5 @@
+﻿#define _VERSION "${_VERSION}"
+#define _DEVELOPER "${_DEVELOPER}"
+#define _NAME "${_NAME}"
+#define _SUPPORT_URL "${_SUPPORT_URL}"
+#define _BUILD_TIME ${_BUILD_TIME}

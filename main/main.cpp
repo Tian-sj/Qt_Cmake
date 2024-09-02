@@ -1,34 +1,18 @@
 ﻿#include <QApplication>
-#include <app/logindialog.h>
-#include <QProcess>
-#include <memory>
-
-const int RESTART_EXIT_CODE = 100;
+#include <QStyleFactory>
+#include "qthelper.h"
+#include <app/mainwindow.h>
 
 int main(int argc, char *argv[])
 {
+    QtHelper::initMain();
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/main.ico"));
 
-    int exitCode;
+    QtHelper::initAll();
 
-    LoginDialog *login = new LoginDialog();
+    MainWindow m;
+    m.show();
 
-    if (login->exec() == QDialog::Accepted) {
-        auto m = login->get_windows();
-        delete login;
-        login = nullptr;
-        m->show();
-        exitCode = a.exec();
-    } else {
-        delete login;
-        login = nullptr;
-        return 0;
-    }
-
-    if (exitCode == RESTART_EXIT_CODE) {
-        QProcess::startDetached(QApplication::applicationFilePath(), QStringList());
-        return 0;
-    }
-
-    return exitCode;
+    return a.exec();
 }

@@ -1,7 +1,0 @@
-#DVW_btn_show_hide {
-    background-color: transparent;
-}
-
-#DVW_btn_show_hide:hover {
-    border-image: url(":/images/fram_hide.png");
-}

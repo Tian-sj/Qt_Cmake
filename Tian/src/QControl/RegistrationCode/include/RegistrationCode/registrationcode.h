@@ -1,14 +1,26 @@
-#ifndef REGISTRATIONCODE_H
+﻿#ifndef REGISTRATIONCODE_H
 #define REGISTRATIONCODE_H
 
 #include <QString>
 #include <QDateTime>
-#include <QJsonObject>
+#include <QDate>
 
 class RegistrationCode {
 public:
     RegistrationCode(const QByteArray &secretKey);
 
+    enum class ERROT_TYPE {
+        RegistrationCodeValid,        // 注册码验证通过
+        RegistrationCodeInvalidFormat,// 注册码格式不正确
+        RegistrationCodeExpired,      // 注册码过期
+        RegistrationCodeAboutToExpire,// 注册码将要过期
+        RegistrationCodeInvalid       // 注册码验证不通过
+    };
+
+    /*!
+     * @brief
+     * @return
+     */
     QString getUniqueSystemIdentifier() const;
 
     /*!
@@ -17,7 +29,7 @@ public:
      * @param         expirationDays
      * @return        QString
      */
-    QString generateCode(QString systemIdentifier, int expirationDays) const;
+    QString generateCode(QString systemIdentifier, QDate expirationDays) const;
 
     /*!
      * @brief         
@@ -27,9 +39,9 @@ public:
      * @return        false
      * @attention
      */
-    bool validateCode(const QString &code) const;
-    void storeCode(const QString &code) const;
-    QJsonObject loadCode() const;
+    ERROT_TYPE validateCode(const QString &code);
+
+    QDateTime getEndTime();
 
 private:
     /*!
@@ -40,7 +52,8 @@ private:
      */
     QByteArray generateHash(const QString &input) const;
     QByteArray secretKey;
-    QString localFile;
+
+    QDateTime m_end_time;
 };
 
 #endif // REGISTRATIONCODE_H

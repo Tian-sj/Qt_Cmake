@@ -1,14 +1,20 @@
 ﻿#include <RegistrationCode/registrationcode.h>
 #include <QCryptographicHash>
 #include <QFile>
-#include <QJsonDocument>
 #include <QDebug>
 #include <QProcess>
 #include <QRegularExpression>
+#include <QTime>
 
-namespace {
+RegistrationCode::RegistrationCode(const QByteArray &secretKey)
+    : secretKey(secretKey)
+{
+
+}
+
+QString RegistrationCode::getUniqueSystemIdentifier() const
+{
 #ifdef Q_OS_WIN
-QString get_motherboard_serial_number_windows() {
     QProcess process;
     process.start("wmic", QStringList() << "baseboard" << "get" << "serialnumber");
     if (!process.waitForFinished()) {
@@ -20,11 +26,8 @@ QString get_motherboard_serial_number_windows() {
     QRegularExpression re("[^a-zA-Z0-9]");
 
     return serialNumber.replace(re, QString(""));
-}
 #endif
-
 #ifdef Q_OS_LINUX
-QString get_motherboard_serial_number_linux() {
     QFile file("/sys/class/dmi/id/board_serial");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return QString();
@@ -32,11 +35,8 @@ QString get_motherboard_serial_number_linux() {
     QString serial_number = file.readLine().trimmed();
     file.close();
     return serial_number;
-}
 #endif
-
 #ifdef Q_OS_MAC
-QString get_motherboard_serial_number_mac() {
     QProcess process;
     process.start("bash", QStringList() << "-c" << "system_profiler SPHardwareDataType | awk '/Serial Number/ {print $4}'");
     if (!process.waitForFinished()) {
@@ -47,25 +47,6 @@ QString get_motherboard_serial_number_mac() {
     QString serialNumber(output.trimmed());
 
     return serialNumber;
-}
-#endif
-}
-
-RegistrationCode::RegistrationCode(const QByteArray &secretKey)
-    : secretKey(secretKey), localFile("registration_info.json") {}
-
-QString RegistrationCode::getUniqueSystemIdentifier() const
-{
-    QString osType = QSysInfo::productType();
-
-#ifdef Q_OS_WIN
-    return get_motherboard_serial_number_windows();
-#endif
-#ifdef Q_OS_LINUX
-    return get_motherboard_serial_number_linux();
-#endif
-#ifdef Q_OS_MAC
-    return get_motherboard_serial_number_mac();
 #endif
 
     return QString();
@@ -77,7 +58,7 @@ QByteArray RegistrationCode::generateHash(const QString &input) const
     return QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex();
 }
 
-QString RegistrationCode::generateCode(QString systemIdentifier, int expirationDays) const
+QString RegistrationCode::generateCode(QString systemIdentifier, QDate expirationDays) const
 {
     if (systemIdentifier.isEmpty())
     {
@@ -85,67 +66,58 @@ QString RegistrationCode::generateCode(QString systemIdentifier, int expirationD
         return QString();
     }
 
-    QDateTime currentTime = QDateTime::currentDateTime();
-    QDateTime expirationTime = currentTime.addDays(expirationDays);
-    QString data = QString("%1|%2|%3").arg(systemIdentifier).arg(currentTime.toSecsSinceEpoch()).arg(expirationTime.toSecsSinceEpoch());
+    QTime t(0, 0, 0);
+
+    QDateTime end_time(expirationDays, t);
+
+
+    QString data = QString("%1|%2").arg(systemIdentifier).arg(end_time.toSecsSinceEpoch());
     QByteArray hash = generateHash(data);
     return QString("%1|%2").arg(data).arg(QString(hash));
 }
 
-bool RegistrationCode::validateCode(const QString &code) const
+RegistrationCode::ERROT_TYPE RegistrationCode::validateCode(const QString &code)
 {
     QStringList parts = code.split('|');
-    if (parts.size() != 4)
+    if (parts.size() != 3)
     {
-        return false;
+        return ERROT_TYPE::RegistrationCodeInvalidFormat;
     }
 
     QString uniqueIdentifier = parts[0];
 
     if (uniqueIdentifier != getUniqueSystemIdentifier()) {
-        return false;
+        return ERROT_TYPE::RegistrationCodeInvalid;
     }
 
-    qint64 startTime = parts[1].toLongLong();
-    qint64 expirationTime = parts[2].toLongLong();
-    QByteArray hash = parts[3].toUtf8();
+    qint64 expirationTime = parts[1].toLongLong();
+    QByteArray hash = parts[2].toUtf8();
 
+    m_end_time = QDateTime::fromSecsSinceEpoch(expirationTime);
 
-    QString data = QString("%1|%2|%3").arg(uniqueIdentifier).arg(startTime).arg(expirationTime);
+    QString data = QString("%1|%2").arg(uniqueIdentifier).arg(expirationTime);
     QByteArray expectedHash = generateHash(data);
 
     if (hash != expectedHash)
     {
-        return false;
+        return ERROT_TYPE::RegistrationCodeInvalid;
     }
 
     QDateTime currentTime = QDateTime::currentDateTime();
-    if (currentTime.toSecsSinceEpoch() > expirationTime)
-    {
-        return false;
+
+    if (currentTime.toSecsSinceEpoch() > expirationTime) {
+        return ERROT_TYPE::RegistrationCodeExpired;
     }
 
-    return true;
+    qint64 secondsInThreeDays = 3 * 24 * 60 * 60; // 3 days in seconds
+    if (currentTime.toSecsSinceEpoch() < expirationTime && (expirationTime - currentTime.toSecsSinceEpoch()) <= secondsInThreeDays) {
+        return ERROT_TYPE::RegistrationCodeAboutToExpire;
+    }
+
+    return ERROT_TYPE::RegistrationCodeValid;
 }
 
-void RegistrationCode::storeCode(const QString &code) const
+QDateTime RegistrationCode::getEndTime()
 {
-    QFile file(localFile);
-    if (file.open(QIODevice::WriteOnly))
-    {
-        QJsonObject json;
-        json["registration_code"] = code;
-        json["stored_time"] = QDateTime::currentDateTime().toSecsSinceEpoch();
-        file.write(QJsonDocument(json).toJson());
-    }
-}
-
-QJsonObject RegistrationCode::loadCode() const
-{
-    QFile file(localFile);
-    if (file.open(QIODevice::ReadOnly))
-    {
-        return QJsonDocument::fromJson(file.readAll()).object();
-    }
-    return QJsonObject();
+    return m_end_time;
 }

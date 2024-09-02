@@ -11,6 +11,7 @@ endif()
 
 # 生成
 add_executable(${PROJECT_NAME}
+    qthelper.cpp
     main.cpp
     "app_win32.rc"
 )
@@ -23,3 +24,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
 )
+
+
+if(WIN32)
+    set(LIB_PATH C:/Users/tian_sj/Desktop/Projects/ChuanQiHMI_bin)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:${PROJECT_NAME}>
+        ${LIB_PATH}
+    )
+endif()

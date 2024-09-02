@@ -1,43 +1,22 @@
 ﻿#include <app/mainwindow.h>
-#include <FramelessWidget/FramelessWidget.h>
-#include <app/SuperAdmin/superadmin.h>
-#include <app/Admin/admin.h>
-#include <app/User/user.h>
 #include <QFile>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QWidget(parent),
-    frameless_widget(new FramelessWidget(this))
+#include "ui_mainwindow.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::MainWindow)
 {
+    ui->setupUi(this);
+
+    treeView = new QTreeView(this);
+    model = new QStandardItemModel(this);
+    treeView->setModel(model);
+
+    
 }
 
 MainWindow::~MainWindow()
-{
-}
-
-std::unique_ptr<MainWindow> MainWindow::create(int role, QString username)
-{
-    switch (role) {
-    case 0:
-        return std::make_unique<SurperAdmin::SurperAdminWindow>();
-    case 1:
-        return std::make_unique<Admin::AdminWindow>();
-    case 2:
-        return std::make_unique<User::UserWindow>(username);
-    default:
-        return std::make_unique<MainWindow>();
-    }
-}
-
-void MainWindow::initUI()
-{
-}
-
-void MainWindow::initUIText()
-{
-}
-
-void MainWindow::initConnect()
 {
 }
 

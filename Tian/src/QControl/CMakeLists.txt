@@ -22,5 +22,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # add_subdirectory(lightbutton)
 # add_subdirectory(QCustomPlot)
-# add_subdirectory(RegistrationCode)
+add_subdirectory(RegistrationCode)
 add_subdirectory(FramelessWidget)
+add_subdirectory(ComTool)
+add_subdirectory(NetTool)

@@ -1,0 +1,141 @@
+﻿#background {
+    border: none;
+    border-image: url(:/images/LoginBackground.png);
+}
+
+#groupBackground {
+    border: none;
+}
+
+#group_in_left {
+    border: none;
+    border-image: url(:/images/group_in_left.png);
+}
+
+#group_in_right {
+    border: none;
+    border-image: url(:/images/group_in_right.png);
+}
+
+#lab_logo {
+    border: none;
+    border-image: url(:/images/Logo.png);
+}
+
+#lab_username, #lab_password, #lab_role {
+    color: darkgray;
+    font-size: 12px;
+    font-family: Arial, sans-serif;
+}
+
+#username, #password {
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+#username:focus, #password:focus {
+    border: 1px solid #0078d7;
+}
+
+#role {
+    color: #666666;
+    font-size: 14px;
+    padding: 1px 15px 1px 3px;
+    border: 1px solid rgba(228, 228, 228, 1);
+    border-radius: 5px 5px 0px 0px;
+}
+
+#role::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border: none;
+}
+
+#role::down-arrow {
+    border-image: url(:/images/down_arrow.png);
+}
+    
+#role QAbstractItemView {
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(228, 228, 228, 1);
+    border-radius: 0px 0px 5px 5px;
+    font-size: 14px;
+    outline: 0px;
+}
+
+#role QAbstractItemView::item {
+    height: 36px;
+    color: #666666;
+    padding-left: 9px;
+    background-color: #ffffff;
+}
+
+#role QAbstractItemView::item:hover {
+    background-color: #409CE1;
+    color: #ffffff;
+}
+
+#role QAbstractItemView::item:selected {
+    background-color: #409CE1;
+    color: #ffffff;
+}
+
+#role:on {
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+#role::down-arrow:on {
+    top: 1px;
+    left: 1px;
+}
+
+#btn_login {
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    padding: 5px;
+    border: 1px solid #0078d7;
+    border-radius: 5px;
+    background-color: #0078d7;
+    color: white;
+}
+
+#btn_login:hover {
+    background-color: #005bb5;
+}
+
+#btn_login:pressed {
+    background-color: #003f7f;
+}
+
+#lab_error_username, #lab_error_password {
+    font-size: 12px;
+    color: red;
+    font-family: Arial, sans-serif;
+    margin-top: 0px;
+}
+
+#btn_close {
+    border-image: url(:/images/close.png);
+}
+
+#btn_close:hover {
+    border-image: url(:/images/close_hover.png);
+}
+
+#lab_top, #lab_center {
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+#lab_bottom {
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+}
