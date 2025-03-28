@@ -1,36 +1,37 @@
-﻿# 执行程序生成路径
 if(WIN32)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/windows)
-#windows系统动态库生成lib文件命令
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    set(APP_ICON "${CMAKE_CURRENT_BINARY_DIR}/app_win32.rc")
+    file(WRITE ${APP_ICON}
+        "IDI_ICON1 ICON \"${CMAKE_SOURCE_DIR}/icons/logo.ico\"\n"
+    )
 elseif(APPLE)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/macos)
-else(UNIX)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/linux)
+    # 设置 MACOSX_BUNDLE_ICON_FILE，只要是文件名，不要路径
+    set(MACOSX_BUNDLE_ICON_FILE logo.icns)
+
+    # 设置资源文件路径
+    set(MACOSX_BUNDLE_BUNDLE_ICON_PATH icons)
+
+    # 添加资源文件到工程
+    set(app_icon_mac "${CMAKE_SOURCE_DIR}/icons/logo.icns")
+    set_source_files_properties(${app_icon_mac} PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources"
+    )
+
+    set(APP_ICON ${app_icon_mac})
 endif()
 
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
 # 生成
-add_executable(${PROJECT_NAME}
-    qthelper.cpp
+qt_add_executable(${PROJECT_NAME}
     main.cpp
-    "app_win32.rc"
+    ${APP_ICON}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    app
+    gui
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
 )
-
-
-if(WIN32)
-    set(LIB_PATH C:/Users/tian_sj/Desktop/Projects/ChuanQiHMI_bin)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        $<TARGET_FILE:${PROJECT_NAME}>
-        ${LIB_PATH}
-    )
-endif()

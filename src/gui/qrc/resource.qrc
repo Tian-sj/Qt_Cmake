@@ -1,0 +1,31 @@
+﻿<RCC>
+    <qresource prefix="/GUI">
+        <file>languages/gui_cn.qm</file>
+        <file>languages/gui_en.qm</file>
+
+        <file>css/Light/gui-themes.css</file>
+
+        <file>fonts/NotoSansSC-VariableFont_wght.ttf</file>
+        <file>fonts/NotoSerif-Italic-VariableFont_wdth,wght.ttf</file>
+        <file>fonts/NotoSerif-VariableFont_wdth,wght.ttf</file>
+
+        <file>images/checkbox_checked_light.png</file>
+        <file>images/checkbox_disabled_light.png</file>
+        <file>images/checkbox_indeterminate_light.png</file>
+        <file>images/checkbox_indeterminate_dis_light.png</file>
+        <file>images/xiangxia.png</file>
+        <file>images/up_arrow.png</file>
+        <file>images/down_arrow.png</file>
+        <file>images/icon-oc-date.png</file>
+        <file>images/left-arrow.png</file>
+        <file>images/right-arrow.png</file>
+        <file>images/Assessment.png</file>
+        <file>images/Assessment@2x.png</file>
+        <file>images/Communication.png</file>
+        <file>images/Communication@2x.png</file>
+        <file>images/FMTest.png</file>
+        <file>images/FMTest@2x.png</file>
+        <file>images/Realtimedata.png</file>
+        <file>images/Realtimedata@2x.png</file>
+    </qresource>
+</RCC>
