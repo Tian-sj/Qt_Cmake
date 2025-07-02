@@ -1,5 +1,6 @@
 ﻿#include "gui/mainwindow.hpp"
 #include "gui/registrationexpirationreminder.hpp"
+#include "gui/config.hpp"
 
 #include <QVBoxLayout>
 #include <QTimer>

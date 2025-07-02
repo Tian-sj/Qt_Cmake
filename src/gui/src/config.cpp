@@ -1,5 +1,6 @@
 ﻿#include "gui/config.hpp"
 
+#include <magic_enum/magic_enum.hpp>
 #include <QApplication>
 #include <QFontDatabase>
 #include <QSettings>
@@ -197,8 +198,8 @@ void Config::getTranslationFileNames() {
 
 QString Config::fontDir(Font font) {
     switch (font) {
-    case Font::Inter: return ":/GUI/fonts/Inter";
-    case Font::Noto_Sans_SC : return ":/GUI/fonts/Noto_Sans_SC";
+    case Font::Inter: return QCoreApplication::applicationDirPath() + "/fonts/Inter";
+    case Font::Noto_Sans_SC : return QCoreApplication::applicationDirPath() + "/fonts/Noto_Sans_SC";
     default: return "";
     }
 }
@@ -211,6 +212,7 @@ void Config::loadFonts() {
 void Config::loadFontDir(Font font, const QString &dir_path) {
     QStringList families;
 
+    // 遍历资源目录下的所有 .ttf / .otf 字体文件
     QDirIterator it(dir_path, QStringList() << "*.ttf" << "*.otf", QDir::Files);
     while (it.hasNext()) {
         QString filePath = it.next();

@@ -1,18 +1,6 @@
 ﻿#pragma once
 
 #include "gui/mainobject.hpp"
-#include "gui/config.hpp"
-
-#include <QWidget>
-#include <QTreeView>
-#include <QStandardItemModel>
-#include <QMainWindow>
-#include <QStackedWidget>
-#include <QComboBox>
-#include <QTableView>
-#include <QDateEdit>
-#include <QPushButton>
-#include <QComboBox>
 
 class QTimer;
 class Cache;

@@ -9,8 +9,6 @@
 #include "version.h"
 
 #include <RegistrationCode/registrationcode.hpp>
-#include <magic_enum/magic_enum.hpp>
-#include <QMap>
 #include <QHash>
 #include <QVector>
 #include <QFont>
@@ -309,7 +307,7 @@ private:
     QSettings* m_settings;
     RegistrationCode* m_reg_code;
 
-    QMap<Language, QStringList> map_language_path;
+    QHash<Language, QStringList> map_language_path;
     QVector<QTranslator*> translators;
     RegistrationCode::ERROT_TYPE m_registration_code_error_type;
 

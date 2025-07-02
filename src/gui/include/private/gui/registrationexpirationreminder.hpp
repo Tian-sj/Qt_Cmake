@@ -3,7 +3,6 @@
 #include "gui/mainobject.hpp"
 
 #include <QDialog>
-#include <QTimer>
 
 namespace Ui {
 class RegistrationExpirationReminder;

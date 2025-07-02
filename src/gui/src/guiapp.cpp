@@ -7,7 +7,6 @@
 #include <QWidget>
 #include <QMessageBox>
 #include <QFontDatabase>
-#include <QChar>
 
 GuiApp::GuiApp(int &argc, char **argv)
     : app(std::make_unique<QApplication>(argc, argv))

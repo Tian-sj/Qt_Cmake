@@ -1,7 +1,7 @@
 # 项目目录结构
 
 ```plaintext
-Qt_CMake/
+TRM2Oxy/
 ├── src/                      # 源代码目录
 │   ├── gui/                  # GUI 相关代码
 │   ├── RegistrationCode      # 注册码类
