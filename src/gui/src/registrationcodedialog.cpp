@@ -1,5 +1,5 @@
-﻿#include "gui/registrationcodedialog.h"
-#include "gui/config.h"
+﻿#include "gui/registrationcodedialog.hpp"
+#include "gui/config.hpp"
 
 #include <QClipboard>
 #include <QFile>
@@ -27,14 +27,14 @@ void RegistrationCodeDialog::init_ui()
 {
     this->loadCSS(this, "");
     ui->lab_uuid->setText("UUID");
-    ui->uuid->setText(Config::get_instance().get_unique_system_identifier());
+    ui->uuid->setText(Config::getInstance().getUniqueSystemIdentifier());
 }
 
 void RegistrationCodeDialog::init_ui_text()
 {
     ui->btn_copy->setText(tr("Copy"));
     ui->btn_activate->setText(tr("Activate"));
-    ui->text->setPlainText(Config::get_instance().get_registration_code());
+    ui->text->setPlainText(Config::getInstance().getRegistrationCode());
 }
 
 void RegistrationCodeDialog::init_connect()
@@ -52,12 +52,12 @@ void RegistrationCodeDialog::on_btn_copy_clicked()
 void RegistrationCodeDialog::on_btn_activate_clicked()
 {
     QString code = ui->text->toPlainText();
-    bool valid =  Config::get_instance().validate_code(code);
+    bool valid =  Config::getInstance().validateCode(code);
     if (valid) {
-        Config::get_instance().set_registration_code(code);
+        Config::getInstance().setRegistrationCode(code);
         return accept();
     } else {
-        switch (Config::get_instance().get_registration_code_error_type())
+        switch (Config::getInstance().getRegistrationCodeErrorType())
         {
         case RegistrationCode::ERROT_TYPE::RegistrationCodeInvalidFormat:
             ui->lab_error->setText(tr("Invalid registration code format"));

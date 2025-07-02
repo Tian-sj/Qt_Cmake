@@ -1,4 +1,4 @@
-﻿#include "gui/dragdropplaintexteditrc.h"
+﻿#include "gui/dragdropplaintexteditrc.hpp"
 
 #include <QApplication>
 #include <QWidget>

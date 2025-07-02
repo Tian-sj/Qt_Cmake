@@ -1,14 +1,32 @@
 ﻿<RCC>
     <qresource prefix="/GUI">
+        <!-- 语言 -->
         <file>languages/gui_cn.qm</file>
         <file>languages/gui_en.qm</file>
-
+        <!-- 主题 -->
         <file>css/Light/gui-themes.css</file>
-
-        <file>fonts/NotoSansSC-VariableFont_wght.ttf</file>
-        <file>fonts/NotoSerif-Italic-VariableFont_wdth,wght.ttf</file>
-        <file>fonts/NotoSerif-VariableFont_wdth,wght.ttf</file>
-
+        <!-- Inter 字体 -->
+        <file>fonts/Inter/Inter-Black-3.otf</file>
+        <file>fonts/Inter/Inter-Bold-4.otf</file>
+        <file>fonts/Inter/Inter-ExtraBold-5.otf</file>
+        <file>fonts/Inter/Inter-ExtraLight-6.otf</file>
+        <file>fonts/Inter/Inter-Light-7.otf</file>
+        <file>fonts/Inter/Inter-Medium-8.otf</file>
+        <file>fonts/Inter/Inter-Regular-9.otf</file>
+        <file>fonts/Inter/Inter-SemiBold-10.otf</file>
+        <file>fonts/Inter/Inter-Thin-11.otf</file>
+        <file>fonts/Inter/Inter-var-2.ttf</file>
+        <!-- Noto Sans SC 字体 -->
+        <file>fonts/Noto_Sans_SC/NotoSansSC-Black.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-Bold.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-ExtraBold.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-ExtraLight.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-Light.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-Medium.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-Regular.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-SemiBold.ttf</file>
+        <file>fonts/Noto_Sans_SC/NotoSansSC-Thin.ttf</file>
+        <!-- 图片 -->
         <file>images/checkbox_checked_light.png</file>
         <file>images/checkbox_disabled_light.png</file>
         <file>images/checkbox_indeterminate_light.png</file>

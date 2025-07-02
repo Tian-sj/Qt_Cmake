@@ -1,11 +1,13 @@
-﻿#include "gui/guiapp.h"
-#include "gui/mainwindow.h"
-#include "gui/config.h"
-#include "gui/registrationcodedialog.h"
+﻿#include "gui/guiapp.hpp"
+#include "gui/mainwindow.hpp"
+#include "gui/config.hpp"
+#include "gui/registrationcodedialog.hpp"
 
 #include <QApplication>
 #include <QWidget>
 #include <QMessageBox>
+#include <QFontDatabase>
+#include <QChar>
 
 GuiApp::GuiApp(int &argc, char **argv)
     : app(std::make_unique<QApplication>(argc, argv))
@@ -19,23 +21,29 @@ GuiApp::~GuiApp() {
 int GuiApp::run() {
     set_default_style();
 
-    Config& config = Config::get_instance();
+    Config& config = Config::getInstance();
 
-    config.set_language(config.get_language());
-    config.set_theme(config.get_theme());
+    config.setLanguage(config.getLanguage());
+    config.setTheme(config.getTheme());
+
+    QFont app_font = config.getFont(Config::Font::Inter, 14, QFont::Normal);
+    app_font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferDefault | QFont::ContextFontMerging));
+    app->setFont(app_font);
+
+    QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Han, config.getFontFamilies(Config::Font::Noto_Sans_SC));
 
 #if 0
-    config.delete_registration_code();
+    config.deleteRegistrationCode();
 #endif
 
-    if (QDateTime::currentDateTime() <= config.get_app_runtime() || (!config.get_registration_code().isEmpty() && config.get_app_runtime().isNull())) {
+    if (QDateTime::currentDateTime() <= config.getAppRuntime() || (!config.getRegistrationCode().isEmpty() && config.getAppRuntime().isNull())) {
         QMessageBox::critical(nullptr, "Error", "The application has expired, please contact the vendor for a new license key.");
         return 0;
     }
 
-    config.set_app_runtime(QDateTime::currentDateTime());
+    config.setAppRuntime(QDateTime::currentDateTime());
 
-    if (!config.validate_code(config.get_registration_code())) {
+    if (!config.validateCode(config.getRegistrationCode())) {
         RegistrationCodeDialog *reg_code_dialog = new RegistrationCodeDialog();
         if (reg_code_dialog->exec() != QDialog::Accepted)
             return 0;

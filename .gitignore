@@ -1,0 +1,16 @@
+# 忽略日志文件
+*.log
+
+# 忽略编译生成的文件
+*.o
+*.out
+*.exe
+build/
+bin/
+
+# 忽略 IDE 的临时文件
+.vscode/
+.cache/
+.idea/
+*.swp
+*.user

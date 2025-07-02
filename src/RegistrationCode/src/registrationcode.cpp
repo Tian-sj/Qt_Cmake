@@ -1,4 +1,5 @@
-﻿#include <RegistrationCode/registrationcode.h>
+﻿#include "RegistrationCode/registrationcode.hpp"
+
 #include <QCryptographicHash>
 #include <QFile>
 #include <QDebug>

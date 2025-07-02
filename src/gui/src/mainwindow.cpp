@@ -1,11 +1,13 @@
-﻿#include "gui/mainwindow.h"
-#include "gui/registrationexpirationreminder.h"
-#include "ui_mainwindow.h"
+﻿#include "gui/mainwindow.hpp"
+#include "gui/registrationexpirationreminder.hpp"
+
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QTextLayout>
 
+#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
@@ -19,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
     init_ui();
     init_ui_text();
     init_connect();
-
 }
 
 MainWindow::~MainWindow()
@@ -28,7 +29,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::init_ui() {
 
-    loadCSS(this, Config::get_instance().get_theme_path() + "gui-themes.css");
+    loadCSS(this, Config::getInstance().getThemePath() + "gui-themes.css");
 
     timer_rc->setInterval(60000);
     timer_rc->start();
@@ -41,11 +42,12 @@ void MainWindow::init_connect(){
 
 void MainWindow::init_ui_text(){
     ui->retranslateUi(this);
+    this->setWindowTitle(tr(_NAME));
 }
 
 void MainWindow::on_timer_rc()
 {
-    if (is_show && !is_current_show && Config::get_instance().check_expiration_reminder()) {
+    if (is_show && !is_current_show && Config::getInstance().checkExpirationReminder()) {
         RegistrationExpirationReminder *rer = new RegistrationExpirationReminder(&is_show);
         is_current_show = true;
         rer->exec();
@@ -54,16 +56,16 @@ void MainWindow::on_timer_rc()
         rer = nullptr;
     }
 
-    if (QDateTime::currentDateTime() < Config::get_instance().get_app_runtime()) {
+    if (QDateTime::currentDateTime() < Config::getInstance().getAppRuntime()) {
         QMessageBox::critical(nullptr, "Error", "The application has expired, please contact the vendor for a new license key.");
         qApp->exit();
     }
 
-    if (QDateTime::currentDateTime() > Config::get_instance().get_app_runtime()) {
-        Config::get_instance().set_app_runtime(QDateTime::currentDateTime());
+    if (QDateTime::currentDateTime() > Config::getInstance().getAppRuntime()) {
+        Config::getInstance().setAppRuntime(QDateTime::currentDateTime());
     }
 
-    if (QDateTime::currentDateTime() >= Config::get_instance().get_end_time()) {
+    if (QDateTime::currentDateTime() >= Config::getInstance().getEndTime()) {
         qApp->exit();
     }
 }

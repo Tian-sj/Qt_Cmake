@@ -3,7 +3,7 @@
     background-color: #FFFFFF;
 }
 
-QPushButton, QToolButton {
+QPushButton[styleType="blue"], QToolButton[styleType="blue"] {
     font: inherit;
     background-color: #2F51FF;
     color: #FFFFFF;
@@ -11,7 +11,7 @@ QPushButton, QToolButton {
     border-radius: 4px; 
 }
 
-QPushButton:hover, QToolButton:hover {
+QPushButton[styleType="blue"]:hover, QToolButton[styleType="blue"]:hover {
     font: inherit;
     background-color: #506DFF;
     color: #FFFFFF;
@@ -19,7 +19,7 @@ QPushButton:hover, QToolButton:hover {
     border: 2px solid #EFF4FF;
 }
 
-QPushButton:pressed, QToolButton:pressed {
+QPushButton[styleType="blue"]:pressed, QToolButton[styleType="blue"]:pressed {
     font: inherit;
     background-color: #2744D6;
     color: #FFFFFF;
@@ -27,7 +27,7 @@ QPushButton:pressed, QToolButton:pressed {
     border-radius: 4px; 
 }
 
-QPushButton:disabled, QToolButton:disabled {
+QPushButton[styleType="blue"]:disabled, QToolButton[styleType="blue"]:disabled {
     font: inherit;
     background-color: #E6E8EB;
     color: #BBBDBF;
@@ -35,7 +35,7 @@ QPushButton:disabled, QToolButton:disabled {
     border-radius: 4px; 
 }
 
-QRadioButton::indicator {
+QRadioButton[styleType="blue"]::indicator {
     font: inherit;
     width: 14px;
     height: 14px;
@@ -44,7 +44,7 @@ QRadioButton::indicator {
     background: #FFFFFF;                
 }
 
-QRadioButton::indicator:checked {
+QRadioButton[styleType="blue"]::indicator:checked {
     font: inherit;
     width: 8px;
     height: 8px;
@@ -53,29 +53,29 @@ QRadioButton::indicator:checked {
     background: #FFFFFF;                
 }
 
-QRadioButton::indicator:hover {
+QRadioButton[styleType="blue"]::indicator:hover {
     font: inherit;
     border-color: #506DFF;
 }
 
-QRadioButton::indicator:pressed {
+QRadioButton[styleType="blue"]::indicator:pressed {
     font: inherit;
     background: #2744D6;
 }
 
-QRadioButton::indicator:disabled {
+QRadioButton[styleType="blue"]::indicator:disabled {
     font: inherit;
     border: 1px solid #D4D6D9;         
     background: #E6E8EB;                
 }
 
-QRadioButton::indicator:checked:disabled {
+QRadioButton[styleType="blue"]::indicator:checked:disabled {
     font: inherit;
     border: 4px solid #E6E8EB;
     background: #D4D6D9;                
 }
 
-QCheckBox::indicator {
+QCheckBox[styleType="blue"]::indicator {
     font: inherit;
     width: 14px;
     height: 14px;
@@ -84,7 +84,7 @@ QCheckBox::indicator {
     background: #FFFFFF;                
 }
 
-QCheckBox::indicator:checked {
+QCheckBox[styleType="blue"]::indicator:checked {
     font: inherit;
     width: 16px;
     height: 16px;
@@ -93,7 +93,7 @@ QCheckBox::indicator:checked {
     border-image: url(:/GUI/images/checkbox_checked_light.png);
 }
 
-QCheckBox::indicator:indeterminate {
+QCheckBox[styleType="blue"]::indicator:indeterminate {
     font: inherit;
     width: 16px;
     height: 16px;
@@ -101,7 +101,7 @@ QCheckBox::indicator:indeterminate {
     border-image: url(:/GUI/images/checkbox_indeterminate_light.png);
 }
 
-QCheckBox::indicator:indeterminate:disabled {
+QCheckBox[styleType="blue"]::indicator:indeterminate:disabled {
     font: inherit;
     width: 16px;
     height: 16px;
@@ -109,23 +109,23 @@ QCheckBox::indicator:indeterminate:disabled {
     border-image: url(:/GUI/images/checkbox_indeterminate_dis_light.png);
 }
 
-QCheckBox::indicator:hover {
+QCheckBox[styleType="blue"]::indicator:hover {
     font: inherit;
     border-color: #506DFF;
 }
 
-QCheckBox::indicator:pressed {
+QCheckBox[styleType="blue"]::indicator:pressed {
     font: inherit;
     background: #2744D6;
 }
 
-QCheckBox::indicator:disabled {
+QCheckBox[styleType="blue"]::indicator:disabled {
     font: inherit;
     border: 1px solid #D4D6D9;         
     background: #E6E8EB;                
 }
 
-QCheckBox::indicator:checked:disabled {
+QCheckBox[styleType="blue"]::indicator:checked:disabled {
     font: inherit;
     width: 16px;
     height: 16px;
@@ -134,7 +134,7 @@ QCheckBox::indicator:checked:disabled {
     border-image: url(:/GUI/images/checkbox_disabled_light.png);
 }
 
-QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+QLineEdit[styleType="blue"], QComboBox[styleType="blue"], QSpinBox[styleType="blue"], QDoubleSpinBox[styleType="blue"] {
     font: inherit;
     padding-left: 8px;
     border-radius: 4px;
@@ -143,28 +143,28 @@ QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
     padding-right: 20px;
 }
 
-QLineEdit:hover, QComboBox:hover, QSpinBox:hover, QDoubleSpinBox:hover {
+QLineEdit[styleType="blue"]:hover, QComboBox[styleType="blue"]:hover, QSpinBox[styleType="blue"]:hover, QDoubleSpinBox[styleType="blue"]:hover {
     font: inherit;
     border-radius: 4px;
     border: 1px solid #2F51FF;
     background-color: #FFFFFF;
 }
 
-QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+QLineEdit[styleType="blue"]:focus, QComboBox[styleType="blue"]:focus, QSpinBox[styleType="blue"]:focus, QDoubleSpinBox[styleType="blue"]:focus {
     font: inherit;
     border-radius: 4px;
     border: 2px solid #2F51FF;
     background-color: #FFFFFF;
 }
 
-QComboBox::drop-down {
+QComboBox[styleType="blue"]::drop-down {
     font: inherit;
     border-radius: 4px;
     border: none;
     background-color: #FFFFFF;
 }
 
-QComboBox::down-arrow {
+QComboBox[styleType="blue"]::down-arrow {
     font: inherit;
     padding-right: 8px;
     image: url(:/GUI/images/xiangxia.png);
@@ -173,29 +173,29 @@ QComboBox::down-arrow {
 }
 
 /* 上下按钮区域 */
-QSpinBox::up-button, QSpinBox::down-button,
-QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+QSpinBox[styleType="blue"]::up-button, QSpinBox[styleType="blue"]::down-button,
+QDoubleSpinBox[styleType="blue"]::up-button, QDoubleSpinBox[styleType="blue"]::down-button {
     font: inherit;
     width: 16px;              
     border-radius: 4px;
     border: 1px solid #f0f0f0;
 }
 
-QSpinBox::up-button:hover, QSpinBox::down-button:hover,
-QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+QSpinBox[styleType="blue"]::up-button:hover, QSpinBox[styleType="blue"]::down-button:hover,
+QDoubleSpinBox[styleType="blue"]::up-button:hover, QDoubleSpinBox[styleType="blue"]::down-button:hover {
     font: inherit;
     border-radius: 4px;
     border: 1px solid #e0e0e0; 
 }
 
-QSpinBox::up-button:pressed, QSpinBox::down-button:pressed {
+QSpinBox[styleType="blue"]::up-button:pressed, QSpinBox[styleType="blue"]::down-button:pressed {
     font: inherit;
     border-radius: 4px;
     border: 1px solid #d0d0d0;
 }
 
 /* 自定义上箭头图标 */
-QSpinBox::up-arrow, QDoubleSpinBox:up-arrow {
+QSpinBox[styleType="blue"]::up-arrow, QDoubleSpinBox[styleType="blue"]:up-arrow {
     font: inherit;
     image: url(:/GUI/images/up_arrow.png);
     width: 8px;
@@ -203,7 +203,7 @@ QSpinBox::up-arrow, QDoubleSpinBox:up-arrow {
 }
 
 /* 自定义下箭头图标 */
-QSpinBox::down-arrow, QDoubleSpinBox:down-arrow {
+QSpinBox[styleType="blue"]::down-arrow, QDoubleSpinBox[styleType="blue"]:down-arrow {
     font: inherit;
     image: url(:/GUI/images/down_arrow.png);
     width: 8px;
@@ -213,14 +213,14 @@ QSpinBox::down-arrow, QDoubleSpinBox:down-arrow {
 
 
 /* 优化 QTabWidget 的整体样式 */
-QTabWidget::pane {
+QTabWidget[styleType="blue"]::pane {
     border: 1px solid #dcdcdc; /* 边框颜色 */
     background: #f8f8f8; /* 背景颜色 */
     border-radius: 5px; /* 圆角效果 */
 }
 
 /* 优化 QTabBar 的标签样式 */
-QTabBar::tab {
+QTabBar[styleType="blue"]::tab {
     background: #e6e6e6; /* 默认标签背景颜色 */
     border: 1px solid #cccccc; /* 边框颜色 */
     border-bottom: none; /* 去掉底部边框 */
@@ -232,34 +232,34 @@ QTabBar::tab {
 }
 
 /* 鼠标悬停时的标签样式 */
-QTabBar::tab:hover {
+QTabBar[styleType="blue"]::tab:hover {
     background: #d6d6d6; /* 悬停时的背景颜色 */
     color: #000000; /* 悬停时的文字颜色 */
 }
 
 /* 当前选中标签的样式 */
-QTabBar::tab:selected {
+QTabBar[styleType="blue"]::tab:selected {
     background: #0078d7; /* 选中标签的背景颜色 */
     color: white; /* 选中标签的文字颜色 */
     font-weight: bold; /* 加粗选中文字 */
 }
 
 /* 未选中标签的样式 */
-QTabBar::tab:!selected {
+QTabBar[styleType="blue"]::tab:!selected {
     margin-top: 2px; /* 与选中标签的间距 */
 }
 
 
 /* 优化标签栏的位置（在顶部时） */
-QTabBar::tab:first {
+QTabBar[styleType="blue"]::tab:first {
     margin-left: 5px; /* 第一个标签的左间距 */
 }
-QTabBar::tab:last {
+QTabBar[styleType="blue"]::tab:last {
     margin-right: 5px; /* 最后一个标签的右间距 */
 }
 
 /* 优化 QTabWidget 的内容区域 */
-QTabWidget::pane {
+QTabWidget[styleType="blue"]::pane {
     background: #ffffff; /* 内容区域背景颜色 */
     border: 1px solid #cccccc; /* 边框颜色 */
     border-radius: 0px 0px 5px 5px; /* 内容区域的圆角 */
@@ -267,16 +267,16 @@ QTabWidget::pane {
 }
 
 /* 滚动条样式（如果有滚动） */
-QScrollBar:vertical {
+QScrollBar[styleType="blue"]:vertical {
     width: 8px;
     background: #f0f0f0;
     border: none;
 }
-QScrollBar::handle:vertical {
+QScrollBar[styleType="blue"]::handle:vertical {
     background: #0078d7;
     border-radius: 4px;
 }
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+QScrollBar[styleType="blue"]::add-line:vertical, QScrollBar[styleType="blue"]::sub-line:vertical {
     background: none;
 }
 

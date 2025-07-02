@@ -1,4 +1,4 @@
-# cmake/CustomCommands.cmake
+﻿# cmake/CustomCommands.cmake
 
 function(add_post_build_copy TARGET_NAME DESTINATION_PATH)
     add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
@@ -13,10 +13,10 @@ endfunction()
 function(add_resources TARGET_NAME QRC_FILE RESOURCE_PATH)
     # 检查当前系统
     if (WIN32)
-        set(Qt6_RCC_EXECUTABLE "C:/Qt/6.8.0/msvc2022_64/bin/rcc")
-        set(FINAL_RESOURCE_PATH ${RESOURCE_PATH})
+        set(Qt6_RCC_EXECUTABLE "C:/Qt/6.8.3/msvc2022_64/bin/rcc")
+        set(FINAL_RESOURCE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${RESOURCE_PATH})
     elseif(APPLE)
-        set(Qt6_RCC_EXECUTABLE "/opt/Qt/6.8.1/macos/libexec/rcc")
+        set(Qt6_RCC_EXECUTABLE "/opt/Qt/6.8.3/macos/libexec/rcc")
         set(FINAL_RESOURCE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_NAME}.app/Contents/MacOS/${RESOURCE_PATH})
     else()
         message(FATAL_ERROR "Unsupported platform for resource generation.")

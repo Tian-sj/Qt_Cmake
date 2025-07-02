@@ -1,1 +1,5 @@
-﻿include("/Users/tian_sj/code/third_party/third_party.cmake")
+﻿if(APPLE)
+    include("/Users/tian_sj/code/third_party/third_party.cmake")
+elseif(WIN32)
+    include("C:/Users/tian_sj/Desktop/Projects/third_party/third_party.cmake")
+endif()

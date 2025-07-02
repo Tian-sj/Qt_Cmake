@@ -4,16 +4,16 @@
  * @author        Tian_sj
  * @date          2024-12-18
  */
+#pragma once
 
-#ifndef GUIEXT_HPP
-#define GUIEXT_HPP
-
-#include "gui/signalmanager.h"
+#include "gui/signalmanager.hpp"
 
 #include <QObject>
 
 /*!
  * @brief         Connection language modification of the template function that triggers the refresh of the text
+ *
+ * 对触发文本刷新的模板函数进行连接语言修改
  * 
  * @tparam        T
  * @param         obj
@@ -25,5 +25,3 @@ void connect_language_changed(T* obj) {
         obj->invoke_init_ui_text();
     });
 }
-
-#endif // GUIEXT_HPP

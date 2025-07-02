@@ -1,10 +1,15 @@
 ﻿# 指定CMake的最低版本
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25)
+
+get_filename_component(CUR_DIR_NAME
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    NAME
+)
 
 # 软件版本
-set(_VERSION 0.0.1.241129_beta)
+set(_VERSION 0.0.1.250701_beta)
 set(_DEVELOPER ChuanQi)
-set(_NAME FreqStation)
+set(_NAME ${CUR_DIR_NAME})
 set(_SUPPORT_URL )
 
 if(UNIX)
@@ -30,13 +35,15 @@ endif()
 configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_BINARY_DIR}/version.h)
 include_directories(${CMAKE_BINARY_DIR})
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # 指定工程名
 project(${_NAME} LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 执行程序生成路径
 if(WIN32)

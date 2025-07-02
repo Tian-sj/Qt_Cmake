@@ -1,5 +1,5 @@
-﻿#include "gui/registrationexpirationreminder.h"
-#include "gui/config.h"
+﻿#include "gui/registrationexpirationreminder.hpp"
+#include "gui/config.hpp"
 
 #include "ui_registrationexpirationreminder.h"
 
@@ -30,7 +30,7 @@ void RegistrationExpirationReminder::init_ui()
 
 void RegistrationExpirationReminder::init_ui_text()
 {
-    ui->lab_message->setText(tr("Your registration code will expired at %1 , please update the registration code as soon as possible, otherwise the expiration program will terminate automatically.").arg(Config::get_instance().get_end_time().toString("yyyy-MM-dd HH:mm:ss")));
+    ui->lab_message->setText(tr("Your registration code will expired at %1 , please update the registration code as soon as possible, otherwise the expiration program will terminate automatically.").arg(Config::getInstance().getEndTime().toString("yyyy-MM-dd HH:mm:ss")));
     ui->checkBox->setText(tr("Don't show this reminder again"));
     // 确认
     ui->btn_verify->setText(tr("Verify"));

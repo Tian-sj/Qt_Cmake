@@ -1,4 +1,4 @@
-﻿#include "gui/signalmanager.h"
+﻿#include "gui/signalmanager.hpp"
 
 SignalManager &SignalManager::instance()
 {

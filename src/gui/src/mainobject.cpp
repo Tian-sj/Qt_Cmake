@@ -1,4 +1,4 @@
-﻿#include "gui/mainobject.h"
+﻿#include "gui/mainobject.hpp"
 #include "version.h"
 
 #include <QFile>

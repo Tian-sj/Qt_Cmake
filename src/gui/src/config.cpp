@@ -1,4 +1,4 @@
-﻿#include "gui/config.h"
+﻿#include "gui/config.hpp"
 
 #include <QApplication>
 #include <QFontDatabase>
@@ -6,27 +6,25 @@
 #include <QTranslator>
 #include <QResource>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QWidget>
 
-Config &Config::get_instance()
-{
+Config &Config::getInstance() {
     static Config instance;
     return instance;
 }
 
 Config::Config() 
     : m_settings(new QSettings(QSettings::NativeFormat, QSettings::UserScope, _DEVELOPER, _NAME))
-    , m_reg_code(new RegistrationCode(QString("%1_%2").arg(_DEVELOPER, _NAME).toLocal8Bit()))
-{
+    , m_reg_code(new RegistrationCode(QString("%1_%2").arg(_DEVELOPER, _NAME).toLocal8Bit())) {
     m_settings->setValue("version", _VERSION);
 
-    get_translation_file_names();
-    add_font();
+    getTranslationFileNames();
+    loadFonts();
 }
 
-Config::~Config()
-{
+Config::~Config() {
     if (m_settings) {
         delete m_settings;
         m_settings = nullptr;
@@ -40,20 +38,7 @@ Config::~Config()
     translators.clear();
 }
 
-void Config::set_language(const Language &language)
-{
-    switch (language) {
-    case Language::English:
-        set_font(Font::Noto_Serif);
-        break;
-    case Language::Chinese:
-        // set_font(Font::Noto_Sans_SC);
-        set_font(Font::Noto_Serif);
-        break;
-    default:
-        break;
-    }
-
+void Config::setLanguage(const Language &language) {
     auto name_view = magic_enum::enum_name(language);
     m_settings->setValue("Language", QString::fromUtf8(name_view.data(), static_cast<int>(name_view.size())));
 
@@ -65,8 +50,7 @@ void Config::set_language(const Language &language)
     }
 }
 
-Config::Language Config::get_language() const
-{
+Config::Language Config::getLanguage() const {
     auto name = magic_enum::enum_cast<Language>(m_settings->value("Language").toString().toStdString());
     if (name.has_value())
         return name.value();
@@ -74,21 +58,18 @@ Config::Language Config::get_language() const
         return Language::English;
 }
 
-void Config::set_theme(const Theme &theme)
-{
+void Config::setTheme(const Theme &theme) {
     auto name_view = magic_enum::enum_name(theme);
     QString path = QString::fromUtf8(name_view.data(), name_view.size());
     m_settings->setValue("Theme", path);
     theme_path = ":/GUI/css/" + path + "/";
 }
 
-QString Config::get_theme_path() const
-{
+QString Config::getThemePath() const {
     return theme_path;
 }
 
-Config::Theme Config::get_theme() const
-{
+Config::Theme Config::getTheme() const {
     auto name = magic_enum::enum_cast<Theme>(m_settings->value("Theme").toString().toStdString());
     if (name.has_value())
         return name.value();
@@ -96,51 +77,46 @@ Config::Theme Config::get_theme() const
         return Theme::Light;
 }
 
-void Config::set_current_user_id(const int &user_id)
-{
+QFont Config::getFont(Font primary, int pointSize, QFont::Weight weight) {
+    if (!font_families.contains(primary) || font_families[primary].isEmpty()) {
+        qWarning() << "[FontManager] Font not found for enum:" << static_cast<int>(primary);
+        return QFont();
+    }
+
+    QString family = font_families[primary].first();
+    QFont font(family);
+    font.setPointSize(pointSize);
+    font.setWeight(weight);
+    return font;
+}
+
+QStringList Config::getFontFamilies(Font font) {
+    return font_families[font];
+}
+
+void Config::setCurrentUserId(const int &user_id) {
     this->m_user_id = user_id;
 }
 
-int Config::get_current_user_id() const
-{
+int Config::getCurrentUserId() const {
     return this->m_user_id;
 }
 
-void Config::set_app_runtime(QDateTime runtime)
-{
+void Config::setAppRuntime(QDateTime runtime) {
     m_settings->setValue("App_runtime", runtime);
 }
 
-QDateTime Config::get_app_runtime() const
-{
+QDateTime Config::getAppRuntime() const {
     return m_settings->value("App_runtime").toDateTime();
 }
 
-void Config::set_font(const Font &font)
-{
-    QFont f(map_font_name[font]);
-    qApp->setFont(f);
-}
-
-void Config::display_font_families()
-{
-    QStringList fontFamilies = QFontDatabase::families();
-    qDebug() << "Available Fonts:";
-    for (const auto& family : fontFamilies) {
-        qDebug() << family;
-    }
-}
-
-void Config::registerResource(QString file)
-{
+void Config::registerResource(QString file) {
     qDebug() <<"registerResource:" << QResource::registerResource(file);
 }
 
-bool Config::validate_code(const QString &code)
-{
+bool Config::validateCode(const QString &code) {
     m_registration_code_error_type = m_reg_code->validateCode(code);
-    switch (m_registration_code_error_type)
-    {
+    switch (m_registration_code_error_type) {
     case RegistrationCode::ERROT_TYPE::RegistrationCodeValid:
     case RegistrationCode::ERROT_TYPE::RegistrationCodeAboutToExpire:
         return true;
@@ -153,32 +129,27 @@ bool Config::validate_code(const QString &code)
     }
 }
 
-void Config::set_registration_code(const QString& code) const
-{
+void Config::setRegistrationCode(const QString& code) const {
     m_settings->setValue("RegistrationCode", code.toLocal8Bit());
 }
 
-void Config::delete_registration_code() const
-{
+void Config::deleteRegistrationCode() const {
     m_settings->remove("RegistrationCode");
 }
 
-QString Config::get_registration_code() const
-{
+QString Config::getRegistrationCode() const {
     return QString::fromLocal8Bit(m_settings->value("RegistrationCode").toByteArray());
 }
 
-QString Config::get_unique_system_identifier() const
-{
+QString Config::getUniqueSystemIdentifier() const {
     return m_reg_code->getUniqueSystemIdentifier();
 }
 
-bool Config::check_expiration_reminder()
-{
+bool Config::checkExpirationReminder() {
     if (m_registration_code_error_type == RegistrationCode::ERROT_TYPE::RegistrationCodeAboutToExpire)
         return true;
     
-    if (is_within_x_days(3, QDateTime::currentDateTime(), m_reg_code->getEndTime())) {
+    if (isWithinXDays(3, QDateTime::currentDateTime(), m_reg_code->getEndTime())) {
         m_registration_code_error_type = RegistrationCode::ERROT_TYPE::RegistrationCodeAboutToExpire;
         return true;
     }
@@ -186,24 +157,20 @@ bool Config::check_expiration_reminder()
     return false;
 }
 
-QDateTime Config::get_end_time() const
-{
+QDateTime Config::getEndTime() const {
     return m_reg_code->getEndTime();
 }
 
-RegistrationCode::ERROT_TYPE Config::get_registration_code_error_type() const
-{
+RegistrationCode::ERROT_TYPE Config::getRegistrationCodeErrorType() const {
     return m_registration_code_error_type;
 }
 
-bool Config::is_within_x_days(const int day, const QDateTime& date_time_1, const QDateTime& date_time_2)
-{
+bool Config::isWithinXDays(const int day, const QDateTime& date_time_1, const QDateTime& date_time_2) {
     int days = qAbs(date_time_1.daysTo(date_time_2));
     return days < day;
 }
 
-void Config::get_translation_file_names()
-{
+void Config::getTranslationFileNames() {
     QString resourcePath = ":/GUI/languages/";
     QDir dir(resourcePath);
 
@@ -228,12 +195,36 @@ void Config::get_translation_file_names()
     }
 }
 
-void Config::add_font()
-{
-    int id;
-    id = QFontDatabase::addApplicationFont(":/GUI/fonts/NotoSansSC-VariableFont_wght.ttf");
-    map_font_name[Font::Noto_Sans_SC] = QFontDatabase::applicationFontFamilies(id).at(0);
-    id = QFontDatabase::addApplicationFont(":/GUI/fonts/NotoSerif-Italic-VariableFont_wdth,wght.ttf");
-    id = QFontDatabase::addApplicationFont(":/GUI/fonts/NotoSerif-VariableFont_wdth,wght.ttf");
-    map_font_name[Font::Noto_Serif] = QFontDatabase::applicationFontFamilies(id).at(0);
+QString Config::fontDir(Font font) {
+    switch (font) {
+    case Font::Inter: return ":/GUI/fonts/Inter";
+    case Font::Noto_Sans_SC : return ":/GUI/fonts/Noto_Sans_SC";
+    default: return "";
+    }
+}
+
+void Config::loadFonts() {
+    loadFontDir(Font::Inter, fontDir(Font::Inter));
+    loadFontDir(Font::Noto_Sans_SC, fontDir(Font::Noto_Sans_SC));
+}
+
+void Config::loadFontDir(Font font, const QString &dir_path) {
+    QStringList families;
+
+    QDirIterator it(dir_path, QStringList() << "*.ttf" << "*.otf", QDir::Files);
+    while (it.hasNext()) {
+        QString filePath = it.next();
+        int id = QFontDatabase::addApplicationFont(filePath);
+        if (id >= 0) {
+            QStringList loaded = QFontDatabase::applicationFontFamilies(id);
+            if (!loaded.isEmpty()) {
+                families << loaded.first();
+                qDebug() << "[FontManager] Loaded:" << filePath << "->" << loaded.first();
+            }
+        } else {
+            qWarning() << "[FontManager] Failed to load:" << filePath;
+        }
+    }
+
+    font_families[font] = families;
 }

@@ -6,7 +6,7 @@ add_executable(${cur_name}
 )
 
 target_link_libraries(${cur_name} PRIVATE
-    server
+    # server
 )
 
 # set_target_properties(${cur_name} PROPERTIES
