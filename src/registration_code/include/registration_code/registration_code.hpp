@@ -6,14 +6,14 @@
 
 class RegistrationCode {
 public:
-    RegistrationCode(const QByteArray &secretKey);
+    RegistrationCode(const QByteArray &secret_key);
 
-    enum class ERROT_TYPE {
-        RegistrationCodeValid,        // 注册码验证通过
-        RegistrationCodeInvalidFormat,// 注册码格式不正确
-        RegistrationCodeExpired,      // 注册码过期
-        RegistrationCodeAboutToExpire,// 注册码将要过期
-        RegistrationCodeInvalid       // 注册码验证不通过
+    enum class ErrorType {
+        REGISTRATION_CODE_VALID,            // 注册码验证通过
+        REGISTRATION_CODE_INVALID_FORMAT,   // 注册码格式不正确
+        REGISTRATION_CODE_EXPIRED,          // 注册码过期
+        REGISTRATION_CODE_ABOUT_TO_EXPIRE,  // 注册码将要过期
+        REGISTRATION_CODE_INVALID           // 注册码验证不通过
     };
 
     /*!
@@ -28,7 +28,7 @@ public:
      * @param         expirationDays
      * @return        QString
      */
-    QString generateCode(QString systemIdentifier, QDate expirationDays) const;
+    QString generateCode(QString system_identifier, QDate expiration_days) const;
 
     /*!
      * @brief         
@@ -38,7 +38,7 @@ public:
      * @return        false
      * @attention
      */
-    ERROT_TYPE validateCode(const QString &code);
+    ErrorType validateCode(const QString &code);
 
     QDateTime getEndTime();
 
@@ -52,6 +52,6 @@ private:
     QByteArray generateHash(const QString &input) const;
 
 private:
-    QByteArray secretKey;
-    QDateTime m_end_time;
+    QByteArray secret_key_;
+    QDateTime end_time_;
 };

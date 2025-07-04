@@ -1,6 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-Run the update_translations CMake target to populate the source strings in this file.
--->
 <!DOCTYPE TS>
-<TS version="2.1"/>
+<TS version="2.1" language="zh" sourcelanguage="en">
+<context>
+    <name>DragDropPlainTextEditRC</name>
+    <message>
+        <location filename="../src/drag_drop_plain_text_edit_rc.cpp" line="38"/>
+        <source>Invalid file type. Only .cqrc files are allowed.</source>
+        <translation>文件类型无效。只允许 .cqrc 文件。</translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="../ui/main_window.ui" line="23"/>
+        <source>Widget</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>RegistrationCodeDialog</name>
+    <message>
+        <location filename="../src/registration_code_dialog.cpp" line="35"/>
+        <source>Copy</source>
+        <translation>拷贝</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_code_dialog.cpp" line="36"/>
+        <source>Activate</source>
+        <translation>启动</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_code_dialog.cpp" line="63"/>
+        <source>Invalid registration code format</source>
+        <translation>注册码格式无效</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_code_dialog.cpp" line="66"/>
+        <source>Registration code expired</source>
+        <translation>注册码已过期</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_code_dialog.cpp" line="69"/>
+        <source>Invalid registration code</source>
+        <translation>注册码无效</translation>
+    </message>
+</context>
+<context>
+    <name>RegistrationExpirationReminder</name>
+    <message>
+        <location filename="../ui/registration_expiration_reminder.ui" line="14"/>
+        <source>Dialog</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/registration_expiration_reminder.cpp" line="25"/>
+        <source>Registration Code Expiration Reminder</source>
+        <translation>注册码有效期提醒</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_expiration_reminder.cpp" line="30"/>
+        <source>Your registration code will expired at %1 , please update the registration code as soon as possible, otherwise the expiration program will terminate automatically.</source>
+        <translation>您的注册码将在 %1 时过期，请尽快更新注册码，否则过期程序将自动终止。</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_expiration_reminder.cpp" line="31"/>
+        <source>Don&apos;t show this reminder again</source>
+        <translation>不要再显示此提醒</translation>
+    </message>
+    <message>
+        <location filename="../src/registration_expiration_reminder.cpp" line="33"/>
+        <source>Verify</source>
+        <translation>核对</translation>
+    </message>
+</context>
+</TS>

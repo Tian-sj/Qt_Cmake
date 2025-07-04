@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "gui/mainobject.hpp"
+#include "gui/main_object.hpp"
 
 class QTimer;
 class Cache;
@@ -18,9 +18,9 @@ public:
     ~MainWindow();
 
 protected:
-    virtual void init_ui() override;
-    virtual void init_connect() override;
-    virtual void init_ui_text() override;
+    virtual void initUi() override;
+    virtual void initConnect() override;
+    virtual void initUiText() override;
 
 private slots:
     void on_timer_rc();
@@ -28,8 +28,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QTimer* timer_rc;
+    QTimer* timer_rc_;
 
-    bool is_show;
-    bool is_current_show;
+    bool is_show_;
+    bool is_current_show_;
 };

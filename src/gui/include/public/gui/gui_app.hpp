@@ -38,6 +38,6 @@ private:
     void set_default_style();
 
 private:
-    std::unique_ptr<QApplication> app;
-    std::unique_ptr<QWidget> main_window;
+    std::unique_ptr<QApplication> app_;
+    std::unique_ptr<QWidget> main_window_;
 };

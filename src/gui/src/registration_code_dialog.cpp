@@ -1,11 +1,11 @@
-﻿#include "gui/registrationcodedialog.hpp"
+﻿#include "gui/registration_code_dialog.hpp"
 #include "gui/config.hpp"
 
 #include <QClipboard>
 #include <QFile>
 #include <QApplication>
 
-#include "ui_registrationcodedialog.h"
+#include "ui_registration_code_dialog.h"
 
 RegistrationCodeDialog::RegistrationCodeDialog(QWidget *parent)
     : QDialog(parent)
@@ -13,9 +13,9 @@ RegistrationCodeDialog::RegistrationCodeDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    init_ui();
-    init_ui_text();
-    init_connect();
+    initUi();
+    initUiText();
+    initConnect();
 }
 
 RegistrationCodeDialog::~RegistrationCodeDialog()
@@ -23,21 +23,21 @@ RegistrationCodeDialog::~RegistrationCodeDialog()
     delete ui;
 }
 
-void RegistrationCodeDialog::init_ui()
+void RegistrationCodeDialog::initUi()
 {
     this->loadCSS(this, "");
     ui->lab_uuid->setText("UUID");
     ui->uuid->setText(Config::getInstance().getUniqueSystemIdentifier());
 }
 
-void RegistrationCodeDialog::init_ui_text()
+void RegistrationCodeDialog::initUiText()
 {
     ui->btn_copy->setText(tr("Copy"));
     ui->btn_activate->setText(tr("Activate"));
     ui->text->setPlainText(Config::getInstance().getRegistrationCode());
 }
 
-void RegistrationCodeDialog::init_connect()
+void RegistrationCodeDialog::initConnect()
 {
 
 }
@@ -59,13 +59,13 @@ void RegistrationCodeDialog::on_btn_activate_clicked()
     } else {
         switch (Config::getInstance().getRegistrationCodeErrorType())
         {
-        case RegistrationCode::ERROT_TYPE::RegistrationCodeInvalidFormat:
+        case RegistrationCode::ErrorType::REGISTRATION_CODE_INVALID_FORMAT:
             ui->lab_error->setText(tr("Invalid registration code format"));
             break;
-        case RegistrationCode::ERROT_TYPE::RegistrationCodeExpired:
+        case RegistrationCode::ErrorType::REGISTRATION_CODE_EXPIRED:
             ui->lab_error->setText(tr("Registration code expired"));
             break;
-        case RegistrationCode::ERROT_TYPE::RegistrationCodeInvalid:
+        case RegistrationCode::ErrorType::REGISTRATION_CODE_INVALID:
             ui->lab_error->setText(tr("Invalid registration code"));
             break;
         default:

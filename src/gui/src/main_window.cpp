@@ -1,5 +1,5 @@
-﻿#include "gui/mainwindow.hpp"
-#include "gui/registrationexpirationreminder.hpp"
+﻿#include "gui/main_window.hpp"
+#include "gui/registration_expiration_reminder.hpp"
 #include "gui/config.hpp"
 
 #include <QVBoxLayout>
@@ -8,51 +8,49 @@
 #include <QMessageBox>
 #include <QTextLayout>
 
-#include "ui_mainwindow.h"
+#include "ui_main_window.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-    , timer_rc(new QTimer(this))
-    , is_show(true)
-    , is_current_show(false)
+    , timer_rc_(new QTimer(this))
+    , is_show_(true)
+    , is_current_show_(false)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    init_ui();
-    init_ui_text();
-    init_connect();
+    initUi();
+    initConnect();
+    initUiText();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
 }
 
-void MainWindow::init_ui() {
+void MainWindow::initUi() {
 
     loadCSS(this, Config::getInstance().getThemePath() + "gui-themes.css");
 
-    timer_rc->setInterval(60000);
-    timer_rc->start();
+    timer_rc_->setInterval(60000);
+    timer_rc_->start();
 }
 
-void MainWindow::init_connect(){
-    connect_language_changed(this);
-    connect(timer_rc, &QTimer::timeout, this, &MainWindow::on_timer_rc);
+void MainWindow::initConnect(){
+    connectLanguageChanged(this);
+    connect(timer_rc_, &QTimer::timeout, this, &MainWindow::on_timer_rc);
 }
 
-void MainWindow::init_ui_text(){
+void MainWindow::initUiText(){
     ui->retranslateUi(this);
     this->setWindowTitle(tr(_NAME));
 }
 
-void MainWindow::on_timer_rc()
-{
-    if (is_show && !is_current_show && Config::getInstance().checkExpirationReminder()) {
-        RegistrationExpirationReminder *rer = new RegistrationExpirationReminder(&is_show);
-        is_current_show = true;
+void MainWindow::on_timer_rc() {
+    if (is_show_ && !is_current_show_ && Config::getInstance().checkExpirationReminder()) {
+        RegistrationExpirationReminder *rer = new RegistrationExpirationReminder(&is_show_);
+        is_current_show_ = true;
         rer->exec();
-        is_current_show = false;
+        is_current_show_ = false;
         delete rer;
         rer = nullptr;
     }

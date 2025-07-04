@@ -1,7 +1,7 @@
-﻿#include "gui/guiapp.hpp"
-#include "gui/mainwindow.hpp"
+﻿#include "gui/gui_app.hpp"
+#include "gui/main_window.hpp"
 #include "gui/config.hpp"
-#include "gui/registrationcodedialog.hpp"
+#include "gui/registration_code_dialog.hpp"
 
 #include <QApplication>
 #include <QWidget>
@@ -9,8 +9,8 @@
 #include <QFontDatabase>
 
 GuiApp::GuiApp(int &argc, char **argv)
-    : app(std::make_unique<QApplication>(argc, argv))
-    , main_window(nullptr)
+    : app_(std::make_unique<QApplication>(argc, argv))
+    , main_window_(nullptr)
 {
 }
 
@@ -25,11 +25,11 @@ int GuiApp::run() {
     config.setLanguage(config.getLanguage());
     config.setTheme(config.getTheme());
 
-    QFont app_font = config.getFont(Config::Font::Inter, 14, QFont::Normal);
+    QFont app_font = config.getFont(Config::Font::INTER, 10, QFont::Normal);
     app_font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferDefault | QFont::ContextFontMerging));
-    app->setFont(app_font);
+    app_->setFont(app_font);
 
-    QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Han, config.getFontFamilies(Config::Font::Noto_Sans_SC));
+    QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Han, config.getFontFamilies(Config::Font::NOTO_SANS_SC));
 
 #if 0
     config.deleteRegistrationCode();
@@ -48,15 +48,15 @@ int GuiApp::run() {
             return 0;
     }
 
-    main_window = std::make_unique<MainWindow>();
-    main_window->show();
-    return app->exec();
+    main_window_ = std::make_unique<MainWindow>();
+    main_window_->show();
+    return app_->exec();
 }
 
 void GuiApp::set_default_style()
 {
-    app->setStyle("Fusion");
+    app_->setStyle("Fusion");
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QColor("#F0F0F0"));
-    app->setPalette(palette);}
+    app_->setPalette(palette);}

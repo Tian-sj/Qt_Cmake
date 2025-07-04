@@ -1,5 +1,5 @@
 ﻿# 指定CMake的最低版本
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.26)
 
 get_filename_component(CUR_DIR_NAME
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -34,6 +34,8 @@ endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/version.h.in ${CMAKE_BINARY_DIR}/version.h)
 include_directories(${CMAKE_BINARY_DIR})
+
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

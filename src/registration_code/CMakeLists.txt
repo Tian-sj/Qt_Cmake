@@ -1,12 +1,11 @@
-﻿# 指定CMake的最低版本
-set(cur_name RegistrationCode)
+﻿set(cur_name registration_code)
 
 include(MyFindQt6)
 
 # 设置Qt工具链的环境变量
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h)
+file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h include/*.hpp)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
 

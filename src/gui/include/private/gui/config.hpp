@@ -1,14 +1,8 @@
-﻿/*!
- * @file          config.hpp
- * @brief         Tool class that provides some internal interfaces
- * @author        Tian_sj
- * @date          2024-12-18
- */
-#pragma once
+﻿#pragma once
 
 #include "version.h"
 
-#include <RegistrationCode/registrationcode.hpp>
+#include <registration_code/registration_code.hpp>
 #include <QHash>
 #include <QVector>
 #include <QFont>
@@ -22,18 +16,18 @@ public:
     static Config& getInstance();
 
     enum class Language {
-        English,
-        Chinese
+        ENGLISH,
+        CHINESE
     };
 
     enum class Font {
-        Inter,
-        Noto_Sans_SC
+        INTER,
+        NOTO_SANS_SC
     };
 
     enum class Theme {
-        Light,
-        Dark
+        LIGHT,
+        DARK
     };
 
     Config(const Config&) = delete;
@@ -149,7 +143,7 @@ public:
      * @return        RegistrationCode::ERROT_TYPE
      * @attention
      */
-    RegistrationCode::ERROT_TYPE getRegistrationCodeErrorType() const;
+    RegistrationCode::ErrorType getRegistrationCodeErrorType() const;
 
     /*!
      * @brief         Set the Language
@@ -212,7 +206,7 @@ public:
      * @return        QFont
      * @attention
      */
-    QFont getFont(Font primary, int pointSize = 12, QFont::Weight weight = QFont::Normal);
+    QFont getFont(Font primary, int point_size = 12, QFont::Weight weight = QFont::Normal);
 
     /*!
      * @brief         Get the Font Families
@@ -304,16 +298,16 @@ private:
     void loadFontDir(Font font, const QString& dir_path);
 
 private:
-    QSettings* m_settings;
-    RegistrationCode* m_reg_code;
+    QSettings* settings_;
+    RegistrationCode* reg_code_;
 
-    QHash<Language, QStringList> map_language_path;
-    QVector<QTranslator*> translators;
-    RegistrationCode::ERROT_TYPE m_registration_code_error_type;
+    QHash<Language, QStringList> map_language_path_;
+    QVector<QTranslator*> translators_;
+    RegistrationCode::ErrorType registration_code_error_type_;
 
-    QHash<Font, QStringList> font_families;
+    QHash<Font, QStringList> font_families_;
 
-    QString theme_path;
+    QString theme_path_;
 
-    int m_user_id;
+    int user_id_;
 };

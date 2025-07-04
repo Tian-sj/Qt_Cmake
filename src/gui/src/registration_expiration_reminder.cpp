@@ -1,47 +1,43 @@
-﻿#include "gui/registrationexpirationreminder.hpp"
+﻿#include "gui/registration_expiration_reminder.hpp"
 #include "gui/config.hpp"
 
-#include "ui_registrationexpirationreminder.h"
+#include "ui_registration_expiration_reminder.h"
 
 RegistrationExpirationReminder::RegistrationExpirationReminder(bool *is_show, QWidget *parent)
     : QDialog(parent)
-    , m_is_show(is_show)
+    , is_show_(is_show)
     , ui(new Ui::RegistrationExpirationReminder)
 {
     ui->setupUi(this);
 
-    init_ui();
-    init_ui_text();
-    init_connect();
+    initUi();
+    initUiText();
+    initConnect();
 }
 
-RegistrationExpirationReminder::~RegistrationExpirationReminder()
-{
+RegistrationExpirationReminder::~RegistrationExpirationReminder() {
     delete ui;
 }
 
-void RegistrationExpirationReminder::init_ui()
-{
+void RegistrationExpirationReminder::initUi() {
     this->loadCSS(this, "");
 
     this->setWindowTitle(tr("Registration Code Expiration Reminder"));
     ui->lab_message->setWordWrap(true);
 }
 
-void RegistrationExpirationReminder::init_ui_text()
-{
+void RegistrationExpirationReminder::initUiText() {
     ui->lab_message->setText(tr("Your registration code will expired at %1 , please update the registration code as soon as possible, otherwise the expiration program will terminate automatically.").arg(Config::getInstance().getEndTime().toString("yyyy-MM-dd HH:mm:ss")));
-    ui->checkBox->setText(tr("Don't show this reminder again"));
+    ui->check_box->setText(tr("Don't show this reminder again"));
     // 确认
     ui->btn_verify->setText(tr("Verify"));
 }
 
-void RegistrationExpirationReminder::init_connect()
-{
+void RegistrationExpirationReminder::initConnect() {
 
 }
 
-void RegistrationExpirationReminder::on_checkBox_stateChanged(int arg1)
-{
-    *m_is_show = !arg1;
+
+void RegistrationExpirationReminder::on_check_box_checkStateChanged(const Qt::CheckState &arg1) {
+    *is_show_ = !arg1;
 }

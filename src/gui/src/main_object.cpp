@@ -1,4 +1,4 @@
-﻿#include "gui/mainobject.hpp"
+﻿#include "gui/main_object.hpp"
 #include "version.h"
 
 #include <QFile>
@@ -13,12 +13,12 @@ MainObject::~MainObject()
 {
 }
 
-void MainObject::invoke_init_ui_text()
+void MainObject::invokeInitUiText()
 {
-    init_ui_text();
+    initUiText();
 }
 
-QString MainObject::stdtm_to_QString(std::tm tm_value)
+QString MainObject::stdTmToQString(std::tm tm_value)
 {
     time_t time_value = mktime(&tm_value);  // 将 std::tm 转换为 time_t
 
@@ -28,9 +28,9 @@ QString MainObject::stdtm_to_QString(std::tm tm_value)
     return date_time.toString("yyyy-MM-dd hh:mm:ss");
 }
 
-void MainObject::loadCSS(QWidget* parrent, const QString &cssFile)
+void MainObject::loadCSS(QWidget* parrent, const QString &css_file)
 {
-    QFile file(cssFile);
+    QFile file(css_file);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         return;
     }

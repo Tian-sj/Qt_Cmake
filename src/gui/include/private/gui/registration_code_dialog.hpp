@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "gui/mainobject.hpp"
+#include "gui/main_object.hpp"
 
 #include <QDialog>
 
@@ -17,11 +17,11 @@ public:
     ~RegistrationCodeDialog();
 
 private:
-    virtual void init_ui() override;
+    virtual void initUi() override;
 
-    virtual void init_ui_text() override;
+    virtual void initUiText() override;
 
-    virtual void init_connect() override;
+    virtual void initConnect() override;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

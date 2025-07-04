@@ -28,7 +28,7 @@ qt_add_translations(${cur_name}
 
 target_link_libraries(${cur_name} PRIVATE
     Qt6::Widgets
-    RegistrationCode
+    registration_code
     magic_enum
 )
 

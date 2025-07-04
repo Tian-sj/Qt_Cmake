@@ -16,99 +16,99 @@ Config &Config::getInstance() {
     return instance;
 }
 
-Config::Config() 
-    : m_settings(new QSettings(QSettings::NativeFormat, QSettings::UserScope, _DEVELOPER, _NAME))
-    , m_reg_code(new RegistrationCode(QString("%1_%2").arg(_DEVELOPER, _NAME).toLocal8Bit())) {
-    m_settings->setValue("version", _VERSION);
+Config::Config()
+    : settings_(new QSettings(QSettings::NativeFormat, QSettings::UserScope, _DEVELOPER, _NAME))
+    , reg_code_(new RegistrationCode(QString("%1_%2").arg(_DEVELOPER, _NAME).toLocal8Bit())) {
+    settings_->setValue("version", _VERSION);
 
     getTranslationFileNames();
     loadFonts();
 }
 
 Config::~Config() {
-    if (m_settings) {
-        delete m_settings;
-        m_settings = nullptr;
+    if (settings_) {
+        delete settings_;
+        settings_ = nullptr;
     }
 
-    foreach (auto translator, translators) {
+    foreach (auto translator, translators_) {
         delete translator;
         translator = nullptr;
     }
 
-    translators.clear();
+    translators_.clear();
 }
 
 void Config::setLanguage(const Language &language) {
     auto name_view = magic_enum::enum_name(language);
-    m_settings->setValue("Language", QString::fromUtf8(name_view.data(), static_cast<int>(name_view.size())));
+    settings_->setValue("Language", QString::fromUtf8(name_view.data(), static_cast<int>(name_view.size())));
 
-    QStringList list = map_language_path[language];
+    QStringList list = map_language_path_[language];
     size_t i { 0 };
     foreach (const auto &file_path, list) {
-        qDebug() << file_path << ":" << translators[i]->load(file_path);
-        qApp->installTranslator(translators[i++]);
+        qDebug() << file_path << ":" << translators_[i]->load(file_path);
+        qApp->installTranslator(translators_[i++]);
     }
 }
 
 Config::Language Config::getLanguage() const {
-    auto name = magic_enum::enum_cast<Language>(m_settings->value("Language").toString().toStdString());
+    auto name = magic_enum::enum_cast<Language>(settings_->value("Language").toString().toStdString());
     if (name.has_value())
         return name.value();
     else
-        return Language::English;
+        return Language::ENGLISH;
 }
 
 void Config::setTheme(const Theme &theme) {
     auto name_view = magic_enum::enum_name(theme);
     QString path = QString::fromUtf8(name_view.data(), name_view.size());
-    m_settings->setValue("Theme", path);
-    theme_path = ":/GUI/css/" + path + "/";
+    settings_->setValue("Theme", path);
+    theme_path_ = ":/GUI/css/" + path + "/";
 }
 
 QString Config::getThemePath() const {
-    return theme_path;
+    return theme_path_;
 }
 
 Config::Theme Config::getTheme() const {
-    auto name = magic_enum::enum_cast<Theme>(m_settings->value("Theme").toString().toStdString());
+    auto name = magic_enum::enum_cast<Theme>(settings_->value("Theme").toString().toStdString());
     if (name.has_value())
         return name.value();
     else
-        return Theme::Light;
+        return Theme::LIGHT;
 }
 
-QFont Config::getFont(Font primary, int pointSize, QFont::Weight weight) {
-    if (!font_families.contains(primary) || font_families[primary].isEmpty()) {
+QFont Config::getFont(Font primary, int point_size, QFont::Weight weight) {
+    if (!font_families_.contains(primary) || font_families_[primary].isEmpty()) {
         qWarning() << "[FontManager] Font not found for enum:" << static_cast<int>(primary);
         return QFont();
     }
 
-    QString family = font_families[primary].first();
+    QString family = font_families_[primary].first();
     QFont font(family);
-    font.setPointSize(pointSize);
+    font.setPointSize(point_size);
     font.setWeight(weight);
     return font;
 }
 
 QStringList Config::getFontFamilies(Font font) {
-    return font_families[font];
+    return font_families_[font];
 }
 
 void Config::setCurrentUserId(const int &user_id) {
-    this->m_user_id = user_id;
+    this->user_id_ = user_id;
 }
 
 int Config::getCurrentUserId() const {
-    return this->m_user_id;
+    return this->user_id_;
 }
 
 void Config::setAppRuntime(QDateTime runtime) {
-    m_settings->setValue("App_runtime", runtime);
+    settings_->setValue("App_runtime", runtime);
 }
 
 QDateTime Config::getAppRuntime() const {
-    return m_settings->value("App_runtime").toDateTime();
+    return settings_->value("App_runtime").toDateTime();
 }
 
 void Config::registerResource(QString file) {
@@ -116,14 +116,14 @@ void Config::registerResource(QString file) {
 }
 
 bool Config::validateCode(const QString &code) {
-    m_registration_code_error_type = m_reg_code->validateCode(code);
-    switch (m_registration_code_error_type) {
-    case RegistrationCode::ERROT_TYPE::RegistrationCodeValid:
-    case RegistrationCode::ERROT_TYPE::RegistrationCodeAboutToExpire:
+    registration_code_error_type_ = reg_code_->validateCode(code);
+    switch (registration_code_error_type_) {
+    case RegistrationCode::ErrorType::REGISTRATION_CODE_VALID:
+    case RegistrationCode::ErrorType::REGISTRATION_CODE_ABOUT_TO_EXPIRE:
         return true;
-    case RegistrationCode::ERROT_TYPE::RegistrationCodeInvalid:
-    case RegistrationCode::ERROT_TYPE::RegistrationCodeInvalidFormat:
-    case RegistrationCode::ERROT_TYPE::RegistrationCodeExpired:
+    case RegistrationCode::ErrorType::REGISTRATION_CODE_INVALID:
+    case RegistrationCode::ErrorType::REGISTRATION_CODE_INVALID_FORMAT:
+    case RegistrationCode::ErrorType::REGISTRATION_CODE_EXPIRED:
         return false;
     default:
         return false;
@@ -131,27 +131,27 @@ bool Config::validateCode(const QString &code) {
 }
 
 void Config::setRegistrationCode(const QString& code) const {
-    m_settings->setValue("RegistrationCode", code.toLocal8Bit());
+    settings_->setValue("RegistrationCode", code.toLocal8Bit());
 }
 
 void Config::deleteRegistrationCode() const {
-    m_settings->remove("RegistrationCode");
+    settings_->remove("RegistrationCode");
 }
 
 QString Config::getRegistrationCode() const {
-    return QString::fromLocal8Bit(m_settings->value("RegistrationCode").toByteArray());
+    return QString::fromLocal8Bit(settings_->value("RegistrationCode").toByteArray());
 }
 
 QString Config::getUniqueSystemIdentifier() const {
-    return m_reg_code->getUniqueSystemIdentifier();
+    return reg_code_->getUniqueSystemIdentifier();
 }
 
 bool Config::checkExpirationReminder() {
-    if (m_registration_code_error_type == RegistrationCode::ERROT_TYPE::RegistrationCodeAboutToExpire)
+    if (registration_code_error_type_ == RegistrationCode::ErrorType::REGISTRATION_CODE_ABOUT_TO_EXPIRE)
         return true;
     
-    if (isWithinXDays(3, QDateTime::currentDateTime(), m_reg_code->getEndTime())) {
-        m_registration_code_error_type = RegistrationCode::ERROT_TYPE::RegistrationCodeAboutToExpire;
+    if (isWithinXDays(3, QDateTime::currentDateTime(), reg_code_->getEndTime())) {
+        registration_code_error_type_ = RegistrationCode::ErrorType::REGISTRATION_CODE_ABOUT_TO_EXPIRE;
         return true;
     }
 
@@ -159,11 +159,11 @@ bool Config::checkExpirationReminder() {
 }
 
 QDateTime Config::getEndTime() const {
-    return m_reg_code->getEndTime();
+    return reg_code_->getEndTime();
 }
 
-RegistrationCode::ERROT_TYPE Config::getRegistrationCodeErrorType() const {
-    return m_registration_code_error_type;
+RegistrationCode::ErrorType Config::getRegistrationCodeErrorType() const {
+    return registration_code_error_type_;
 }
 
 bool Config::isWithinXDays(const int day, const QDateTime& date_time_1, const QDateTime& date_time_2) {
@@ -172,41 +172,41 @@ bool Config::isWithinXDays(const int day, const QDateTime& date_time_1, const QD
 }
 
 void Config::getTranslationFileNames() {
-    QString resourcePath = ":/GUI/languages/";
-    QDir dir(resourcePath);
+    QString resource_path = ":/GUI/languages/";
+    QDir dir(resource_path);
 
     QStringList filters;
-    QFileInfoList fileList;
+    QFileInfoList file_list;
     filters << "*_en.qm";
     dir.setNameFilters(filters);
     dir.setFilter(QDir::Files);
-    fileList = dir.entryInfoList();
-    foreach (const QFileInfo &fileInfo, fileList) {
-        map_language_path[Language::English] << fileInfo.absoluteFilePath();
-        translators.emplace_back(new QTranslator);
+    file_list = dir.entryInfoList();
+    foreach (const QFileInfo &file_info, file_list) {
+        map_language_path_[Language::ENGLISH] << file_info.absoluteFilePath();
+        translators_.emplace_back(new QTranslator);
     }
 
     filters.clear();
     filters << "*_cn.qm";
     dir.setNameFilters(filters);
     dir.setFilter(QDir::Files);
-    fileList = dir.entryInfoList();
-    foreach (const QFileInfo &fileInfo, fileList) {
-        map_language_path[Language::Chinese] << fileInfo.absoluteFilePath();
+    file_list = dir.entryInfoList();
+    foreach (const QFileInfo &file_info, file_list) {
+        map_language_path_[Language::CHINESE] << file_info.absoluteFilePath();
     }
 }
 
 QString Config::fontDir(Font font) {
     switch (font) {
-    case Font::Inter: return QCoreApplication::applicationDirPath() + "/fonts/Inter";
-    case Font::Noto_Sans_SC : return QCoreApplication::applicationDirPath() + "/fonts/Noto_Sans_SC";
+    case Font::INTER: return QCoreApplication::applicationDirPath() + "/fonts/Inter";
+    case Font::NOTO_SANS_SC : return QCoreApplication::applicationDirPath() + "/fonts/Noto_Sans_SC";
     default: return "";
     }
 }
 
 void Config::loadFonts() {
-    loadFontDir(Font::Inter, fontDir(Font::Inter));
-    loadFontDir(Font::Noto_Sans_SC, fontDir(Font::Noto_Sans_SC));
+    loadFontDir(Font::INTER, fontDir(Font::INTER));
+    loadFontDir(Font::NOTO_SANS_SC, fontDir(Font::NOTO_SANS_SC));
 }
 
 void Config::loadFontDir(Font font, const QString &dir_path) {
@@ -215,18 +215,18 @@ void Config::loadFontDir(Font font, const QString &dir_path) {
     // 遍历资源目录下的所有 .ttf / .otf 字体文件
     QDirIterator it(dir_path, QStringList() << "*.ttf" << "*.otf", QDir::Files);
     while (it.hasNext()) {
-        QString filePath = it.next();
-        int id = QFontDatabase::addApplicationFont(filePath);
+        QString file_path = it.next();
+        int id = QFontDatabase::addApplicationFont(file_path);
         if (id >= 0) {
             QStringList loaded = QFontDatabase::applicationFontFamilies(id);
             if (!loaded.isEmpty()) {
                 families << loaded.first();
-                qDebug() << "[FontManager] Loaded:" << filePath << "->" << loaded.first();
+                qDebug() << "[FontManager] Loaded:" << file_path << "->" << loaded.first();
             }
         } else {
-            qWarning() << "[FontManager] Failed to load:" << filePath;
+            qWarning() << "[FontManager] Failed to load:" << file_path;
         }
     }
 
-    font_families[font] = families;
+    font_families_[font] = families;
 }

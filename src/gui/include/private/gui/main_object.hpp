@@ -16,7 +16,7 @@ public:
      * 
      * @attention
      */
-    void invoke_init_ui_text();
+    void invokeInitUiText();
 
 protected:
     /*!
@@ -24,21 +24,21 @@ protected:
      * 
      * @attention
      */
-    virtual void init_ui() = 0;
+    virtual void initUi() = 0;
 
     /*!
      * @brief         
      * 
      * @attention
      */
-    virtual void init_connect() = 0;
+    virtual void initConnect() = 0;
 
     /*!
      * @brief         
      * 
      * @attention
      */
-    virtual void init_ui_text() = 0;
+    virtual void initUiText() = 0;
 
     /*!
      * @brief         
@@ -47,7 +47,7 @@ protected:
      * @return        QString
      * @attention
      */
-    QString stdtm_to_QString(std::tm tm_value);
+    QString stdTmToQString(std::tm tm_value);
 
     /*!
      * @brief         
@@ -56,5 +56,5 @@ protected:
      * @param         cssFile
      * @attention
      */
-    void loadCSS(QWidget* parrent, const QString &cssFile);
+    void loadCSS(QWidget* parrent, const QString &css_file);
 };

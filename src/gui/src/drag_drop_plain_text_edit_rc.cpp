@@ -1,4 +1,4 @@
-﻿#include "gui/dragdropplaintexteditrc.hpp"
+﻿#include "gui/drag_drop_plain_text_edit_rc.hpp"
 
 #include <QApplication>
 #include <QWidget>
@@ -25,15 +25,15 @@ void DragDropPlainTextEditRC::dragEnterEvent(QDragEnterEvent *event)
 
 void DragDropPlainTextEditRC::dropEvent(QDropEvent *event)
 {
-    const QMimeData *mimeData = event->mimeData();
+    const QMimeData *mime_data = event->mimeData();
 
-    if (mimeData->hasUrls()) {
-        QList<QUrl> urlList = mimeData->urls();
+    if (mime_data->hasUrls()) {
+        QList<QUrl> url_list = mime_data->urls();
 
-        if (urlList.size() > 0) {
-            QString filePath = urlList.at(0).toLocalFile();
-            if (isValidFile(filePath)) {
-                loadFile(filePath);
+        if (url_list.size() > 0) {
+            QString file_path = url_list.at(0).toLocalFile();
+            if (isValidFile(file_path)) {
+                loadFile(file_path);
             } else {
                 setPlainText(tr("Invalid file type. Only .cqrc files are allowed."));
             }
@@ -41,24 +41,24 @@ void DragDropPlainTextEditRC::dropEvent(QDropEvent *event)
     }
 }
 
-void DragDropPlainTextEditRC::loadFile(const QString &filePath)
+void DragDropPlainTextEditRC::loadFile(const QString &file_path)
 {
-    QFile file(filePath);
+    QFile file(file_path);
     if (file.open(QIODevice::ReadOnly)) {
-        QDataStream fileIn(&file);
-        QByteArray byteArray;
-        fileIn >> byteArray;
+        QDataStream file_in(&file);
+        QByteArray byte_array;
+        file_in >> byte_array;
         file.close();
 
-        QDataStream in(&byteArray, QIODevice::ReadOnly);
+        QDataStream in(&byte_array, QIODevice::ReadOnly);
         QString text;
         in >> text;
         setPlainText(text);
     }
 }
 
-bool DragDropPlainTextEditRC::isValidFile(const QString &filePath)
+bool DragDropPlainTextEditRC::isValidFile(const QString &file_path)
 {
-    QFileInfo fileInfo(filePath);
-    return fileInfo.suffix().toLower() == "cqrc";
+    QFileInfo file_info(file_path);
+    return file_info.suffix().toLower() == "cqrc";
 }

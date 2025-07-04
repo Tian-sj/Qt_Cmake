@@ -14,7 +14,7 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
-    void loadFile(const QString &filePath);
+    void loadFile(const QString &file_path);
 
-    bool isValidFile(const QString &filePath);
+    bool isValidFile(const QString &file_path);
 };

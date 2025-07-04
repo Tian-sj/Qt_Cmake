@@ -102,7 +102,7 @@
   <customwidget>
    <class>DragDropPlainTextEditRC</class>
    <extends>QPlainTextEdit</extends>
-   <header>gui/dragdropplaintexteditrc.hpp</header>
+   <header>gui/drag_drop_plain_text_edit_rc.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "gui/signalmanager.hpp"
+#include "gui/signal_manager_singleton.hpp"
 
 #include <QObject>
 
@@ -20,8 +20,8 @@
  * @attention
  */
 template <typename T>
-void connect_language_changed(T* obj) {
-    QObject::connect(&SignalManager::instance(), &SignalManager::language_changed, obj, [obj]() {
-        obj->invoke_init_ui_text();
+void connectLanguageChanged(T* obj) {
+    QObject::connect(&SignalManagerSingleton::getInstance(), &SignalManagerSingleton::languageChanged, obj, [obj]() {
+        obj->invokeInitUiText();
     });
 }

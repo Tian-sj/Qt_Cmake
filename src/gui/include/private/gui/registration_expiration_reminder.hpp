@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "gui/mainobject.hpp"
+#include "gui/main_object.hpp"
 
 #include <QDialog>
 
@@ -16,18 +16,18 @@ public:
     explicit RegistrationExpirationReminder(bool *is_show, QWidget *parent = nullptr);
     ~RegistrationExpirationReminder();
 
-private slots:
-    void on_checkBox_stateChanged(int arg1);
-
 private:
-    virtual void init_ui() override;
+    virtual void initUi() override;
 
-    virtual void init_ui_text() override;
+    virtual void initUiText() override;
 
-    virtual void init_connect() override;
+    virtual void initConnect() override;
+
+private slots:
+    void on_check_box_checkStateChanged(const Qt::CheckState &arg1);
 
 private:
     Ui::RegistrationExpirationReminder *ui;
 
-    bool* m_is_show;
+    bool* is_show_;
 };
