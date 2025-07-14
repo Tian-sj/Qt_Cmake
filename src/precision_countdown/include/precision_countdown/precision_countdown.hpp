@@ -6,6 +6,11 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include <vector>
+#include <memory>
+#include <algorithm>
+
+namespace timer {
 
 template<typename... Args>
 class FastSignal {
@@ -30,54 +35,87 @@ public:
             return *this;
         }
         ~Connection() { disconnect(); }
+
         void disconnect() {
-            if (sig_) { sig_->disconnect(id_); sig_ = nullptr; id_ = 0; }
+            if (sig_) {
+                sig_->disconnect(id_);
+                sig_ = nullptr;
+                id_ = 0;
+            }
         }
         bool isConnected() const noexcept { return sig_ != nullptr; }
+
     private:
         FastSignal*   sig_{nullptr};
         connection_id id_{0};
     };
 
-    FastSignal() : next_id_(1), slots_ptr_(std::make_shared<SlotList>()) {}
+    FastSignal()
+        : next_id_(1)
+        , slots_ptr_(std::make_shared<SlotList>())
+    {}
+
     ~FastSignal() = default;
     FastSignal(const FastSignal&) = delete;
     FastSignal& operator=(const FastSignal&) = delete;
 
+    // Connect a new slot. Thread-safe.
     Connection connect(slot_type slot) {
-        auto old_list = std::atomic_load(&slots_ptr_);
-        auto new_list = std::make_shared<SlotList>(*old_list);
+        auto old_list = std::atomic_load_explicit(&slots_ptr_, std::memory_order_acquire);
+        auto new_list = std::make_shared<SlotList>();
+        new_list->reserve(old_list->size() + 1);
+        new_list->insert(new_list->end(), old_list->begin(), old_list->end());
+
         auto id = next_id_.fetch_add(1, std::memory_order_relaxed);
         new_list->emplace_back(id, std::move(slot));
-        std::atomic_store(&slots_ptr_, new_list);
+
+        std::atomic_store_explicit(&slots_ptr_, new_list, std::memory_order_release);
         return Connection(this, id);
     }
 
+    // Disconnect slot by id. Thread-safe.
     void disconnect(connection_id id) {
-        auto old_list = std::atomic_load(&slots_ptr_);
+        auto old_list = std::atomic_load_explicit(&slots_ptr_, std::memory_order_acquire);
         auto new_list = std::make_shared<SlotList>();
         new_list->reserve(old_list->size());
-        for (auto& e : *old_list)
-            if (e.first != id)
-                new_list->push_back(std::move(e));
-        std::atomic_store(&slots_ptr_, new_list);
+        for (auto& e : *old_list) {
+            if (e.first != id) {
+                new_list->push_back(e);
+            }
+        }
+        std::atomic_store_explicit(&slots_ptr_, new_list, std::memory_order_release);
     }
 
-    void emit(Args... args) const {
-        auto list = std::atomic_load(&slots_ptr_);
-        for (auto& e : *list)
-            e.second(args...);
+    // Trigger all slots with given arguments. Exceptions in one slot won't stop others.
+    void trigger(Args... args) const {
+        auto list = std::atomic_load_explicit(&slots_ptr_, std::memory_order_acquire);
+        for (auto& e : *list) {
+            try {
+                e.second(args...);
+            } catch (...) {
+                // swallow or log
+            }
+        }
     }
+
+    // Query number of connected slots.
+    size_t size() const noexcept {
+        auto list = std::atomic_load_explicit(&slots_ptr_, std::memory_order_acquire);
+        return list->size();
+    }
+    bool empty() const noexcept { return size() == 0; }
 
 private:
     using SlotEntry = std::pair<connection_id, slot_type>;
     using SlotList  = std::vector<SlotEntry>;
 
-    std::atomic<connection_id>           next_id_;
-    std::shared_ptr<SlotList>            slots_ptr_;
+    std::atomic<connection_id>    next_id_;
+    std::shared_ptr<SlotList>     slots_ptr_;
 };
 
-
+// ========================
+// PrecisionCountdown
+// ========================
 class PrecisionCountdown {
 public:
     using Clock = std::chrono::steady_clock;
@@ -85,117 +123,147 @@ public:
     explicit PrecisionCountdown(int interval_ms = 10)
         : interval_(std::chrono::milliseconds(interval_ms))
         , thread_running_(true)
+        , active_(false)
+        , paused_(false)
     {
         worker_ = std::thread([this]{ threadLoop(); });
     }
 
     ~PrecisionCountdown() {
-        {
-            std::lock_guard<std::mutex> lk(mtx_);
-            thread_running_ = false;
-            cv_.notify_all();
-        }
-        if (worker_.joinable())
+        // signal thread to exit
+        thread_running_.store(false, std::memory_order_release);
+        cv_.notify_all();
+        if (worker_.joinable()) {
             worker_.join();
+        }
     }
 
-    // 启动或重启倒计时
+    // Start or restart countdown
     void start(int duration_ms) {
         auto now = Clock::now();
         std::lock_guard<std::mutex> lk(mtx_);
-        end_time_   = now + std::chrono::milliseconds(std::max(duration_ms, 0));
-        next_tick_  = now + interval_;
         remaining_  = std::max(duration_ms, 0);
-        active_     = (duration_ms > 0);
-        paused_     = false;
+        end_time_   = now + std::chrono::milliseconds(remaining_);
+        interval_   = std::max(interval_, std::chrono::milliseconds(1));
+        active_.store(remaining_ > 0, std::memory_order_release);
+        paused_.store(false, std::memory_order_release);
         cv_.notify_all();
     }
 
-    // 停止
+    // Stop countdown immediately
     void stop() {
-        std::lock_guard<std::mutex> lk(mtx_);
-        active_ = false;
+        active_.store(false, std::memory_order_release);
         cv_.notify_all();
     }
 
-    // 暂停：记录剩余时间
+    // Pause countdown, preserving remaining time
     void pause() {
-        std::lock_guard<std::mutex> lk(mtx_);
-        if (active_ && !paused_) {
+        if (active_.load(std::memory_order_acquire)
+            && !paused_.load(std::memory_order_acquire)) {
+            auto now = Clock::now();
+            std::lock_guard<std::mutex> lk(mtx_);
             remaining_ = std::chrono::duration_cast<std::chrono::milliseconds>(
-                             end_time_ - Clock::now()).count();
-            paused_ = true;
+                             end_time_ - now).count();
+            paused_.store(true, std::memory_order_release);
         }
     }
 
-    // 恢复：重设 end_time_、next_tick_
+    // Resume countdown from paused state
     void resume() {
-        auto now = Clock::now();
-        std::lock_guard<std::mutex> lk(mtx_);
-        if (active_ && paused_) {
-            end_time_  = now + std::chrono::milliseconds(remaining_);
-            next_tick_ = now + interval_;
-            paused_    = false;
+        if (active_.load(std::memory_order_acquire)
+            && paused_.load(std::memory_order_acquire)) {
+            auto now = Clock::now();
+            std::lock_guard<std::mutex> lk(mtx_);
+            end_time_ = now + std::chrono::milliseconds(remaining_);
+            paused_.store(false, std::memory_order_release);
             cv_.notify_all();
         }
     }
 
-    bool isRunning() const {
+    // Change tick interval (ms); takes effect on next cycle
+    void setInterval(int interval_ms) {
         std::lock_guard<std::mutex> lk(mtx_);
-        return active_ && !paused_;
-    }
-    bool isPaused() const {
-        std::lock_guard<std::mutex> lk(mtx_);
-        return paused_;
+        interval_ = std::chrono::milliseconds(std::max(interval_ms, 1));
+        cv_.notify_all();
     }
 
-    FastSignal<int> timeRemainingChanged;
+    bool isRunning() const noexcept {
+        return active_.load(std::memory_order_acquire)
+        && !paused_.load(std::memory_order_acquire);
+    }
+
+    bool isPaused() const noexcept {
+        return paused_.load(std::memory_order_acquire);
+    }
+
+    FastSignal<int> timeRemainingChanged;  // in milliseconds
     FastSignal<>    finished;
 
 private:
     void threadLoop() {
         std::unique_lock<std::mutex> lk(mtx_);
-        while (thread_running_) {
-            // 等待启动
-            cv_.wait(lk, [this]{ return !thread_running_ || (active_ && !paused_); });
-            if (!thread_running_) break;
+        while (thread_running_.load(std::memory_order_acquire)) {
+            // wait until started or thread termination
+            cv_.wait(lk, [&]{
+                return !thread_running_.load(std::memory_order_acquire)
+                || (active_.load(std::memory_order_acquire)
+                    && !paused_.load(std::memory_order_acquire));
+            });
+            if (!thread_running_.load(std::memory_order_acquire))
+                break;
 
-            // 主循环：直到结束或暂停、停止
-            while (active_ && !paused_) {
-                // 等待到下一个刻度或被打断
-                cv_.wait_until(lk, next_tick_,
-                               [this]{ return !thread_running_ || paused_ || !active_; });
-                if (!thread_running_ || paused_ || !active_) break;
-
+            // countdown loop
+            while (active_.load(std::memory_order_acquire)
+                   && !paused_.load(std::memory_order_acquire))
+            {
                 auto now = Clock::now();
                 if (now >= end_time_) {
-                    active_ = false;
+                    // finished
+                    active_.store(false, std::memory_order_release);
                     lk.unlock();
-                    timeRemainingChanged.emit(0);
-                    finished.emit();
+                    timeRemainingChanged.trigger(0);
+                    finished.trigger();
                     lk.lock();
                     break;
-                } else {
-                    remaining_ = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                     end_time_ - now).count();
-                    // 准备下一次刻度
-                    next_tick_ += interval_;
-                    lk.unlock();
-                    timeRemainingChanged.emit(static_cast<int>(remaining_));
-                    lk.lock();
                 }
+
+                // compute time until next tick
+                auto ms_left   = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_ - now).count();
+                auto wait_ms   = std::min<long long>(interval_.count(), ms_left);
+                // wait or be interrupted
+                cv_.wait_for(lk, std::chrono::milliseconds(wait_ms), [&]{
+                    return !thread_running_.load(std::memory_order_acquire)
+                    || paused_.load(std::memory_order_acquire)
+                        || !active_.load(std::memory_order_acquire);
+                });
+                if (!thread_running_.load(std::memory_order_acquire)
+                    || paused_.load(std::memory_order_acquire)
+                    || !active_.load(std::memory_order_acquire))
+                {
+                    break;
+                }
+
+                // update remaining and emit
+                remaining_ = ms_left - wait_ms;
+                lk.unlock();
+                timeRemainingChanged.trigger(static_cast<int>(remaining_));
+                lk.lock();
             }
         }
     }
 
+private:
     mutable std::mutex               mtx_;
     std::condition_variable          cv_;
     std::thread                      worker_;
-    bool                             thread_running_;
-    bool                             active_{false};
-    bool                             paused_{false};
+
+    std::atomic<bool>                thread_running_;
+    std::atomic<bool>                active_;
+    std::atomic<bool>                paused_;
+
     std::chrono::milliseconds        interval_;
     Clock::time_point                end_time_;
-    Clock::time_point                next_tick_;
     long long                        remaining_{0};
 };
+
+} // namespace timer

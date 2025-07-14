@@ -1,11 +1,8 @@
 ﻿<RCC>
     <qresource prefix="/GUI">
-        <!-- 语言 -->
         <file>languages/gui_cn.qm</file>
         <file>languages/gui_en.qm</file>
-        <!-- 主题 -->
         <file>css/Light/gui-themes.css</file>
-        <!-- 图片 -->
         <file>images/checkbox_checked_light.png</file>
         <file>images/checkbox_disabled_light.png</file>
         <file>images/checkbox_indeterminate_light.png</file>
@@ -24,5 +21,6 @@
         <file>images/FMTest@2x.png</file>
         <file>images/Realtimedata.png</file>
         <file>images/Realtimedata@2x.png</file>
+        <file>css/Light/trdp_form.css</file>
     </qresource>
 </RCC>

@@ -1,6 +1,5 @@
-﻿set(cur_name gui)
-
-include(MyFindQt6)
+﻿set(cur_name "")
+get_filename_component(cur_name "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 # 设置Qt工具链的环境变量
 set(CMAKE_AUTOUIC ON)
@@ -10,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ui)
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h include/*.hpp ui/*.ui qrc/*.qrc)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Network)
 
 set(ts_files translations/${cur_name}_cn.ts translations/${cur_name}_en.ts)
 
@@ -28,8 +27,10 @@ qt_add_translations(${cur_name}
 
 target_link_libraries(${cur_name} PRIVATE
     Qt6::Widgets
+    Qt6::Network
     registration_code
     magic_enum
+    precision_countdown
 )
 
 target_include_directories(${cur_name} PRIVATE

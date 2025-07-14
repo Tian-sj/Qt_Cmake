@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "gui/main_object.hpp"
+#include "gui/base_window.hpp"
 
 #include <QDialog>
 
@@ -8,7 +8,7 @@ namespace Ui {
 class RegistrationCodeDialog;
 }
 
-class RegistrationCodeDialog : public QDialog, public MainObject
+class RegistrationCodeDialog : public BaseWindow<RegistrationCodeDialog, Ui::RegistrationCodeDialog, QDialog>
 {
     Q_OBJECT
 
@@ -17,11 +17,11 @@ public:
     ~RegistrationCodeDialog();
 
 private:
-    virtual void initUi() override;
+    void initUi() override;
 
-    virtual void initUiText() override;
+    void initUiText() override;
 
-    virtual void initConnect() override;
+    void initConnect() override;
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -30,7 +30,4 @@ private slots:
     void on_btn_copy_clicked();
 
     void on_btn_activate_clicked();
-
-private:
-    Ui::RegistrationCodeDialog *ui;
 };

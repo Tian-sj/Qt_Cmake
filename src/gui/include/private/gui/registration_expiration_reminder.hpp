@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "gui/main_object.hpp"
+#include "gui/base_window.hpp"
 
 #include <QDialog>
 
@@ -8,7 +8,7 @@ namespace Ui {
 class RegistrationExpirationReminder;
 }
 
-class RegistrationExpirationReminder : public QDialog, public MainObject
+class RegistrationExpirationReminder : public BaseWindow<RegistrationExpirationReminder, Ui::RegistrationExpirationReminder, QDialog>
 {
     Q_OBJECT
 
@@ -27,7 +27,5 @@ private slots:
     void on_check_box_checkStateChanged(const Qt::CheckState &arg1);
 
 private:
-    Ui::RegistrationExpirationReminder *ui;
-
     bool* is_show_;
 };

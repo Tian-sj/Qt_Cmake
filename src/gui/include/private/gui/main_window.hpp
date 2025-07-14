@@ -1,15 +1,14 @@
 ﻿#pragma once
 
-#include "gui/main_object.hpp"
+#include "gui/base_window.hpp"
 
-class QTimer;
-class Cache;
+#include <QMainWindow>
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QWidget, public MainObject
+class MainWindow : public BaseWindow<MainWindow, Ui::MainWindow, QMainWindow>
 {
     Q_OBJECT
 
@@ -18,16 +17,14 @@ public:
     ~MainWindow();
 
 protected:
-    virtual void initUi() override;
-    virtual void initConnect() override;
-    virtual void initUiText() override;
+    void initUi() override;
+    void initConnect() override;
+    void initUiText() override;
 
 private slots:
-    void on_timer_rc();
+    void timerRc();
 
 private:
-    Ui::MainWindow *ui;
-
     QTimer* timer_rc_;
 
     bool is_show_;

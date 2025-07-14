@@ -8,19 +8,12 @@
 #include "ui_registration_code_dialog.h"
 
 RegistrationCodeDialog::RegistrationCodeDialog(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::RegistrationCodeDialog)
+    : BaseWindow<RegistrationCodeDialog, Ui::RegistrationCodeDialog, QDialog>(parent)
 {
-    ui->setupUi(this);
-
-    initUi();
-    initUiText();
-    initConnect();
 }
 
 RegistrationCodeDialog::~RegistrationCodeDialog()
 {
-    delete ui;
 }
 
 void RegistrationCodeDialog::initUi()
@@ -32,6 +25,8 @@ void RegistrationCodeDialog::initUi()
 
 void RegistrationCodeDialog::initUiText()
 {
+    ui->retranslateUi(this);
+
     ui->btn_copy->setText(tr("Copy"));
     ui->btn_activate->setText(tr("Activate"));
     ui->text->setPlainText(Config::getInstance().getRegistrationCode());

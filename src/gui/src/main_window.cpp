@@ -3,7 +3,6 @@
 #include "gui/config.hpp"
 
 #include <QVBoxLayout>
-#include <QTimer>
 #include <QDateTime>
 #include <QMessageBox>
 #include <QTextLayout>
@@ -11,17 +10,11 @@
 #include "ui_main_window.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+    : BaseWindow<MainWindow, Ui::MainWindow, QMainWindow>(parent)
     , timer_rc_(new QTimer(this))
     , is_show_(true)
     , is_current_show_(false)
-    , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-
-    initUi();
-    initConnect();
-    initUiText();
 }
 
 MainWindow::~MainWindow() {
@@ -36,8 +29,7 @@ void MainWindow::initUi() {
 }
 
 void MainWindow::initConnect(){
-    connectLanguageChanged(this);
-    connect(timer_rc_, &QTimer::timeout, this, &MainWindow::on_timer_rc);
+    connect(timer_rc_, &QTimer::timeout, this, &MainWindow::timerRc);
 }
 
 void MainWindow::initUiText(){
@@ -45,7 +37,7 @@ void MainWindow::initUiText(){
     this->setWindowTitle(tr(_NAME));
 }
 
-void MainWindow::on_timer_rc() {
+void MainWindow::timerRc() {
     if (is_show_ && !is_current_show_ && Config::getInstance().checkExpirationReminder()) {
         RegistrationExpirationReminder *rer = new RegistrationExpirationReminder(&is_show_);
         is_current_show_ = true;

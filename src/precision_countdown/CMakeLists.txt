@@ -1,4 +1,5 @@
-﻿set(cur_name precision_countdown)
+﻿set(cur_name "")
+get_filename_component(cur_name "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS include/*.hpp)
 

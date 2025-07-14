@@ -4,19 +4,12 @@
 #include "ui_registration_expiration_reminder.h"
 
 RegistrationExpirationReminder::RegistrationExpirationReminder(bool *is_show, QWidget *parent)
-    : QDialog(parent)
+    : BaseWindow<RegistrationExpirationReminder, Ui::RegistrationExpirationReminder, QDialog>(parent)
     , is_show_(is_show)
-    , ui(new Ui::RegistrationExpirationReminder)
 {
-    ui->setupUi(this);
-
-    initUi();
-    initUiText();
-    initConnect();
 }
 
 RegistrationExpirationReminder::~RegistrationExpirationReminder() {
-    delete ui;
 }
 
 void RegistrationExpirationReminder::initUi() {
@@ -27,6 +20,8 @@ void RegistrationExpirationReminder::initUi() {
 }
 
 void RegistrationExpirationReminder::initUiText() {
+    ui->retranslateUi(this);
+
     ui->lab_message->setText(tr("Your registration code will expired at %1 , please update the registration code as soon as possible, otherwise the expiration program will terminate automatically.").arg(Config::getInstance().getEndTime().toString("yyyy-MM-dd HH:mm:ss")));
     ui->check_box->setText(tr("Don't show this reminder again"));
     // 确认
