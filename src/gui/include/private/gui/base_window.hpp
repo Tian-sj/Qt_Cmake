@@ -2,7 +2,6 @@
 
 #include "gui/i_ui_initializable.hpp"
 
-#include <QTimer>
 #include <QFile>
 #include <QWidget>
 #include <QEvent>
@@ -17,15 +16,14 @@ public:
     {
         ui->setupUi(this);
 
-        // ↓ 延后到事件循环再调用，保证 Derived 部分已经构造完毕
-        // ↓ 这里改成通过接口调用 public 的 initUi()
-        QTimer::singleShot(0, this, [this]() {
-            // 调用 public 的 IUiInitializable::initUi，virtual dispatch 到 Derived::initUi
+        QMetaObject::invokeMethod(this, [this] {
             IUiInitializable* iface = this;
+            QMetaObject::connectSlotsByName(this);
             iface->initUi();
             iface->initConnect();
             iface->initUiText();
-        });    }
+        }, Qt::QueuedConnection);
+    }
 
     ~BaseWindow() override {
         delete ui;

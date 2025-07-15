@@ -16,18 +16,18 @@ public:
     static Config& getInstance();
 
     enum class Language {
-        ENGLISH,
-        CHINESE
+        English,
+        Chinese
     };
 
     enum class Font {
-        INTER,
-        NOTO_SANS_SC
+        HarmonyOS_Sans,
+        HarmonyOS_Sans_SC
     };
 
     enum class Theme {
-        LIGHT,
-        DARK
+        Light,
+        Dark
     };
 
     Config(const Config&) = delete;

@@ -56,7 +56,7 @@ Config::Language Config::getLanguage() const {
     if (name.has_value())
         return name.value();
     else
-        return Language::ENGLISH;
+        return Language::English;
 }
 
 void Config::setTheme(const Theme &theme) {
@@ -75,7 +75,7 @@ Config::Theme Config::getTheme() const {
     if (name.has_value())
         return name.value();
     else
-        return Theme::LIGHT;
+        return Theme::Light;
 }
 
 QFont Config::getFont(Font primary, int point_size, QFont::Weight weight) {
@@ -182,7 +182,7 @@ void Config::getTranslationFileNames() {
     dir.setFilter(QDir::Files);
     file_list = dir.entryInfoList();
     foreach (const QFileInfo &file_info, file_list) {
-        map_language_path_[Language::ENGLISH] << file_info.absoluteFilePath();
+        map_language_path_[Language::English] << file_info.absoluteFilePath();
         translators_.emplace_back(new QTranslator);
     }
 
@@ -192,21 +192,21 @@ void Config::getTranslationFileNames() {
     dir.setFilter(QDir::Files);
     file_list = dir.entryInfoList();
     foreach (const QFileInfo &file_info, file_list) {
-        map_language_path_[Language::CHINESE] << file_info.absoluteFilePath();
+        map_language_path_[Language::Chinese] << file_info.absoluteFilePath();
     }
 }
 
 QString Config::fontDir(Font font) {
     switch (font) {
-    case Font::INTER: return QCoreApplication::applicationDirPath() + "/fonts/Inter";
-    case Font::NOTO_SANS_SC : return QCoreApplication::applicationDirPath() + "/fonts/Noto_Sans_SC";
+    case Font::HarmonyOS_Sans: return QCoreApplication::applicationDirPath() + "/fonts/HarmonyOS_Sans";
+    case Font::HarmonyOS_Sans_SC : return QCoreApplication::applicationDirPath() + "/fonts/HarmonyOS_Sans_SC";
     default: return "";
     }
 }
 
 void Config::loadFonts() {
-    loadFontDir(Font::INTER, fontDir(Font::INTER));
-    loadFontDir(Font::NOTO_SANS_SC, fontDir(Font::NOTO_SANS_SC));
+    loadFontDir(Font::HarmonyOS_Sans, fontDir(Font::HarmonyOS_Sans));
+    loadFontDir(Font::HarmonyOS_Sans_SC, fontDir(Font::HarmonyOS_Sans_SC));
 }
 
 void Config::loadFontDir(Font font, const QString &dir_path) {

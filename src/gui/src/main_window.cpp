@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QTextLayout>
+#include <QTimer>
 
 #include "ui_main_window.h"
 

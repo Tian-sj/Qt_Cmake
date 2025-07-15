@@ -8,6 +8,13 @@
 #include <QMessageBox>
 #include <QFontDatabase>
 
+
+#if(_WIN32)
+static constexpr int FONT_SIZE = 9;
+#else
+static constexpr int FONT_SIZE = 12;
+#endif
+
 GuiApp::GuiApp(int &argc, char **argv)
     : app_(std::make_unique<QApplication>(argc, argv))
     , main_window_(nullptr)
@@ -22,14 +29,13 @@ int GuiApp::run() {
 
     Config& config = Config::getInstance();
 
+    // config.setLanguage(Config::Language::Chinese);
     config.setLanguage(config.getLanguage());
     config.setTheme(config.getTheme());
 
-    QFont app_font = config.getFont(Config::Font::INTER, 10, QFont::Normal);
+    QFont app_font = config.getFont(Config::Font::HarmonyOS_Sans, FONT_SIZE, QFont::Normal);
     app_font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferDefault | QFont::ContextFontMerging));
     app_->setFont(app_font);
-
-    QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Han, config.getFontFamilies(Config::Font::NOTO_SANS_SC));
 
 #if 0
     config.deleteRegistrationCode();
