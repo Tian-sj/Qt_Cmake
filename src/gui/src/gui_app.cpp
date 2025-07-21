@@ -10,7 +10,7 @@
 
 
 #if(_WIN32)
-static constexpr int FONT_SIZE = 9;
+static constexpr int FONT_SIZE = 10;
 #else
 static constexpr int FONT_SIZE = 12;
 #endif
