@@ -11,7 +11,7 @@ file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h include/*.hpp ui/
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Network)
 
-set(ts_files translations/${cur_name}_cn.ts translations/${cur_name}_en.ts)
+set(ts_files translations/${cur_name}_zh_CN.ts translations/${cur_name}_en.ts)
 
 add_library(${cur_name} SHARED
     ${srcs}

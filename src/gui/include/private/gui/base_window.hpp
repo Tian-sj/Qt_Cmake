@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QWidget>
 #include <QEvent>
+#include <QTimer>
 
 template<typename Derived, typename UiClass, typename Super = QWidget>
 class BaseWindow : public Super, public IUiInitializable
@@ -16,12 +17,15 @@ public:
     {
         ui->setupUi(this);
 
-        QMetaObject::invokeMethod(this, [this] {
-            IUiInitializable* iface = this;
-            QMetaObject::connectSlotsByName(this);
-            iface->initUi();
-            iface->initConnect();
-            iface->initUiText();
+        QMetaObject::invokeMethod(this, [self = static_cast<Derived*>(this)] {
+            QMetaObject::connectSlotsByName(self);
+            self->initUi();
+            self->initConnect();
+            self->initUiText();
+
+            QTimer::singleShot(0, self, [self]() {
+                self->initLazy();
+            });
         }, Qt::QueuedConnection);
     }
 
@@ -56,6 +60,14 @@ protected:
      */
     virtual void initUiText() override = 0;
 
+    /*!
+     * @brief
+     *
+     * @attention
+     */
+    virtual void initLazy() override = 0;
+
+
     void changeEvent(QEvent* ev) override {
         if (ev->type() == QEvent::LanguageChange) {
             // 调用接口的 retranslateUi，多态分发到 Derived
@@ -64,7 +76,6 @@ protected:
         }
         Super::changeEvent(ev);
     }
-
 
     /*!
      * @brief

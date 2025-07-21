@@ -16,12 +16,13 @@ public:
     explicit RegistrationExpirationReminder(bool *is_show, QWidget *parent = nullptr);
     ~RegistrationExpirationReminder();
 
-private:
     virtual void initUi() override;
 
     virtual void initUiText() override;
 
     virtual void initConnect() override;
+
+    virtual void initLazy() override;
 
 private slots:
     void on_check_box_checkStateChanged(const Qt::CheckState &arg1);

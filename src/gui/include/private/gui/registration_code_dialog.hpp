@@ -16,12 +16,13 @@ public:
     explicit RegistrationCodeDialog(QWidget *parent = nullptr);
     ~RegistrationCodeDialog();
 
-private:
     void initUi() override;
 
     void initUiText() override;
 
     void initConnect() override;
+
+    void initLazy() override;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

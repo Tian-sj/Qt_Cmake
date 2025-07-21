@@ -16,10 +16,10 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-protected:
     void initUi() override;
     void initConnect() override;
     void initUiText() override;
+    void initLazy() override;
 
 private slots:
     void timerRc();

@@ -1,5 +1,5 @@
 ﻿if(APPLE)
-    set(CMAKE_PREFIX_PATH "/opt/Qt/6.8.3/macos")
+    set(CMAKE_PREFIX_PATH "/opt/Qt/6.9.1/macos")
 elseif(WIN32)
-    set(CMAKE_PREFIX_PATH "C:/Qt/6.8.3/msvc2022_64")
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.9.1/msvc2022_64")
 endif()

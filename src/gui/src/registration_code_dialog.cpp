@@ -73,3 +73,5 @@ void RegistrationCodeDialog::closeEvent(QCloseEvent *event)
 {
     return reject();
 }
+
+void RegistrationCodeDialog::initLazy() {}

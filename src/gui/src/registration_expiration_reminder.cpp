@@ -36,3 +36,5 @@ void RegistrationExpirationReminder::initConnect() {
 void RegistrationExpirationReminder::on_check_box_checkStateChanged(const Qt::CheckState &arg1) {
     *is_show_ = !arg1;
 }
+
+void RegistrationExpirationReminder::initLazy() {}

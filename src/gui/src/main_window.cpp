@@ -61,3 +61,5 @@ void MainWindow::timerRc() {
         qApp->exit();
     }
 }
+
+void MainWindow::initLazy() {}

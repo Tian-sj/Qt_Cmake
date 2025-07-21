@@ -1,6 +1,5 @@
-﻿set(cur_name registration_code)
-
-include(MyFindQt6)
+﻿set(cur_name "")
+get_filename_component(cur_name "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 # 设置Qt工具链的环境变量
 set(CMAKE_AUTOMOC ON)
