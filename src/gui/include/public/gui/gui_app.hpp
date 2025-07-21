@@ -35,7 +35,7 @@ private:
      *
      * @attention
      */
-    void set_default_style();
+    void setDefaultStyle();
 
 private:
     std::unique_ptr<QApplication> app_;

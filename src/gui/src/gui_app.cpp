@@ -25,7 +25,7 @@ GuiApp::~GuiApp() {
 }
 
 int GuiApp::run() {
-    set_default_style();
+    setDefaultStyle();
 
     Config& config = Config::getInstance();
 
@@ -59,7 +59,7 @@ int GuiApp::run() {
     return app_->exec();
 }
 
-void GuiApp::set_default_style()
+void GuiApp::setDefaultStyle()
 {
     app_->setStyle("Fusion");
 
