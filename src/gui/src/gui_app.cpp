@@ -34,7 +34,8 @@ int GuiApp::run() {
     config.setTheme(config.getTheme());
 
     QFont app_font = config.getFont(Config::Font::HarmonyOS_Sans, FONT_SIZE, QFont::Normal);
-    app_font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferDefault | QFont::ContextFontMerging));
+    // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
+    QFont::StyleStrategy strategy = QFont::StyleStrategy(QFont::PreferDefault | QFont::ContextFontMerging);
     app_->setFont(app_font);
 
 #if 0
@@ -64,5 +65,5 @@ void GuiApp::setDefaultStyle()
     app_->setStyle("Fusion");
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QColor("#F0F0F0"));
+    palette.setBrush(QPalette::Window, QColor::fromRgb(0xF0F0F0));
     app_->setPalette(palette);}
