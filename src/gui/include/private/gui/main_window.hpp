@@ -3,6 +3,7 @@
 #include "gui/base_window.hpp"
 
 #include <QMainWindow>
+#include <QProcess>
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,7 @@ private slots:
     void timerRc();
 
 private:
+    // Ui::MainWindow ui;
     QTimer* timer_rc_;
 
     bool is_show_;

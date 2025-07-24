@@ -8,17 +8,16 @@
 #include <QMessageBox>
 #include <QFontDatabase>
 
-
-#if(_WIN32)
+#ifdef _WIN32
 static constexpr int FONT_SIZE = 10;
 #else
 static constexpr int FONT_SIZE = 12;
 #endif
 
 GuiApp::GuiApp(int &argc, char **argv)
-    : app_(std::make_unique<QApplication>(argc, argv))
-    , main_window_(nullptr)
+    : main_window_(nullptr)
 {
+    app_ = std::make_unique<QApplication>(argc, argv);
 }
 
 GuiApp::~GuiApp() {
