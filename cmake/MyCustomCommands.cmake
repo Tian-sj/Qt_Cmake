@@ -42,3 +42,20 @@ endfunction()
 # set(RESOURCE_PATH "skin")
 # set(QRC_FILE ${CMAKE_CURRENT_SOURCE_DIR}/qrc/resource.qrc)
 # add_resources(MyApp ${QRC_FILE} ${RESOURCE_PATH})
+
+function(copy_files SRC_DIR DST_DIR)
+    set(FILES ${ARGN})
+
+    foreach(FILE ${FILES})
+        set(SRC_FILE "${SRC_DIR}/${FILE}")
+        set(DST_FILE "${DST_DIR}/${FILE}")
+
+        file(MAKE_DIRECTORY "${DST_DIR}")
+        file(COPY "${SRC_FILE}" DESTINATION "${DST_DIR}")
+    endforeach()
+endfunction()
+# copy_files(
+#     ${CMAKE_SOURCE_DIR}/assets
+#     ${CMAKE_BINARY_DIR}/assets
+#     icon.png config.json readme.txt
+# )
