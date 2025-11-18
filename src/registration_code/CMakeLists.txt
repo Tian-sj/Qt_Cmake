@@ -12,12 +12,12 @@ set_target_properties(${cur_name} PROPERTIES
 
 if (WIN32)
     set_target_properties(${cur_name} PROPERTIES
-            IMPORTED_IMPLIB  "${CMAKE_CURRENT_LIST_DIR}/lib/win/RegistrationCode.lib"
-            IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/win/RegistrationCode.dll"
+            IMPORTED_IMPLIB  "${CMAKE_CURRENT_LIST_DIR}/lib/win/registration_code.lib"
+            IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/win/registration_code.dll"
     )
 elseif (APPLE)
     set_target_properties(${cur_name} PROPERTIES
-            IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/mac/libRegistrationCode.dylib"
+            IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/mac/libregistration_code.dylib"
     )
 endif()
 
