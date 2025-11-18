@@ -8,24 +8,24 @@ namespace Ui {
 class RegistrationExpirationReminder;
 }
 
-class RegistrationExpirationReminder : public BaseWindow<RegistrationExpirationReminder, Ui::RegistrationExpirationReminder, QDialog>
+class RegistrationExpirationReminder final : public BaseWindow<RegistrationExpirationReminder, Ui::RegistrationExpirationReminder, QDialog>
 {
     Q_OBJECT
 
 public:
     explicit RegistrationExpirationReminder(bool *is_show, QWidget *parent = nullptr);
-    ~RegistrationExpirationReminder();
+    ~RegistrationExpirationReminder() override;
 
-    virtual void initUi() override;
+    void initUi() override;
 
-    virtual void initUiText() override;
+    void initUiText() override;
 
-    virtual void initConnect() override;
+    void initConnect() override;
 
-    virtual void initLazy() override;
+    void initLazy() override;
 
 private slots:
-    void on_check_box_checkStateChanged(const Qt::CheckState &arg1);
+    void on_check_box_checkStateChanged(const Qt::CheckState &arg1) const;
 
 private:
     bool* is_show_;

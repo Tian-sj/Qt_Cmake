@@ -40,7 +40,7 @@ Config::~Config() {
 }
 
 void Config::setLanguage(const Language &language) {
-    auto name_view = magic_enum::enum_name(language);
+    const auto name_view = magic_enum::enum_name(language);
     settings_->setValue("Language", QString::fromUtf8(name_view.data(), static_cast<int>(name_view.size())));
 
     QStringList list = map_language_path_[language];
@@ -52,8 +52,7 @@ void Config::setLanguage(const Language &language) {
 }
 
 Config::Language Config::getLanguage() const {
-    auto name = magic_enum::enum_cast<Language>(settings_->value("Language").toString().toStdString());
-    if (name.has_value())
+    if (const auto name = magic_enum::enum_cast<Language>(settings_->value("Language").toString().toStdString()); name.has_value())
         return name.value();
     else
         return Language::English;
@@ -81,10 +80,10 @@ Config::Theme Config::getTheme() const {
 QFont Config::getFont(Font primary, int point_size, QFont::Weight weight) {
     if (!font_families_.contains(primary) || font_families_[primary].isEmpty()) {
         qWarning() << "[FontManager] Font not found for enum:" << static_cast<int>(primary);
-        return QFont();
+        return {};
     }
 
-    QString family = font_families_[primary].first();
+    const QString family = font_families_[primary].first();
     QFont font(family);
     font.setPointSize(point_size);
     font.setWeight(weight);
@@ -111,7 +110,7 @@ QDateTime Config::getAppRuntime() const {
     return settings_->value("App_runtime").toDateTime();
 }
 
-void Config::registerResource(QString file) {
+void Config::registerResource(const QString& file) {
     qDebug() <<"registerResource:" << QResource::registerResource(file);
 }
 
@@ -167,7 +166,7 @@ RegistrationCode::ErrorType Config::getRegistrationCodeErrorType() const {
 }
 
 bool Config::isWithinXDays(const int day, const QDateTime& date_time_1, const QDateTime& date_time_2) {
-    int days = qAbs(date_time_1.daysTo(date_time_2));
+    const int days = qAbs(date_time_1.daysTo(date_time_2));
     return days < day;
 }
 
@@ -176,11 +175,10 @@ void Config::getTranslationFileNames() {
     QDir dir(resource_path);
 
     QStringList filters;
-    QFileInfoList file_list;
     filters << "*_en.qm";
     dir.setNameFilters(filters);
     dir.setFilter(QDir::Files);
-    file_list = dir.entryInfoList();
+    QFileInfoList file_list = dir.entryInfoList();
     foreach (const QFileInfo &file_info, file_list) {
         map_language_path_[Language::English] << file_info.absoluteFilePath();
         translators_.emplace_back(new QTranslator);
@@ -196,7 +194,7 @@ void Config::getTranslationFileNames() {
     }
 }
 
-QString Config::fontDir(Font font) {
+QString Config::fontDir(const Font font) {
     switch (font) {
     case Font::HarmonyOS_Sans: return QCoreApplication::applicationDirPath() + "/fonts/HarmonyOS_Sans";
     case Font::HarmonyOS_Sans_SC : return QCoreApplication::applicationDirPath() + "/fonts/HarmonyOS_Sans_SC";

@@ -14,7 +14,7 @@ class RegistrationCodeDialog : public BaseWindow<RegistrationCodeDialog, Ui::Reg
 
 public:
     explicit RegistrationCodeDialog(QWidget *parent = nullptr);
-    ~RegistrationCodeDialog();
+    ~RegistrationCodeDialog() override;
 
     void initUi() override;
 
@@ -28,7 +28,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private slots:
-    void on_btn_copy_clicked();
+    void on_btn_copy_clicked() const;
 
     void on_btn_activate_clicked();
 };

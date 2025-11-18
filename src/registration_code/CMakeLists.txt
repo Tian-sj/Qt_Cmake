@@ -1,24 +1,24 @@
 ﻿set(cur_name "")
 get_filename_component(cur_name "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
-# 设置Qt工具链的环境变量
-set(CMAKE_AUTOMOC ON)
-
-file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cpp include/*.h include/*.hpp)
-
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
-add_library(${cur_name} SHARED
-    ${srcs}
+add_library(${cur_name} SHARED IMPORTED GLOBAL)
+
+# 让 include 正确传播
+set_target_properties(${cur_name} PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
 )
 
-target_link_libraries(${cur_name} PRIVATE
-    Qt6::Core
-)
+if (WIN32)
+    set_target_properties(${cur_name} PROPERTIES
+            IMPORTED_IMPLIB  "${CMAKE_CURRENT_LIST_DIR}/lib/win/RegistrationCode.lib"
+            IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/win/RegistrationCode.dll"
+    )
+elseif (APPLE)
+    set_target_properties(${cur_name} PROPERTIES
+            IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/lib/mac/libRegistrationCode.dylib"
+    )
+endif()
 
-target_include_directories(${cur_name} PUBLIC
-    include
-)
-
-# set(LIB_PATH C:/Users/tian_sj/Desktop/Projects/ChuanQiHMI_bin)
-# add_post_build_copy(${cur_name} ${LIB_PATH})
+target_link_libraries(${cur_name} INTERFACE Qt6::Core)

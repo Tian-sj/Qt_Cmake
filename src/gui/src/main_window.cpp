@@ -10,27 +10,31 @@
 
 #include "ui_main_window.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(bool use_reg_code, QWidget *parent)
     : BaseWindow<MainWindow, Ui::MainWindow, QMainWindow>(parent)
-    , timer_rc_(new QTimer(this))
+    , timer_rc_(nullptr)
     , is_show_(true)
     , is_current_show_(false)
 {
+    if (use_reg_code)
+        timer_rc_ = new QTimer(this);
 }
 
-MainWindow::~MainWindow() {
-}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::initUi() {
 
     loadCSS(this, Config::getInstance().getThemePath() + "gui-themes.css");
 
-    timer_rc_->setInterval(60000);
-    timer_rc_->start();
+    if (timer_rc_) {
+        timer_rc_->setInterval(60000);
+        timer_rc_->start();
+    }
 }
 
 void MainWindow::initConnect(){
-    connect(timer_rc_, &QTimer::timeout, this, &MainWindow::timerRc);
+    if (timer_rc_)
+        connect(timer_rc_, &QTimer::timeout, this, &MainWindow::timerRc);
 }
 
 void MainWindow::initUiText(){
@@ -40,7 +44,7 @@ void MainWindow::initUiText(){
 
 void MainWindow::timerRc() {
     if (is_show_ && !is_current_show_ && Config::getInstance().checkExpirationReminder()) {
-        RegistrationExpirationReminder *rer = new RegistrationExpirationReminder(&is_show_);
+        auto *rer = new RegistrationExpirationReminder(&is_show_);
         is_current_show_ = true;
         rer->exec();
         is_current_show_ = false;

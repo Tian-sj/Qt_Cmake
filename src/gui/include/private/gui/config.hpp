@@ -66,14 +66,14 @@ public:
      *
      * @return        QDateTime 启动时间
      */
-    QDateTime getAppRuntime() const;
+    [[nodiscard]] QDateTime getAppRuntime() const;
 
     /*!
      * @brief         注册 Qt 资源文件（*.qrc）
      *
      * @param         file   资源文件路径
      */
-    void registerResource(QString file);
+    static void registerResource(const QString& file);
 
     /*!
      * @brief         验证注册码
@@ -100,14 +100,14 @@ public:
      *
      * @return        注册码字符串
      */
-    QString getRegistrationCode() const;
+    [[nodiscard]] QString getRegistrationCode() const;
 
     /*!
      * @brief         获取系统唯一标识符
      *
      * @return        唯一标识符字符串
      */
-    QString getUniqueSystemIdentifier() const;
+    [[nodiscard]] QString getUniqueSystemIdentifier() const;
 
     /*!
      * @brief         检查注册码是否即将过期
@@ -121,14 +121,14 @@ public:
      *
      * @return        QDateTime 对象
      */
-    QDateTime getEndTime() const;
+    [[nodiscard]] QDateTime getEndTime() const;
 
     /*!
      * @brief         获取最近一次校验的注册码错误类型
      *
      * @return        RegistrationCode::ErrorType 枚举值
      */
-    RegistrationCode::ErrorType getRegistrationCodeErrorType() const;
+    [[nodiscard]] RegistrationCode::ErrorType getRegistrationCodeErrorType() const;
 
     /*!
      * @brief         设置当前语言
@@ -142,7 +142,7 @@ public:
      *
      * @return        当前语言
      */
-    Language getLanguage() const;
+    [[nodiscard]] Language getLanguage() const;
 
     /*!
      * @brief         设置当前主题
@@ -156,14 +156,14 @@ public:
      *
      * @return        当前主题
      */
-    Theme getTheme() const;
+    [[nodiscard]] Theme getTheme() const;
 
     /*!
      * @brief         获取当前主题的 CSS 路径
      *
      * @return        路径字符串
      */
-    QString getThemePath() const;
+    [[nodiscard]] QString getThemePath() const;
 
     /*!
      * @brief         获取字体对象
@@ -195,7 +195,7 @@ public:
      *
      * @return        整型 ID
      */
-    int getCurrentUserId() const;
+    [[nodiscard]] int getCurrentUserId() const;
 
 private:
     /*!
@@ -216,7 +216,7 @@ private:
      * @param         date_time_2   时间点 2
      * @return        true 表示在范围内
      */
-    bool isWithinXDays(const int day, const QDateTime& date_time_1, const QDateTime& date_time_2);
+    static bool isWithinXDays(int day, const QDateTime& date_time_1, const QDateTime& date_time_2);
 
     /*!
      * @brief         获取翻译文件名
@@ -229,7 +229,7 @@ private:
      * @param         font   字体枚举值
      * @return        路径字符串
      */
-    QString fontDir(Font font);
+    static QString fontDir(Font font);
 
     /*!
      * @brief         加载所有字体
@@ -254,5 +254,5 @@ private:
 
     QHash<Font, QStringList> font_families_;                //!< 字体 -> 可用家族列表
     QString theme_path_;                                    //!< 当前主题的 CSS 路径
-    int user_id_;                                           //!< 当前用户 ID
+    int user_id_{};                                           //!< 当前用户 ID
 };

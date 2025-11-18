@@ -9,13 +9,13 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public BaseWindow<MainWindow, Ui::MainWindow, QMainWindow>
+class MainWindow final : public BaseWindow<MainWindow, Ui::MainWindow, QMainWindow>
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit MainWindow(bool use_reg_code, QWidget *parent = nullptr);
+    ~MainWindow() override;
 
     void initUi() override;
     void initConnect() override;

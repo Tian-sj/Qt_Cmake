@@ -25,14 +25,9 @@ void DragDropPlainTextEditRC::dragEnterEvent(QDragEnterEvent *event)
 
 void DragDropPlainTextEditRC::dropEvent(QDropEvent *event)
 {
-    const QMimeData *mime_data = event->mimeData();
-
-    if (mime_data->hasUrls()) {
-        QList<QUrl> url_list = mime_data->urls();
-
-        if (url_list.size() > 0) {
-            QString file_path = url_list.at(0).toLocalFile();
-            if (isValidFile(file_path)) {
+    if (const QMimeData *mime_data = event->mimeData(); mime_data->hasUrls()) {
+        if (const QList<QUrl> url_list = mime_data->urls(); !url_list.empty()) {
+            if (const QString file_path = url_list.at(0).toLocalFile(); isValidFile(file_path)) {
                 loadFile(file_path);
             } else {
                 setPlainText(tr("Invalid file type. Only .cqrc files are allowed."));

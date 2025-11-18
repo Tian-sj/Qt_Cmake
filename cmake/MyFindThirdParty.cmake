@@ -2,4 +2,8 @@
     include("/Users/tian_sj/code/third_party/third_party.cmake")
 elseif(WIN32)
     include("C:/Users/tian_sj/Desktop/Projects/third_party/third_party.cmake")
+elseif(UNIX AND NOT APPLE)
+    include("/home/Tian/code/third_party/third_party.cmake")
+else()
+    message(FATAL_ERROR "Unsupported platform for finding third-party libraries.")
 endif()

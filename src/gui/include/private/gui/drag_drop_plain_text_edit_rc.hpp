@@ -18,7 +18,7 @@ public:
      *
      * @param         parent   父级 QWidget 指针（默认 nullptr）
      */
-    DragDropPlainTextEditRC(QWidget *parent = nullptr);
+    explicit DragDropPlainTextEditRC(QWidget *parent = nullptr);
 
 protected:
     /*!

@@ -9,8 +9,7 @@ RegistrationExpirationReminder::RegistrationExpirationReminder(bool *is_show, QW
 {
 }
 
-RegistrationExpirationReminder::~RegistrationExpirationReminder() {
-}
+RegistrationExpirationReminder::~RegistrationExpirationReminder() = default;
 
 void RegistrationExpirationReminder::initUi() {
     this->loadCSS(this, "");
@@ -33,7 +32,7 @@ void RegistrationExpirationReminder::initConnect() {
 }
 
 
-void RegistrationExpirationReminder::on_check_box_checkStateChanged(const Qt::CheckState &arg1) {
+void RegistrationExpirationReminder::on_check_box_checkStateChanged(const Qt::CheckState &arg1) const {
     *is_show_ = !arg1;
 }
 

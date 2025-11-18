@@ -14,14 +14,16 @@ static constexpr int FONT_SIZE = 10;
 static constexpr int FONT_SIZE = 12;
 #endif
 
+// 是否开启注册码
+static constexpr bool USE_REG_CODE = true;
+
 GuiApp::GuiApp(int &argc, char **argv)
     : main_window_(nullptr)
 {
     app_ = std::make_unique<QApplication>(argc, argv);
 }
 
-GuiApp::~GuiApp() {
-}
+GuiApp::~GuiApp() = default;
 
 int GuiApp::run() {
     setDefaultStyle();
@@ -34,27 +36,27 @@ int GuiApp::run() {
 
     QFont app_font = config.getFont(Config::Font::HarmonyOS_Sans, FONT_SIZE, QFont::Normal);
     // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
-    QFont::StyleStrategy strategy = QFont::StyleStrategy(QFont::PreferDefault | QFont::ContextFontMerging);
+    auto strategy = QFont::StyleStrategy(QFont::PreferDefault | QFont::ContextFontMerging);
     app_->setFont(app_font);
 
 #if 0
     config.deleteRegistrationCode();
 #endif
 
-    if (QDateTime::currentDateTime() <= config.getAppRuntime() || (!config.getRegistrationCode().isEmpty() && config.getAppRuntime().isNull())) {
+    if (USE_REG_CODE && (QDateTime::currentDateTime() <= config.getAppRuntime() || (!config.getRegistrationCode().isEmpty() && config.getAppRuntime().isNull()))) {
         QMessageBox::critical(nullptr, "Error", "The application has expired, please contact the vendor for a new license key.");
         return 0;
     }
 
     config.setAppRuntime(QDateTime::currentDateTime());
 
-    if (!config.validateCode(config.getRegistrationCode())) {
-        RegistrationCodeDialog *reg_code_dialog = new RegistrationCodeDialog();
+    if (USE_REG_CODE && !config.validateCode(config.getRegistrationCode())) {
+        auto *reg_code_dialog = new RegistrationCodeDialog();
         if (reg_code_dialog->exec() != QDialog::Accepted)
             return 0;
     }
 
-    main_window_ = std::make_unique<MainWindow>();
+    main_window_ = std::make_unique<MainWindow>(USE_REG_CODE);
     main_window_->show();
     return app_->exec();
 }

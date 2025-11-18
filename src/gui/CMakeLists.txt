@@ -1,4 +1,4 @@
-﻿set(cur_name "")
+set(cur_name "")
 get_filename_component(cur_name "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 
 # 设置Qt工具链的环境变量
@@ -17,6 +17,10 @@ add_library(${cur_name} SHARED
     ${srcs}
 )
 
+set(QT_I18N_SOURCE_LANGUAGE "en")
+
+set(QT_I18N_TRANSLATED_LANGUAGES zh_CN)
+
 qt_add_translations(${cur_name}
     SOURCE_TARGETS ${cur_name}
     TS_FILE_BASE ${cur_name}
@@ -33,12 +37,11 @@ target_link_libraries(${cur_name} PRIVATE
     precision_countdown
 )
 
-target_include_directories(${cur_name} PRIVATE
-    include/private
-)
-
-target_include_directories(${cur_name} PUBLIC
-    include/public
+target_include_directories(${cur_name}
+    PRIVATE
+        include/private
+    PUBLIC
+        include/public
 )
 
 # set(RESOURCE_PATH "skin")

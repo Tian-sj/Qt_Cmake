@@ -47,8 +47,8 @@ project(${_NAME} LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# 执行程序生成路径
 if(WIN32)
+    set(OS_BIN_SUBDIR "bin/win")
     #windows系统动态库生成lib文件命令
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     # 设置静态库文件目录
@@ -56,11 +56,41 @@ if(WIN32)
     # 可执行文件目录
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/windows)
 elseif(APPLE)
+    set(OS_BIN_SUBDIR "bin/mac")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/macos)
-else(UNIX)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/linux)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(OS_BIN_SUBDIR "bin/linux")
+    set(PROGRAM_OUT_DIR "${CMAKE_SOURCE_DIR}/bin/linux")
+    file(MAKE_DIRECTORY "${PROGRAM_OUT_DIR}")
+
+    # 单配置生成器（Ninja/Makefile）
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${PROGRAM_OUT_DIR}") # 可执行
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  "${PROGRAM_OUT_DIR}") # SHARED/MODULE 默认也会来这里
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  "${PROGRAM_OUT_DIR}") # .a
+
+    # 多配置生成器兼容（无害；在 Ninja 下也 OK）
+    foreach(cfg Debug Release RelWithDebInfo MinSizeRel)
+      string(TOUPPER "${cfg}" CFG_UP)
+      set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_UP}  "${PROGRAM_OUT_DIR}")
+      set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_UP}  "${PROGRAM_OUT_DIR}")
+      set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_UP}  "${PROGRAM_OUT_DIR}")
+    endforeach()
+
+    # 运行时搜索“当前目录($ORIGIN)” + 你的私有运行库目录
+    # 可执行：bin/linux/            -> $ORIGIN
+    # 私有库：scripts/runtime/lib/   -> $ORIGIN/../../scripts/runtime/lib
+    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    set(CMAKE_INSTALL_RPATH
+      "\$ORIGIN"                          # 找同目录的 .so（你自己生成的动态库）
+      "\$ORIGIN/../../scripts/runtime/lib" # 找你随包带的新版 libstdc++
+    )
 endif()
 
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}" CACHE PATH "" FORCE)
+set(CMAKE_INSTALL_BINDIR "${OS_BIN_SUBDIR}"    CACHE PATH "" FORCE)
+set(CMAKE_INSTALL_LIBDIR "${OS_BIN_SUBDIR}"    CACHE PATH "" FORCE)
 
 add_subdirectory(src)
 add_subdirectory(main)

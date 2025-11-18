@@ -12,9 +12,7 @@ RegistrationCodeDialog::RegistrationCodeDialog(QWidget *parent)
 {
 }
 
-RegistrationCodeDialog::~RegistrationCodeDialog()
-{
-}
+RegistrationCodeDialog::~RegistrationCodeDialog() = default;
 
 void RegistrationCodeDialog::initUi()
 {
@@ -37,8 +35,7 @@ void RegistrationCodeDialog::initConnect()
 
 }
 
-void RegistrationCodeDialog::on_btn_copy_clicked()
-{
+void RegistrationCodeDialog::on_btn_copy_clicked() const {
     QClipboard* clip = QApplication::clipboard();
     clip->setText(ui->uuid->text());
 }
@@ -46,9 +43,8 @@ void RegistrationCodeDialog::on_btn_copy_clicked()
 
 void RegistrationCodeDialog::on_btn_activate_clicked()
 {
-    QString code = ui->text->toPlainText();
-    bool valid =  Config::getInstance().validateCode(code);
-    if (valid) {
+    const QString code = ui->text->toPlainText();
+    if (bool valid =  Config::getInstance().validateCode(code)) {
         Config::getInstance().setRegistrationCode(code);
         return accept();
     } else {
