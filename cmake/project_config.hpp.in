@@ -1,5 +1,6 @@
 #pragma once
 
+// 此文件由 CMake configure_file() 生成，禁止直接修改 build 目录中的副本。
 #include <string_view>
 
 #cmakedefine01 QTCPP_GIT_DIRTY

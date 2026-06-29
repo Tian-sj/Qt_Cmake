@@ -1,3 +1,4 @@
+# 将预编译 SDK 包装成 imported target，调用方无需知道平台库文件路径。
 add_library(qtcpp_registration_sdk SHARED IMPORTED GLOBAL)
 add_library(QtCpp::registration_sdk ALIAS qtcpp_registration_sdk)
 
@@ -7,6 +8,7 @@ set_target_properties(
         INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
+# Windows 链接 .lib 并运行时加载 .dll；macOS 直接链接 .dylib。
 if(WIN32)
     set(qtcpp_registration_runtime "${CMAKE_CURRENT_SOURCE_DIR}/lib/win/registration_code.dll")
     set_target_properties(
@@ -29,8 +31,10 @@ else()
     )
 endif()
 
+# SDK 公共头暴露 Qt Core 类型，因此依赖只停留在 integration 边界内。
 target_link_libraries(qtcpp_registration_sdk INTERFACE Qt6::Core)
 
+# 将 SDK 运行库复制到最终程序可加载的位置，并补充安装规则。
 function(qtcpp_install_registration_runtime app_target)
     get_target_property(registration_runtime qtcpp_registration_sdk IMPORTED_LOCATION)
 
@@ -41,6 +45,7 @@ function(qtcpp_install_registration_runtime app_target)
         set(registration_runtime_destination "$<TARGET_FILE_DIR:${app_target}>")
     endif()
 
+    # copy_if_different 避免未变化的二进制触发无意义重写。
     add_custom_command(
         TARGET "${app_target}"
         POST_BUILD

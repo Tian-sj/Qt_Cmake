@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.25)
 
+# 用法：cmake [-DFORCE=ON] [-DQT_ROOT=<路径>] [-DNINJA_PATH=<路径>]
+#             [-DTHIRD_PARTY_ROOT=<共享第三方库路径>]
+#             -P scripts/setup-toolchain.cmake
+# 本脚本只发现本机工具并生成 CMakeUserPresets.json，不安装工具也不执行构建。
 get_filename_component(project_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
+# OUTPUT 可用于测试或特殊工作区；默认文件由 Git 忽略，不会泄漏个人绝对路径。
 if(NOT DEFINED OUTPUT OR OUTPUT STREQUAL "")
     set(OUTPUT "${project_root}/CMakeUserPresets.json")
 endif()
@@ -11,6 +16,7 @@ if(EXISTS "${OUTPUT}" AND NOT FORCE)
     message(FATAL_ERROR "${OUTPUT} 已存在；如需覆盖请传入 -DFORCE=ON。")
 endif()
 
+# CMake 的 string(JSON) 需要已经带双引号并正确转义的 JSON 字符串值。
 function(json_quote output value)
     string(REPLACE "\\" "\\\\" escaped "${value}")
     string(REPLACE "\"" "\\\"" escaped "${escaped}")
@@ -20,6 +26,7 @@ function(json_quote output value)
     set(${output} "\"${escaped}\"" PARENT_SCOPE)
 endfunction()
 
+# 接受“可执行文件”或“包含该程序的目录”，并统一成真实的 CMake 风格路径。
 function(normalize_executable output candidate executable_name)
     if(candidate STREQUAL "")
         set(${output} "" PARENT_SCOPE)
@@ -39,6 +46,24 @@ function(normalize_executable output candidate executable_name)
     endif()
 endfunction()
 
+# 外部依赖根目录必须包含统一入口 third_party.cmake，不能把任意目录写入预设。
+function(resolve_third_party_root output candidate)
+    if(candidate STREQUAL "")
+        set(${output} "" PARENT_SCOPE)
+        return()
+    endif()
+
+    file(TO_CMAKE_PATH "${candidate}" candidate_path)
+    if(IS_DIRECTORY "${candidate_path}" AND EXISTS "${candidate_path}/third_party.cmake")
+        get_filename_component(candidate_path "${candidate_path}" REALPATH)
+        file(TO_CMAKE_PATH "${candidate_path}" candidate_path)
+        set(${output} "${candidate_path}" PARENT_SCOPE)
+    else()
+        set(${output} "" PARENT_SCOPE)
+    endif()
+endfunction()
+
+# Qt 参数可以是安装前缀、Qt6Config.cmake 或 qmake/qtpaths 可执行文件。
 function(resolve_qt_prefix output candidate)
     if(candidate STREQUAL "")
         set(${output} "" PARENT_SCOPE)
@@ -79,6 +104,7 @@ function(resolve_qt_prefix output candidate)
     set(${output} "" PARENT_SCOPE)
 endfunction()
 
+# 本机 configure preset 继承仓库预设，只补充工具的绝对路径和环境变量。
 function(make_configure_preset output name parent ninja compiler qt_prefix environment)
     set(cache "{}")
     json_quote(value "${ninja}")
@@ -90,6 +116,10 @@ function(make_configure_preset output name parent ninja compiler qt_prefix envir
     if(NOT qt_prefix STREQUAL "")
         json_quote(value "${qt_prefix}")
         string(JSON cache SET "${cache}" CMAKE_PREFIX_PATH "${value}")
+    endif()
+    if(NOT external_third_party_root STREQUAL "")
+        json_quote(value "${external_third_party_root}")
+        string(JSON cache SET "${cache}" QTCPP_EXTERNAL_THIRD_PARTY_ROOT "${value}")
     endif()
 
     set(preset "{}")
@@ -106,6 +136,7 @@ function(make_configure_preset output name parent ninja compiler qt_prefix envir
     set(${output} "${preset}" PARENT_SCOPE)
 endfunction()
 
+# build/test preset 与同名 configure preset 绑定，避免重复配置路径。
 function(make_build_preset output name)
     set(preset "{}")
     json_quote(value "${name}")
@@ -123,7 +154,7 @@ function(make_test_preset output name)
     set(${output} "${preset}" PARENT_SCOPE)
 endfunction()
 
-# Ninja
+# 按显式参数、环境变量、PATH 和常见安装目录的顺序查找 Ninja。
 if(CMAKE_HOST_WIN32)
     set(ninja_name ninja.exe)
 else()
@@ -156,7 +187,7 @@ endif()
 get_filename_component(ninja "${ninja}" REALPATH)
 file(TO_CMAKE_PATH "${ninja}" ninja)
 
-# Compiler and Windows developer environment
+# Windows 必须捕获 VsDevCmd 提供的 MSVC/SDK 环境；Unix 只需确认编译器可用。
 set(environment "{}")
 set(preset_compiler "")
 if(CMAKE_HOST_WIN32)
@@ -190,30 +221,43 @@ if(CMAKE_HOST_WIN32)
         message(FATAL_ERROR "未找到 ${vs_developer_command}。")
     endif()
 
-    set(initialize_msvc
-        "chcp 65001>nul && call \"${vs_developer_command}\" -no_logo -arch=x64")
+    # 使用短生命周期批处理文件，避免 cmd.exe 复合命令的多层引号解析问题。
+    set(_msvc_env_bat "${project_root}/_msvc_env.bat")
+    file(WRITE "${_msvc_env_bat}"
+        "@echo off\r\n"
+        "call \"${vs_developer_command}\" -no_logo -arch=x64 >nul\r\n"
+        "set\r\n"
+    )
     execute_process(
-        COMMAND cmd.exe /d /s /c "${initialize_msvc} && set"
+        COMMAND cmd.exe /d /c "${_msvc_env_bat}"
         RESULT_VARIABLE environment_result
         OUTPUT_VARIABLE environment_output
         ERROR_VARIABLE environment_error
         ENCODING UTF-8
     )
     if(NOT environment_result EQUAL 0)
+        file(REMOVE "${_msvc_env_bat}")
         message(FATAL_ERROR "无法初始化 MSVC x64 环境：${environment_error}")
     endif()
 
+    file(WRITE "${_msvc_env_bat}"
+        "@echo off\r\n"
+        "call \"${vs_developer_command}\" -no_logo -arch=x64 >nul\r\n"
+        "where cl.exe\r\n"
+    )
     execute_process(
-        COMMAND cmd.exe /d /s /c "${initialize_msvc} && where cl.exe"
+        COMMAND cmd.exe /d /c "${_msvc_env_bat}"
         RESULT_VARIABLE compiler_result
         OUTPUT_VARIABLE compiler_output
         ERROR_QUIET
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ENCODING UTF-8
     )
+    file(REMOVE "${_msvc_env_bat}")
     if(NOT compiler_result EQUAL 0 OR compiler_output STREQUAL "")
         message(FATAL_ERROR "Visual Studio 环境已找到，但 cl.exe 不可用。")
     endif()
+
     string(REGEX MATCH "^[^\r\n]+" compiler "${compiler_output}")
     file(TO_CMAKE_PATH "${compiler}" compiler)
     set(preset_compiler "${compiler}")
@@ -248,7 +292,7 @@ else()
     file(TO_CMAKE_PATH "${compiler}" compiler)
 endif()
 
-# Qt 6. Explicit arguments and environment variables take precedence.
+# Qt 6 查找优先级：显式参数、环境变量、PATH 查询工具、常见安装目录。
 set(qt_prefix "")
 set(qt_candidates
     "${QT_ROOT}"
@@ -291,7 +335,28 @@ if(CMAKE_HOST_WIN32 AND qt_prefix MATCHES "[Mm][Ii][Nn][Gg][Ww]")
     message(FATAL_ERROR "Windows 仅支持 MSVC Qt Kit，当前检测到的是 MinGW Kit。")
 endif()
 
-# Generate user presets that inherit the committed project presets.
+# 共享第三方库优先使用显式参数和环境变量，最后尝试项目同级 ../third_party。
+set(external_third_party_root "")
+set(third_party_candidates
+    "${THIRD_PARTY_ROOT}"
+    "$ENV{QTCPP_THIRD_PARTY_ROOT}"
+    "$ENV{THIRD_PARTY_ROOT}"
+    "${project_root}/../third_party"
+)
+foreach(candidate IN LISTS third_party_candidates)
+    if(external_third_party_root STREQUAL "")
+        resolve_third_party_root(candidate_root "${candidate}")
+        if(NOT candidate_root STREQUAL "")
+            set(external_third_party_root "${candidate_root}")
+        endif()
+    endif()
+endforeach()
+if(NOT "${THIRD_PARTY_ROOT}" STREQUAL "" AND external_third_party_root STREQUAL "")
+    message(FATAL_ERROR
+        "THIRD_PARTY_ROOT 无效：${THIRD_PARTY_ROOT}；目录中必须存在 third_party.cmake。")
+endif()
+
+# 始终生成纯 C++ 预设；只有找到 Qt 时才生成 GUI 开发和发布预设。
 set(configure_presets "[]")
 set(build_presets "[]")
 set(test_presets "[]")
@@ -320,6 +385,7 @@ foreach(preset_name IN LISTS preset_names)
     math(EXPR index "${index} + 1")
 endforeach()
 
+# 直接使用 CMake JSON API 生成合法文件，避免依赖 Python 或平台特定模板替换。
 set(presets "{}")
 string(JSON presets SET "${presets}" version 6)
 string(JSON presets SET "${presets}" configurePresets "${configure_presets}")
@@ -327,6 +393,7 @@ string(JSON presets SET "${presets}" buildPresets "${build_presets}")
 string(JSON presets SET "${presets}" testPresets "${test_presets}")
 file(WRITE "${OUTPUT}" "${presets}\n")
 
+# 部分 CMake 环境不提供处理器名，此时使用平台原生环境变量或 uname 回退。
 set(host_processor "${CMAKE_HOST_SYSTEM_PROCESSOR}")
 if(host_processor STREQUAL "")
     if(CMAKE_HOST_WIN32)
@@ -348,5 +415,10 @@ if(qt_prefix STREQUAL "")
     message(STATUS "Qt 6：未找到（仅生成纯 C++ 预设）")
 else()
     message(STATUS "Qt 6：${qt_prefix}")
+endif()
+if(external_third_party_root STREQUAL "")
+    message(STATUS "共享第三方库：未找到（需要时可传入 -DTHIRD_PARTY_ROOT=<路径>）")
+else()
+    message(STATUS "共享第三方库：${external_third_party_root}")
 endif()
 message(STATUS "已生成：${OUTPUT}")

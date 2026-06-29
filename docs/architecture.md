@@ -36,7 +36,7 @@ src/frontend/qt/widgets/                   自定义 Qt 控件
 src/frontend/qt/resources/                 qrc、样式和图片
 src/frontend/qt/translations/              Qt 翻译源文件
 src/frontend/qt/assets/                    字体和应用图标
-third_party/registration_code/             第三方 SDK 头文件和二进制
+vendor/registration_code/                  当前项目专用 SDK 头文件和二进制
 tests/                                     按后端模块镜像组织的测试
 ```
 

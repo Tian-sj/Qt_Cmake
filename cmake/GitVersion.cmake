@@ -1,5 +1,8 @@
+# 防止同一配置过程中重复定义版本解析函数。
 include_guard(GLOBAL)
 
+# 从最近的 vMAJOR.MINOR.PATCH Tag、当前提交数和 Git 状态生成应用版本。
+# Git 不可用或源码包不含 .git 时使用稳定的 1.0.0.0 回退值。
 function(qtcpp_resolve_git_version)
     set(version_major 1)
     set(version_minor 0)
@@ -10,6 +13,7 @@ function(qtcpp_resolve_git_version)
 
     find_package(Git QUIET)
     if(Git_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+        # Tag 只接受 v1.2、v1.2.3 或不带 v/V 前缀的同类格式。
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" describe --abbrev=0 --tags
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -29,6 +33,7 @@ function(qtcpp_resolve_git_version)
             endif()
         endif()
 
+        # 使用 HEAD 提交总数作为单调递增的构建号，不依赖特定分支名。
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" rev-list --count HEAD
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -41,6 +46,7 @@ function(qtcpp_resolve_git_version)
             set(version_build "${build_output}")
         endif()
 
+        # 短哈希用于问题定位，dirty 标志用于区分未提交源码构建。
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -72,11 +78,13 @@ function(qtcpp_resolve_git_version)
         string(APPEND version_full "+dirty")
     endif()
 
+    # Windows VERSIONINFO 的每段版本号只能使用 16 位无符号整数。
     set(version_build_rc "${version_build}")
     if(version_build_rc GREATER 65535)
         math(EXPR version_build_rc "${version_build_rc} % 65536")
     endif()
 
+    # 函数作用域中的结果显式导出给根 CMakeLists.txt 和配置头模板。
     set(QTCPP_VERSION_MAJOR "${version_major}" PARENT_SCOPE)
     set(QTCPP_VERSION_MINOR "${version_minor}" PARENT_SCOPE)
     set(QTCPP_VERSION_PATCH "${version_patch}" PARENT_SCOPE)

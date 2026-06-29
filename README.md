@@ -8,7 +8,7 @@
 - GUI 只能通过 application 的公开接口调用业务能力。
 - 系统能力通过 platform 实现，专有 SDK 通过 integrations 接入，不能反向污染业务层。
 - 所有 target 显式声明源码、include 可见性和依赖，不使用递归 `GLOB`。
-- 构建产物只写入 `build/`，不会污染源码目录。
+- 正式运行文件统一写入根目录 `bin/`；缓存、中间文件和测试仍隔离在 `build/`。
 - UTF-8、C++20、警告策略、测试、格式化和 CI 在三平台保持一致。
 
 ```mermaid
@@ -29,6 +29,7 @@ flowchart LR
 ```text
 Qt_Cmake/
 ├── apps/desktop/                  # 桌面程序入口与依赖组装
+├── bin/                           # 自动生成的程序运行目录，不提交 Git
 ├── cmake/                         # 项目级 CMake 公共模块
 ├── docs/                          # 架构等设计文档
 ├── scripts/                       # 跨平台环境初始化脚本
@@ -46,7 +47,7 @@ Qt_Cmake/
 │       ├── resources/             # 编译进 Qt Resource System 的资源
 │       ├── translations/          # Qt 翻译源文件
 │       └── assets/                # 打包使用的字体和应用图标
-├── third_party/                   # 外部 SDK 头文件与预编译二进制
+├── vendor/                        # 随当前项目管理的专用 SDK
 ├── tests/                         # 与生产模块对应的自动化测试
 ├── CMakeLists.txt                 # 工程入口、版本和全局构建选项
 ├── CMakePresets.json              # 可提交、跨平台共享的构建预设
@@ -59,7 +60,7 @@ Qt_Cmake/
 
 | 文件或目录 | 职责 |
 |---|---|
-| `CMakeLists.txt` | 声明工程、C++ 标准、构建选项、Git 版本，并组织 `third_party`、`src`、`apps` 和 `tests`。这里只放项目级配置，不直接堆业务源码。 |
+| `CMakeLists.txt` | 声明工程、C++ 标准、构建选项、Git 版本，并组织 `vendor`、`src`、`apps` 和 `tests`。这里只放项目级配置，不直接堆业务源码。 |
 | `CMakePresets.json` | 保存团队共享的 configure、build 和 test 预设，所有平台统一使用 Ninja。 |
 | `CMakeUserPresets.json` | 由环境脚本生成，保存当前机器的 Qt、Ninja 和编译器路径。该文件包含本机绝对路径，已被 Git 忽略。 |
 | `CONTRIBUTING.md` | 约定分支、提交、格式化、测试和评审流程，供多人协作时统一执行。 |
@@ -106,17 +107,17 @@ Qt_Cmake/
 
 适合放入这里的代码应具备明确业务边界、尽量不依赖 Qt，并能独立测试。新模块使用相同的 `include/ + src/ + CMakeLists.txt` 结构。
 
-### `src/backend/integrations` 与 `third_party`：第三方隔离
+### `src/backend/integrations` 与 `vendor`：专用 SDK 隔离
 
 | 目录 | 职责 |
 |---|---|
 | `src/backend/integrations/registration/` | 将注册码 SDK 转换为 application 层的 `LicenseGateway` 接口，第三方类型不能越过此边界。 |
-| `third_party/registration_code/include/` | 保存第三方 SDK 公开头文件。 |
-| `third_party/registration_code/lib/mac/` | 保存 macOS 动态库。 |
-| `third_party/registration_code/lib/win/` | 保存 Windows MSVC 使用的 `.lib` 和运行时 `.dll`。 |
-| `third_party/registration_code/CMakeLists.txt` | 将平台二进制包装为可链接的 CMake target。 |
+| `vendor/registration_code/include/` | 保存专用 SDK 公开头文件。 |
+| `vendor/registration_code/lib/mac/` | 保存 macOS 动态库。 |
+| `vendor/registration_code/lib/win/` | 保存 Windows MSVC 使用的 `.lib` 和运行时 `.dll`。 |
+| `vendor/registration_code/CMakeLists.txt` | 将平台二进制包装为可链接的 CMake target。 |
 
-`third_party` 只保存无法通过包管理器稳定获得的第三方产物，不放项目自身业务代码。Linux 当前没有对应的注册码 SDK，因此该功能在 Linux 默认关闭。
+`vendor` 只保存当前项目必须随源码管理、且无法通过共享依赖仓库稳定获得的专用产物，不放项目自身业务代码。Linux 当前没有对应的注册码 SDK，因此该功能在 Linux 默认关闭。
 
 ### `src/frontend/qt`：Qt 表现层
 
@@ -159,11 +160,36 @@ Qt 层只负责展示、收集输入和调用 application 用例。业务判断�
 
 | 文件 | 职责 |
 |---|---|
-| `setup-toolchain.cmake` | 真正的跨平台环境发现逻辑：查找 Ninja、Qt、编译器，并生成 `CMakeUserPresets.json`。 |
-| `setup-toolchain.sh` | macOS/Linux 的薄封装，只负责将参数交给 CMake 脚本。 |
-| `setup-toolchain.ps1` | Windows PowerShell 的薄封装，MSVC 环境由底层 CMake 脚本结合 Visual Studio 工具发现。 |
+| `setup-toolchain.cmake` | 全平台唯一的环境初始化脚本：查找 Ninja、Qt、编译器和共享第三方库目录，并生成 `CMakeUserPresets.json`。 |
 
-自动化脚本统一放在 `scripts/`，核心逻辑只维护一份 CMake 实现，避免三平台脚本行为逐渐不一致。
+macOS、Linux、Windows 和 CI 均直接通过 `cmake -P` 调用该文件，不再维护 `.sh`、`.ps1` 或 Python 包装脚本。
+
+### 外部共享第三方库
+
+项目支持使用仓库外的共享依赖目录，例如当前机器上的 `/Users/tian_sj/Code/third_party`。它与仓库内目录职责不同：
+
+| 位置 | 职责 |
+|---|---|
+| `Qt_Cmake/vendor/` | 当前项目随源码管理的专用 SDK，目前保存注册码库。 |
+| `../third_party/` | 多个项目共享的通用库，例如 Asio、Boost、fmt、QXlsx、OpenSSL。绝对路径不提交 Git。 |
+
+`setup-toolchain.cmake` 会自动检测项目同级的 `../third_party`，并把真实路径写入本机 `CMakeUserPresets.json` 的 `QTCPP_EXTERNAL_THIRD_PARTY_ROOT`。根 CMake 随后加载其中的 `third_party.cmake`，使具体模块可以按需声明依赖：
+
+```cmake
+# 只在真正使用该库的模块 CMakeLists.txt 中加载，不能在根目录一次性引入全部依赖。
+include_third_party(asio nlohmann)
+target_link_libraries(my_module PRIVATE asio nlohmann)
+```
+
+预编译包仍应先加载目录配置，再使用包自身提供的标准 target：
+
+```cmake
+include_third_party(fmt)
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(my_module PRIVATE fmt::fmt)
+```
+
+共享目录不存在时项目仍可正常构建；只有实际模块使用其中的库时才要求配置该目录。
 
 ### 新代码放置规则
 
@@ -173,7 +199,7 @@ Qt 层只负责展示、收集输入和调用 application 用例。业务判断�
 | 独立、可复用的纯 C++ 业务能力 | `src/backend/modules/<module>/` |
 | 文件、数据库、日志、系统 API 实现 | `src/backend/platform/` |
 | 第三方 SDK 或外部服务接入 | `src/backend/integrations/<integration>/` |
-| 第三方预编译头文件或二进制 | `third_party/<library>/` |
+| 当前项目专用的预编译 SDK | `vendor/<sdk>/` |
 | Qt 窗口或对话框 | `src/frontend/qt/views/` |
 | 可复用 Qt 控件 | `src/frontend/qt/widgets/` |
 | 样式、运行期图片和 Qt 资源 | `src/frontend/qt/resources/` |
@@ -193,33 +219,49 @@ Qt 层只负责展示、收集输入和调用 application 用例。业务判断�
 
 所有平台只需要 CMake 3.25+、Ninja 和对应的 C++ 编译器；构建 GUI 时再安装 Qt 6。环境发现脚本本身使用 CMake，不依赖 Python。
 
+## 构建输出目录
+
+正式运行目录位于项目根目录，所有 Preset 共用同一个 `bin/`：
+
+```text
+Qt_Cmake/
+├── bin/                         # 正式程序、运行时动态库和运行资源
+└── build/<preset>/
+    ├── lib/                     # 静态库、Windows 导入库等链接产物
+    ├── symbols/                 # MSVC PDB 调试符号
+    └── tests/bin/               # 测试程序，不进入正式 bin
+```
+
+Windows 构建完成后会自动调用 `windeployqt`，将当前程序实际依赖的 Qt DLL 和插件复制到根目录 `bin/`；启用注册码模块时，其运行时 DLL 也会复制到这里。静态库、测试程序、源码和编译中间文件不会进入 `bin/`。macOS 的运行时资源位于 `bin/<应用名>.app` 内部，Linux 保持标准的可执行文件与系统动态库查找方式。
+
+因为多个 Preset 共用这个目录，切换 Debug/Release 或 Qt Kit 后应重新构建；`bin/` 始终表示最近一次构建生成的本机运行环境。
+
 ## 首次配置
 
-macOS / Linux：
+macOS、Linux 和 Windows 使用同一条初始化命令：
 
 ```bash
-./scripts/setup-toolchain.sh
+cmake -P scripts/setup-toolchain.cmake
 cmake --preset local-dev
 cmake --build --preset local-dev
 ctest --preset local-dev
 ```
 
-Windows PowerShell：
+脚本会自动发现 Ninja、Qt 6、编译器和项目同级的 `../third_party`，并生成本机专用的 `CMakeUserPresets.json`。Windows 还会通过 `vswhere` 和 `VsDevCmd.bat` 获取 MSVC x64 与 Windows SDK 环境。生成文件包含本机绝对路径，已加入 `.gitignore`，不能提交 Git。
 
-```powershell
-.\scripts\setup-toolchain.ps1
-cmake --preset local-dev
-cmake --build --preset local-dev
-ctest --preset local-dev
-```
-
-环境脚本会自动发现 Ninja、Qt 6 和编译器，并生成本机专用的 `CMakeUserPresets.json`。Windows 通过 `vswhere` 和 `VsDevCmd.bat` 获取 MSVC/Windows SDK 环境；生成文件已加入 `.gitignore`，不要提交个人绝对路径。需要覆盖已有文件时使用 `--force`，无法自动发现 Qt 时可传 `--qt <Qt前缀>`。
-
-也可以不经过 shell/PowerShell wrapper，直接执行同一个跨平台 CMake 脚本：
+已有 `CMakeUserPresets.json` 时，使用 `FORCE` 重新生成：
 
 ```bash
 cmake -DFORCE=ON -P scripts/setup-toolchain.cmake
 ```
+
+工具安装在非常规位置时，通过 CMake 变量指定：
+
+```bash
+cmake -DFORCE=ON -DQT_ROOT=<Qt前缀> -DNINJA_PATH=<Ninja路径> -DTHIRD_PARTY_ROOT=<共享库路径> -P scripts/setup-toolchain.cmake
+```
+
+所有 `-D` 参数必须写在 `-P` 前面。可用参数包括 `FORCE`、`QT_ROOT`、`NINJA_PATH`、`THIRD_PARTY_ROOT` 和用于修改生成位置的 `OUTPUT`。
 
 ## 完全不使用 Qt
 

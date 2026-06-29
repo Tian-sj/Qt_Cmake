@@ -32,6 +32,7 @@ bool is_unreserved(const unsigned char value) {
            (value >= '0' && value <= '9') || value == '-' || value == '_' || value == '.';
 }
 
+// 对 UTF-8 原始字节做百分号编码，确保 '='、换行和 '%' 不破坏逐行文件格式。
 std::string encode(const std::string_view value) {
     std::string encoded;
     encoded.reserve(value.size());
@@ -142,6 +143,7 @@ void FileSettingsStore::persist_locked() const {
     auto temporary_file = file_path_;
     temporary_file += ".tmp";
 
+    // 先完整写入临时文件，再替换正式文件，避免异常中断留下半份配置。
     {
         std::ofstream output{temporary_file, std::ios::binary | std::ios::trunc};
         if (!output) {
@@ -160,6 +162,7 @@ void FileSettingsStore::persist_locked() const {
     std::error_code error;
     std::filesystem::rename(temporary_file, file_path_, error);
     if (error) {
+        // Windows 不允许 rename 覆盖已有文件，因此删除旧文件后重试。
         std::filesystem::remove(file_path_, error);
         error.clear();
         std::filesystem::rename(temporary_file, file_path_, error);

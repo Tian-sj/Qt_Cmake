@@ -11,6 +11,7 @@ namespace {
 constexpr std::string_view license_code_key{"license.code"};
 constexpr std::string_view last_runtime_key{"application.last_runtime"};
 
+// 使用 Unix epoch 秒保存时间，避免配置文件依赖时区或本地日期格式。
 std::optional<TimePoint> deserialize_time(const std::optional<std::string>& value) {
     if (!value || value->empty()) {
         return std::nullopt;
@@ -127,6 +128,7 @@ void ApplicationService::clear_license() {
 }
 
 bool ApplicationService::clock_moved_backwards(const TimePoint now) const {
+    // 容差吸收文件精度和轻微校时误差，超过容差才判定为系统时钟回拨。
     return last_runtime_ && now + options_.clock_rollback_tolerance < *last_runtime_;
 }
 
@@ -141,6 +143,7 @@ bool ApplicationService::should_warn(const TimePoint now, const LicenseResult& r
 }
 
 void ApplicationService::record_runtime(const TimePoint now) {
+    // 记录值只允许前进，防止一次较早的时间覆盖已经持久化的安全基线。
     if (!last_runtime_ || now > *last_runtime_) {
         last_runtime_ = now;
         settings_.set(last_runtime_key, serialize_time(now));

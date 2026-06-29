@@ -1,5 +1,6 @@
 #include <windows.h>
 
+// Windows Explorer 使用该资源显示程序图标和 Git 派生的版本信息。
 IDI_ICON1 ICON "@PROJECT_SOURCE_DIR@/src/frontend/qt/assets/icons/logo.ico"
 
 VS_VERSION_INFO VERSIONINFO

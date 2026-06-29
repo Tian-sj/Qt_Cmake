@@ -85,6 +85,7 @@ public:
     void publish(Arguments... arguments) const {
         std::vector<Slot> snapshot;
         {
+            // 复制订阅快照后释放锁，允许回调安全地连接或断开其他订阅。
             const std::scoped_lock lock{state_->mutex};
             snapshot.reserve(state_->slots.size());
             for (const auto& [identifier, slot] : state_->slots) {

@@ -10,6 +10,7 @@
 namespace qtcpp::integrations::registration {
 namespace {
 
+// 第三方枚举只能在 integration 内出现，application 对外只暴露稳定的自有类型。
 application::LicenseStatus to_application_status(const RegistrationCode::ErrorType status) {
     using Source = RegistrationCode::ErrorType;
     switch (status) {

@@ -77,6 +77,7 @@ QFont UiSettings::application_font(const int point_size) const {
 
 void UiSettings::load_bundled_fonts() {
 #if defined(Q_OS_MACOS)
+    // macOS 资源位于 .app/Contents/Resources；其他平台资源与可执行文件同级。
     const auto fonts_path =
         QCoreApplication::applicationDirPath() + QStringLiteral("/../Resources/fonts");
 #else

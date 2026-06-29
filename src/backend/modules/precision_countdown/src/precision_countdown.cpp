@@ -117,6 +117,7 @@ void PrecisionCountdown::run() {
             continue;
         }
 
+        // generation 是状态版本号；任意控制操作都会使本次等待立即失效并重新计算。
         const auto observed_generation = generation_;
         const auto wake_time = std::min(end_time_, now + interval_);
         const bool interrupted =
@@ -140,6 +141,7 @@ void PrecisionCountdown::run() {
 
         remaining_ = std::chrono::duration_cast<Duration>(end_time_ - after_wait);
         const auto value = remaining_;
+        // 用户回调可能耗时或再次控制计时器，调用时不能持有内部互斥锁。
         lock.unlock();
         time_remaining_changed_.publish(value);
         lock.lock();

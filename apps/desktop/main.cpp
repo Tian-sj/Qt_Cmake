@@ -17,6 +17,7 @@
 
 int main(int argc, char* argv[]) {
     try {
+        // main 是唯一组合根：在这里选择具体实现并通过构造函数注入应用层。
         const auto settings_file = qtcpp::platform::application_config_directory(
                                        {.organization = qtcpp::build::organization,
                                         .application_name = qtcpp::build::application_name}) /
