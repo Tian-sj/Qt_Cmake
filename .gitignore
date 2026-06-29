@@ -1,16 +1,31 @@
-# 忽略日志文件
-*.log
+# CMake / build output
+/build/
+/build-*/
+/out/
+/bin/
+CMakeUserPresets.json
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+install_manifest.txt
 
-# 忽略编译生成的文件
-*.o
-*.out
-*.exe
-build/
-bin/
-
-# 忽略 IDE 的临时文件
-.vscode/
+# IDE and editor state
 .cache/
 .idea/
-*.swp
+.vscode/
 *.user
+*.swp
+*.swo
+*~
+
+# Platform files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Runtime output
+*.log
+*.dmp
+*.core

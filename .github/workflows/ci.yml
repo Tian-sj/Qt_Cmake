@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Pure C++ (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Detect Ninja and compiler
+        run: cmake -DFORCE=ON -P scripts/setup-toolchain.cmake
+      - name: Configure
+        run: cmake --preset local-core-only
+      - name: Build
+        run: cmake --build --preset local-core-only
+      - name: Test
+        run: ctest --preset local-core-only
+
+  gui:
+    name: Qt GUI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.*"
+          cache: true
+      - name: Detect Ninja, Qt, and compiler
+        run: cmake -DFORCE=ON -P scripts/setup-toolchain.cmake
+      - name: Configure
+        run: cmake --preset local-dev
+      - name: Build
+        run: cmake --build --preset local-dev
+      - name: Test
+        run: ctest --preset local-dev

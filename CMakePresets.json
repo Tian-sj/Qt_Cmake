@@ -1,0 +1,82 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      }
+    },
+    {
+      "name": "dev",
+      "displayName": "Development (Qt GUI)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "QTCPP_BUILD_GUI": true,
+        "QTCPP_BUILD_TESTS": true
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release (Qt GUI)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "QTCPP_BUILD_GUI": true,
+        "QTCPP_BUILD_TESTS": true
+      }
+    },
+    {
+      "name": "core-only",
+      "displayName": "Pure C++ without Qt",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "QTCPP_BUILD_GUI": false,
+        "QTCPP_BUILD_TESTS": true,
+        "QTCPP_WARNINGS_AS_ERRORS": true
+      }
+    },
+    {
+      "name": "sanitizers",
+      "displayName": "Pure C++ with sanitizers",
+      "inherits": "core-only",
+      "cacheVariables": {
+        "QTCPP_WARNINGS_AS_ERRORS": false,
+        "QTCPP_ENABLE_SANITIZERS": true
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "dev", "configurePreset": "dev" },
+    { "name": "release", "configurePreset": "release" },
+    { "name": "core-only", "configurePreset": "core-only" },
+    { "name": "sanitizers", "configurePreset": "sanitizers" }
+  ],
+  "testPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "core-only",
+      "configurePreset": "core-only",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "sanitizers",
+      "configurePreset": "sanitizers",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

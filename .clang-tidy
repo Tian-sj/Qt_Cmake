@@ -1,0 +1,14 @@
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  concurrency-*,
+  performance-*,
+  portability-*,
+  readability-duplicate-include,
+  readability-inconsistent-declaration-parameter-name,
+  readability-make-member-function-const,
+  readability-redundant-*
+WarningsAsErrors: ''
+HeaderFilterRegex: '^(?!.*[/\\](build|third_party)[/\\]).*$'
+FormatStyle: file

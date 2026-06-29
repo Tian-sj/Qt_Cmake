@@ -1,0 +1,22 @@
+#pragma once
+
+#include <string_view>
+
+#cmakedefine01 QTCPP_GIT_DIRTY
+
+namespace qtcpp::build {
+
+inline constexpr std::string_view application_name{"@QTCPP_APPLICATION_NAME@"};
+inline constexpr std::string_view organization{"@QTCPP_ORGANIZATION@"};
+inline constexpr std::string_view version{"@QTCPP_VERSION_FULL@"};
+inline constexpr std::string_view semantic_version{"@QTCPP_VERSION_SEMVER@"};
+inline constexpr std::string_view git_hash{"@QTCPP_GIT_HASH@"};
+inline constexpr int version_major{@QTCPP_VERSION_MAJOR@};
+inline constexpr int version_minor{@QTCPP_VERSION_MINOR@};
+inline constexpr int version_patch{@QTCPP_VERSION_PATCH@};
+inline constexpr int version_build{@QTCPP_VERSION_BUILD@};
+inline constexpr bool git_dirty{QTCPP_GIT_DIRTY != 0};
+
+}  // namespace qtcpp::build
+
+#undef QTCPP_GIT_DIRTY
