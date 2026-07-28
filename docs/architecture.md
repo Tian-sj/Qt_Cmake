@@ -50,7 +50,8 @@ external Qt app ──┘
 QCustomPlot、QXlsx 和 QWindowKit 属于第三方 Qt 库，不进入任何业务 library 的源码
 目录。源码模式把二进制写入各依赖自己的 `prebuilt/<ABI>/<配置>` 缓存；预编译模式
 只创建 imported target。缓存键必须包含平台、架构、编译器、Qt 版本、静态/动态和
-Debug/Release，不同键之间不得混用。桌面窗口直接依赖 `CppProject::qwindowkit`，
+Debug/Release，不同键之间不得混用。Widgets 前端依赖
+`CppProject::qwindowkit_widgets`，QML 前端依赖 `CppProject::qwindowkit_quick`，
 纯 C++ library 不感知窗口框架。
 
 ## Plugin 边界
@@ -79,15 +80,16 @@ host ── cppproject_plugin_get_api(abi_version) ──> plugin
 Qt 桌面应用使用：
 
 ```text
-CppProject::desktop_ui ──> CppProject::app_core
-    │
-    └── apps/desktop/main.cpp 负责对象创建和依赖组装
+apps/desktop_widgets ──┐
+                      ├──> CppProject::app_core
+apps/desktop_qml ──────┘
 ```
 
-- `apps/desktop` 是 Qt 桌面应用唯一的开发根目录。
-- `desktop_ui` 负责控件、翻译、主题和用户交互。
+- `apps/desktop_widgets` 负责 QWidget、Designer UI、主题和 Widgets 用户交互。
+- `apps/desktop_qml` 负责 Qt Quick 页面、QML 组件和 QML 用户交互。
+- 两个前端是独立可执行程序，通过 CMake 选项单独启用，不互相包含源码。
 - 非 UI 业务进入 `app_core` 或独立 library。
-- 专属于应用的 SDK 适配放在 `apps/desktop/integrations`。
+- 专属于应用的 SDK 适配放在 `apps/desktop_widgets/integrations`。
 - 公共 library 不因桌面应用的私有 SDK 而引入 Qt。
 
 ## 并发与错误

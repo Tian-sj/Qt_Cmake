@@ -2,7 +2,7 @@
 #include "cppproject/app_core/file_settings_store.hpp"
 #include "cppproject/app_core/platform_paths.hpp"
 #include "cppproject/app_core/system_clock.hpp"
-#include "cppproject/desktop/desktop_application.hpp"
+#include "cppproject/widgets/widgets_application.hpp"
 #include "cppproject/project_config.hpp"
 
 #if defined(CPPPROJECT_ENABLE_LICENSING)
@@ -29,13 +29,13 @@ int main(int argc, char* argv[]) {
 #if defined(CPPPROJECT_ENABLE_LICENSING)
         const auto secret = std::string{cppproject::build::organization} + "_" +
                             std::string{cppproject::build::application_name};
-        cppproject::desktop::RegistrationLicenseGateway license_gateway{secret};
+        cppproject::widgets::RegistrationLicenseGateway license_gateway{secret};
         cppproject::app_core::ApplicationService application{settings, clock, &license_gateway};
 #else
         cppproject::app_core::ApplicationService application{settings, clock};
 #endif
 
-        cppproject::desktop::DesktopApplication gui{argc, argv, application};
+        cppproject::widgets::WidgetsApplication gui{argc, argv, application};
         return gui.run();
     } catch (const std::exception& exception) {
         std::cerr << "Fatal startup error: " << exception.what() << '\n';

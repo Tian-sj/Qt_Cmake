@@ -8,7 +8,7 @@
 
 class RegistrationCode;
 
-namespace cppproject::desktop {
+namespace cppproject::widgets {
 
 class RegistrationLicenseGateway final : public app_core::LicenseGateway {
 public:
@@ -27,4 +27,4 @@ private:
     std::unique_ptr<RegistrationCode> registration_code_;
 };
 
-} // namespace cppproject::desktop
+} // namespace cppproject::widgets

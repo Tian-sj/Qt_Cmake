@@ -356,7 +356,7 @@ if(NOT "${THIRD_PARTY_ROOT}" STREQUAL "" AND external_third_party_root STREQUAL 
         "THIRD_PARTY_ROOT 无效：${THIRD_PARTY_ROOT}；目录中必须存在 third_party.cmake。")
 endif()
 
-# 始终生成纯 C++ 预设；找到 Qt 时再生成 Qt 库、GUI 开发和发布预设。
+# 始终生成纯 C++ 预设；找到 Qt 时再生成 Qt 库、Widgets 和 QML 预设。
 set(configure_presets "[]")
 set(build_presets "[]")
 set(test_presets "[]")
@@ -367,7 +367,13 @@ make_configure_preset(
 string(JSON configure_presets SET "${configure_presets}" 0 "${core_preset}")
 
 if(NOT qt_prefix STREQUAL "")
-    list(APPEND preset_names local-qt-libraries local-dev local-release)
+    list(APPEND preset_names
+        local-qt-libraries
+        local-dev
+        local-release
+        local-qml-dev
+        local-qml-release
+    )
     make_configure_preset(
         qt_libraries_preset
         local-qt-libraries
@@ -381,9 +387,22 @@ if(NOT qt_prefix STREQUAL "")
         dev_preset local-dev dev "${ninja}" "${preset_compiler}" "${qt_prefix}" "${environment}")
     make_configure_preset(
         release_preset local-release release "${ninja}" "${preset_compiler}" "${qt_prefix}" "${environment}")
+    make_configure_preset(
+        qml_dev_preset local-qml-dev qml-dev "${ninja}" "${preset_compiler}" "${qt_prefix}" "${environment}")
+    make_configure_preset(
+        qml_release_preset
+        local-qml-release
+        qml-release
+        "${ninja}"
+        "${preset_compiler}"
+        "${qt_prefix}"
+        "${environment}"
+    )
     string(JSON configure_presets SET "${configure_presets}" 1 "${qt_libraries_preset}")
     string(JSON configure_presets SET "${configure_presets}" 2 "${dev_preset}")
     string(JSON configure_presets SET "${configure_presets}" 3 "${release_preset}")
+    string(JSON configure_presets SET "${configure_presets}" 4 "${qml_dev_preset}")
+    string(JSON configure_presets SET "${configure_presets}" 5 "${qml_release_preset}")
 endif()
 
 set(index 0)

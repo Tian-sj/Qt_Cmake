@@ -7,7 +7,7 @@
 #include <registration_code/registration_code.hpp>
 #include <utility>
 
-namespace cppproject::desktop {
+namespace cppproject::widgets {
 namespace {
 
 // 第三方枚举只能在 integration 内出现，application 对外只暴露稳定的自有类型。
@@ -60,4 +60,4 @@ app_core::LicenseResult RegistrationLicenseGateway::validate(const std::string_v
     return result;
 }
 
-} // namespace cppproject::desktop
+} // namespace cppproject::widgets

@@ -12,7 +12,7 @@
 #include <QTranslator>
 #include <string>
 
-namespace cppproject::desktop {
+namespace cppproject::widgets {
 namespace {
 
 QString to_qstring(const std::string_view value) {
@@ -51,7 +51,7 @@ void UiSettings::set_language(const Language language) {
 
     if (language == Language::simplified_chinese) {
         auto translator = std::make_unique<QTranslator>();
-        if (translator->load(QStringLiteral(":/i18n/desktop_zh_CN.qm"))) {
+        if (translator->load(QStringLiteral(":/i18n/widgets_zh_CN.qm"))) {
             application_.installTranslator(translator.get());
             translator_ = std::move(translator);
         }
@@ -105,4 +105,4 @@ UiSettings::Language UiSettings::system_language() {
                                                             : Language::english;
 }
 
-} // namespace cppproject::desktop
+} // namespace cppproject::widgets

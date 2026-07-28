@@ -1,4 +1,4 @@
-#include "cppproject/desktop/desktop_application.hpp"
+#include "cppproject/widgets/widgets_application.hpp"
 
 #include "application/ui_settings.hpp"
 #include "cppproject/app_core/application_service.hpp"
@@ -11,14 +11,14 @@
 #include <cstdlib>
 #include <memory>
 
-namespace cppproject::desktop {
+namespace cppproject::widgets {
 
-DesktopApplication::DesktopApplication(int& argc, char** argv, app_core::ApplicationService& application)
+WidgetsApplication::WidgetsApplication(int& argc, char** argv, app_core::ApplicationService& application)
     : application_{application}, qt_application_{std::make_unique<QApplication>(argc, argv)} {}
 
-DesktopApplication::~DesktopApplication() = default;
+WidgetsApplication::~WidgetsApplication() = default;
 
-int DesktopApplication::run() {
+int WidgetsApplication::run() {
     apply_default_style();
     ui_settings_ = std::make_unique<UiSettings>(*qt_application_);
     ui_settings_->apply_saved_preferences();
@@ -33,9 +33,9 @@ int DesktopApplication::run() {
     auto status = application_.start();
     if (status.issue == app_core::ApplicationIssue::clock_rollback) {
         QMessageBox::critical(
-            nullptr, QApplication::translate("DesktopApplication", "Startup blocked"),
+            nullptr, QApplication::translate("WidgetsApplication", "Startup blocked"),
             QApplication::translate(
-                "DesktopApplication", "The system clock is earlier than the last recorded run time."));
+                "WidgetsApplication", "The system clock is earlier than the last recorded run time."));
         return EXIT_FAILURE;
     }
 
@@ -54,11 +54,11 @@ int DesktopApplication::run() {
     return qt_application_->exec();
 }
 
-void DesktopApplication::apply_default_style() {
+void WidgetsApplication::apply_default_style() {
     qt_application_->setStyle(QStringLiteral("Fusion"));
     auto palette = qt_application_->palette();
     palette.setColor(QPalette::Window, QColor::fromRgb(0xF0, 0xF0, 0xF0));
     qt_application_->setPalette(palette);
 }
 
-} // namespace cppproject::desktop
+} // namespace cppproject::widgets

@@ -9,17 +9,17 @@ namespace cppproject::app_core {
 class ApplicationService;
 }
 
-namespace cppproject::desktop {
+namespace cppproject::widgets {
 
 class UiSettings;
 
-class DesktopApplication final {
+class WidgetsApplication final {
 public:
-    DesktopApplication(int& argc, char** argv, app_core::ApplicationService& application);
-    ~DesktopApplication();
+    WidgetsApplication(int& argc, char** argv, app_core::ApplicationService& application);
+    ~WidgetsApplication();
 
-    DesktopApplication(const DesktopApplication&) = delete;
-    DesktopApplication& operator=(const DesktopApplication&) = delete;
+    WidgetsApplication(const WidgetsApplication&) = delete;
+    WidgetsApplication& operator=(const WidgetsApplication&) = delete;
 
     int run();
 
@@ -32,4 +32,4 @@ private:
     std::unique_ptr<MainWindow> main_window_;
 };
 
-} // namespace cppproject::desktop
+} // namespace cppproject::widgets

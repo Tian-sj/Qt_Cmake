@@ -3,18 +3,26 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   core:
-    name: Pure C++ (${{ matrix.os }})
+    name: Pure C++ (${{ matrix.platform }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-24.04
+            platform: Linux
+          - os: macos-latest
+            platform: macOS
+          - os: windows-2022
+            platform: Windows
 
     steps:
       - uses: actions/checkout@v6
@@ -38,12 +46,19 @@ jobs:
         run: ctest --test-dir build/consumer-test --output-on-failure
 
   gui:
-    name: Qt GUI (${{ matrix.os }})
+    name: Qt GUI (${{ matrix.platform }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-24.04
+            platform: Linux
+          - os: macos-latest
+            platform: macOS
+          - os: windows-2022
+            platform: Windows
 
     steps:
       - uses: actions/checkout@v6
@@ -62,6 +77,20 @@ jobs:
         run: cmake --build --preset local-dev
       - name: Test
         run: ctest --preset local-dev
+      - name: Configure QML application
+        run: cmake --preset local-qml-dev
+      - name: Build QML application
+        run: cmake --build --preset local-qml-dev
+      - name: Lint QML
+        run: cmake --build build/local-qml-dev --target cppproject_desktop_qml_qmllint
+      - name: Test QML application
+        run: ctest --preset local-qml-dev
+      - name: Reconfigure QML from platform ABI cache
+        run: cmake --preset local-qml-dev -DCPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=OFF
+      - name: Build QML from platform ABI cache
+        run: cmake --build --preset local-qml-dev
+      - name: Test QML from platform ABI cache
+        run: ctest --preset local-qml-dev
       - name: Configure reusable Qt libraries
         run: cmake --preset local-qt-libraries
       - name: Build reusable Qt libraries

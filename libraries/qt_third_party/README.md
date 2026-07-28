@@ -13,10 +13,9 @@ QWindowKit's pinned build dependencies are included recursively:
 - qmsetup `85c6c3c783be8af8d3f2fa492748a82da8ec9bad` (MIT).
 - syscmdline `5a67673ff96acbfd894ea653fbaca872fded758a` (MIT).
 
-The vendored QWindowKit package is intentionally limited to its Core and
-Widgets modules because this template builds QWidget desktop applications.
-Its unused Qt Quick module, examples, generated-package resources, and
-documentation sources are omitted.
+The vendored QWindowKit package contains its Core, Widgets, and Qt Quick
+modules. Examples, generated-package resources, and documentation sources are
+omitted.
 
 The repository contains the source and license files needed by this template,
 but not generated binaries. Build outputs under each `vendor/*/prebuilt/`

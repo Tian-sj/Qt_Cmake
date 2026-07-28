@@ -1,7 +1,7 @@
 # 桌面 UI 保持为独立 target，便于窗口代码单独编译，也避免入口文件承载界面实现。
-qt_add_library(cppproject_desktop_ui STATIC
-    include/cppproject/desktop/desktop_application.hpp
-    application/desktop_application.cpp
+qt_add_library(cppproject_widgets_ui STATIC
+    include/cppproject/widgets/widgets_application.hpp
+    application/widgets_application.cpp
     application/ui_settings.cpp
     application/ui_settings.hpp
     views/main_window.cpp
@@ -18,10 +18,10 @@ qt_add_library(cppproject_desktop_ui STATIC
     resources/resource.qrc
 )
 
-add_library(CppProject::desktop_ui ALIAS cppproject_desktop_ui)
+add_library(CppProject::widgets_ui ALIAS cppproject_widgets_ui)
 
 set_target_properties(
-    cppproject_desktop_ui
+    cppproject_widgets_ui
     PROPERTIES
         AUTOMOC ON
         AUTOUIC ON
@@ -30,7 +30,7 @@ set_target_properties(
 )
 
 target_include_directories(
-    cppproject_desktop_ui
+    cppproject_widgets_ui
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
     PUBLIC
@@ -38,11 +38,11 @@ target_include_directories(
 )
 
 target_link_libraries(
-    cppproject_desktop_ui
+    cppproject_widgets_ui
     PUBLIC
         CppProject::app_core
     PRIVATE
-        CppProject::qwindowkit
+        CppProject::qwindowkit_widgets
         Qt6::Widgets
         CppProject::build_config
         CppProject::project_options
@@ -50,9 +50,9 @@ target_link_libraries(
 )
 
 qt_add_translations(
-    cppproject_desktop_ui
+    cppproject_widgets_ui
     TS_FILES
-        translations/desktop_zh_CN.ts
+        translations/widgets_zh_CN.ts
     RESOURCE_PREFIX "/i18n"
     LUPDATE_OPTIONS -no-obsolete
 )
@@ -64,7 +64,7 @@ if(WIN32)
     set(app_icon "${CMAKE_CURRENT_BINARY_DIR}/app.rc")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/app.rc.in" "${app_icon}" @ONLY)
 elseif(APPLE)
-    set(app_icon "${PROJECT_SOURCE_DIR}/apps/desktop/assets/icons/logo.icns")
+    set(app_icon "${PROJECT_SOURCE_DIR}/apps/desktop_widgets/assets/icons/logo.icns")
     set_source_files_properties("${app_icon}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
@@ -88,33 +88,33 @@ if(CPPPROJECT_ENABLE_LICENSING)
     )
 endif()
 
-qt_add_executable(cppproject_desktop
+qt_add_executable(cppproject_desktop_widgets
     main.cpp
     ${app_icon}
 )
 
-add_executable(CppProject::desktop ALIAS cppproject_desktop)
+add_executable(CppProject::desktop_widgets ALIAS cppproject_desktop_widgets)
 
 # 依赖注入发生在 main.cpp，因此具体实现 target 只由最终应用链接。
 target_link_libraries(
-    cppproject_desktop
+    cppproject_desktop_widgets
     PRIVATE
         CppProject::app_core
         CppProject::build_config
-        CppProject::desktop_ui
+        CppProject::widgets_ui
         CppProject::project_options
         CppProject::project_warnings
 )
 
 # 授权功能关闭时，编译器不会看到第三方 SDK 的任何类型或代码路径。
 if(CPPPROJECT_ENABLE_LICENSING)
-    target_link_libraries(cppproject_desktop PRIVATE cppproject_registration_integration)
-    target_compile_definitions(cppproject_desktop PRIVATE CPPPROJECT_ENABLE_LICENSING=1)
+    target_link_libraries(cppproject_desktop_widgets PRIVATE cppproject_registration_integration)
+    target_compile_definitions(cppproject_desktop_widgets PRIVATE CPPPROJECT_ENABLE_LICENSING=1)
 endif()
 
 # 同一组版本变量同时驱动 Windows 资源和 macOS Bundle 元数据。
 set_target_properties(
-    cppproject_desktop
+    cppproject_desktop_widgets
     PROPERTIES
         OUTPUT_NAME "${CPPPROJECT_APPLICATION_NAME}"
         WIN32_EXECUTABLE TRUE
@@ -127,17 +127,17 @@ set_target_properties(
 
 # 字体是运行时资源：macOS 放入 Bundle，Windows/Linux 放在程序旁的 fonts 目录。
 if(APPLE)
-    set(font_output_directory "$<TARGET_BUNDLE_CONTENT_DIR:cppproject_desktop>/Resources/fonts")
+    set(font_output_directory "$<TARGET_BUNDLE_CONTENT_DIR:cppproject_desktop_widgets>/Resources/fonts")
 else()
-    set(font_output_directory "$<TARGET_FILE_DIR:cppproject_desktop>/fonts")
+    set(font_output_directory "$<TARGET_FILE_DIR:cppproject_desktop_widgets>/fonts")
 endif()
 
 add_custom_command(
-    TARGET cppproject_desktop
+    TARGET cppproject_desktop_widgets
     POST_BUILD
     COMMAND
         "${CMAKE_COMMAND}" -E copy_directory
-        "${PROJECT_SOURCE_DIR}/apps/desktop/assets/fonts"
+        "${PROJECT_SOURCE_DIR}/apps/desktop_widgets/assets/fonts"
         "${font_output_directory}"
     VERBATIM
 )
@@ -146,12 +146,12 @@ add_custom_command(
 # 项目翻译已经编译进 qrc，无需复制整套 Qt 翻译文件。
 if(WIN32)
     add_custom_command(
-        TARGET cppproject_desktop
+        TARGET cppproject_desktop_widgets
         POST_BUILD
         COMMAND
             "${CMAKE_COMMAND}" -E copy_if_different
-            "$<TARGET_RUNTIME_DLLS:cppproject_desktop>"
-            "$<TARGET_FILE_DIR:cppproject_desktop>"
+            "$<TARGET_RUNTIME_DLLS:cppproject_desktop_widgets>"
+            "$<TARGET_FILE_DIR:cppproject_desktop_widgets>"
         COMMAND_EXPAND_LISTS
         COMMENT "Copying dependent runtime libraries"
         VERBATIM
@@ -161,13 +161,13 @@ if(WIN32)
         message(FATAL_ERROR "Qt Kit 中未找到 windeployqt，无法准备 bin 运行目录。")
     endif()
     add_custom_command(
-        TARGET cppproject_desktop
+        TARGET cppproject_desktop_widgets
         POST_BUILD
         COMMAND
             "$<TARGET_FILE:Qt6::windeployqt>"
-            --dir "$<TARGET_FILE_DIR:cppproject_desktop>"
+            --dir "$<TARGET_FILE_DIR:cppproject_desktop_widgets>"
             --no-translations
-            "$<TARGET_FILE:cppproject_desktop>"
+            "$<TARGET_FILE:cppproject_desktop_widgets>"
         COMMENT "Deploying required Qt runtime files to bin"
         VERBATIM
     )
@@ -175,14 +175,14 @@ endif()
 
 # install() 生成可发布目录；当前 Preset 的 bin 用于本机直接运行和调试。
 install(
-    TARGETS cppproject_desktop
+    TARGETS cppproject_desktop_widgets
     BUNDLE DESTINATION .
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
 if(NOT APPLE)
     install(
-        DIRECTORY "${PROJECT_SOURCE_DIR}/apps/desktop/assets/fonts/"
+        DIRECTORY "${PROJECT_SOURCE_DIR}/apps/desktop_widgets/assets/fonts/"
         DESTINATION "${CMAKE_INSTALL_BINDIR}/fonts"
         FILES_MATCHING PATTERN "*.ttf" PATTERN "LICENSE.txt"
     )
@@ -190,7 +190,7 @@ endif()
 
 # 专有 SDK 的运行库由 third_party 模块按平台复制到正确位置。
 if(CPPPROJECT_ENABLE_LICENSING)
-    cppproject_install_registration_runtime(cppproject_desktop)
+    cppproject_install_registration_runtime(cppproject_desktop_widgets)
 endif()
 
 # Qt 官方部署脚本在安装阶段补齐框架、插件和平台运行库。
@@ -200,7 +200,7 @@ if(APPLE AND NOT CPPPROJECT_CODESIGN_IDENTITY STREQUAL "")
 endif()
 
 qt_generate_deploy_app_script(
-    TARGET cppproject_desktop
+    TARGET cppproject_desktop_widgets
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
     DEPLOY_TOOL_OPTIONS ${cppproject_deploy_tool_options}

@@ -7,7 +7,7 @@
 class QApplication;
 class QTranslator;
 
-namespace cppproject::desktop {
+namespace cppproject::widgets {
 
 class UiSettings final {
 public:
@@ -34,4 +34,4 @@ private:
     QString font_family_;
 };
 
-} // namespace cppproject::desktop
+} // namespace cppproject::widgets

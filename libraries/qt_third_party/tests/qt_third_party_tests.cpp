@@ -3,6 +3,9 @@
 #include "xlsxdocument.h"
 
 #include <QWKWidgets/widgetwindowagent.h>
+#if defined(CPPPROJECT_HAS_QWINDOWKIT_QUICK)
+#include <QWKQuick/quickwindowagent.h>
+#endif
 #include <QString>
 #include <QVariant>
 
@@ -33,6 +36,15 @@ int main() {
             QStringLiteral("QWK::WidgetWindowAgent"),
             "QWindowKit widgets target");
     });
+
+#if defined(CPPPROJECT_HAS_QWINDOWKIT_QUICK)
+    suite.add("QWindowKit quick module", [] {
+        cppproject::test::require_equal(
+            QString::fromLatin1(QWK::QuickWindowAgent::staticMetaObject.className()),
+            QStringLiteral("QWK::QuickWindowAgent"),
+            "QWindowKit quick target");
+    });
+#endif
 
     return suite.run();
 }

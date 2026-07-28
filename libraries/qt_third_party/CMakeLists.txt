@@ -157,15 +157,20 @@ if(CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE)
         set(QWINDOWKIT_BUILD_STATIC ON CACHE BOOL "" FORCE)
     endif()
     set(QWINDOWKIT_BUILD_WIDGETS ON CACHE BOOL "" FORCE)
-    set(QWINDOWKIT_BUILD_QUICK OFF CACHE BOOL "" FORCE)
+    set(QWINDOWKIT_BUILD_QUICK ${CPPPROJECT_BUILD_QML_APP} CACHE BOOL "" FORCE)
     set(QWINDOWKIT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(QWINDOWKIT_BUILD_DOCUMENTATIONS OFF CACHE BOOL "" FORCE)
     set(QWINDOWKIT_INSTALL OFF CACHE BOOL "" FORCE)
     add_subdirectory(vendor/qwindowkit qwindowkit)
 
     add_library(CppProject::qwindowkit ALIAS QWKWidgets)
+    add_library(CppProject::qwindowkit_widgets ALIAS QWKWidgets)
     cppproject_write_qt_dependency_to_cache(QWKCore qwindowkit)
     cppproject_write_qt_dependency_to_cache(QWKWidgets qwindowkit)
+    if(CPPPROJECT_BUILD_QML_APP)
+        add_library(CppProject::qwindowkit_quick ALIAS QWKQuick)
+        cppproject_write_qt_dependency_to_cache(QWKQuick qwindowkit)
+    endif()
 
     cppproject_qt_dependency_cache_root(qwindowkit_cache_root qwindowkit)
     add_custom_target(
@@ -193,6 +198,23 @@ if(CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE)
         COMMENT "Caching QWindowKit public headers"
         VERBATIM
     )
+    if(CPPPROJECT_BUILD_QML_APP)
+        add_custom_target(
+            cppproject_cache_qwindowkit_quick_headers
+            ALL
+            COMMAND
+                "${CMAKE_COMMAND}" -E make_directory
+                "${qwindowkit_cache_root}/$<CONFIG>/include/QWKQuick"
+            COMMAND
+                "${CMAKE_COMMAND}" -E copy_if_different
+                "${CMAKE_CURRENT_SOURCE_DIR}/vendor/qwindowkit/src/quick/qwkquickglobal.h"
+                "${CMAKE_CURRENT_SOURCE_DIR}/vendor/qwindowkit/src/quick/quickwindowagent.h"
+                "${qwindowkit_cache_root}/$<CONFIG>/include/QWKQuick"
+            DEPENDS QWKQuick
+            COMMENT "Caching QWindowKit Quick public headers"
+            VERBATIM
+        )
+    endif()
 else()
     cppproject_find_cached_qt_dependency(
         qcustomplot_library
@@ -285,6 +307,14 @@ else()
         QWKWidgets
         QWKWidgetsd
     )
+    if(CPPPROJECT_BUILD_QML_APP)
+        cppproject_find_cached_qt_dependency(
+            qwindowkit_quick_library
+            qwindowkit
+            QWKQuick
+            QWKQuickd
+        )
+    endif()
     cppproject_qt_dependency_cache_root(qwindowkit_cache_root qwindowkit)
     set(qwindowkit_include_directory
         "${qwindowkit_cache_root}/${CMAKE_BUILD_TYPE}/include")
@@ -315,6 +345,7 @@ else()
     endif()
     add_library(QWindowKit::Widgets ALIAS cppproject_qwindowkit_widgets)
     add_library(CppProject::qwindowkit ALIAS cppproject_qwindowkit_widgets)
+    add_library(CppProject::qwindowkit_widgets ALIAS cppproject_qwindowkit_widgets)
     set_target_properties(
         cppproject_qwindowkit_widgets
         PROPERTIES
@@ -323,6 +354,29 @@ else()
             INTERFACE_LINK_LIBRARIES
                 "cppproject_qwindowkit_core;Qt6::Core;Qt6::Gui;Qt6::Widgets"
     )
+
+    if(CPPPROJECT_BUILD_QML_APP)
+        if(NOT EXISTS "${qwindowkit_include_directory}/QWKQuick/quickwindowagent.h")
+            message(FATAL_ERROR
+                "Cached QWindowKit Quick headers were not found in "
+                "${qwindowkit_include_directory}. Rebuild QWindowKit from source.")
+        endif()
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            add_library(cppproject_qwindowkit_quick SHARED IMPORTED GLOBAL)
+        else()
+            add_library(cppproject_qwindowkit_quick UNKNOWN IMPORTED GLOBAL)
+        endif()
+        add_library(QWindowKit::Quick ALIAS cppproject_qwindowkit_quick)
+        add_library(CppProject::qwindowkit_quick ALIAS cppproject_qwindowkit_quick)
+        set_target_properties(
+            cppproject_qwindowkit_quick
+            PROPERTIES
+                IMPORTED_LOCATION "${qwindowkit_quick_library}"
+                INTERFACE_INCLUDE_DIRECTORIES "${qwindowkit_include_directory}"
+                INTERFACE_LINK_LIBRARIES
+                    "cppproject_qwindowkit_core;Qt6::Core;Qt6::Gui;Qt6::Qml;Qt6::Quick"
+        )
+    endif()
 
     if(BUILD_SHARED_LIBS)
         if(WIN32)
@@ -342,6 +396,16 @@ else()
                 NO_CACHE
                 REQUIRED
             )
+            if(CPPPROJECT_BUILD_QML_APP)
+                find_file(
+                    qwindowkit_quick_runtime
+                    NAMES QWKQuick.dll QWKQuickd.dll
+                    PATHS "${qwindowkit_cache_root}/${CMAKE_BUILD_TYPE}/bin"
+                    NO_DEFAULT_PATH
+                    NO_CACHE
+                    REQUIRED
+                )
+            endif()
             set_target_properties(
                 cppproject_qwindowkit_core
                 PROPERTIES
@@ -354,6 +418,14 @@ else()
                     IMPORTED_IMPLIB "${qwindowkit_widgets_library}"
                     IMPORTED_LOCATION "${qwindowkit_widgets_runtime}"
             )
+            if(CPPPROJECT_BUILD_QML_APP)
+                set_target_properties(
+                    cppproject_qwindowkit_quick
+                    PROPERTIES
+                        IMPORTED_IMPLIB "${qwindowkit_quick_library}"
+                        IMPORTED_LOCATION "${qwindowkit_quick_runtime}"
+                )
+            endif()
         endif()
     else()
         target_compile_definitions(
@@ -364,6 +436,12 @@ else()
             cppproject_qwindowkit_widgets
             INTERFACE QWK_WIDGETS_STATIC
         )
+        if(CPPPROJECT_BUILD_QML_APP)
+            target_compile_definitions(
+                cppproject_qwindowkit_quick
+                INTERFACE QWK_QUICK_STATIC
+            )
+        endif()
         if(WIN32)
             target_link_libraries(cppproject_qwindowkit_core INTERFACE uxtheme)
         elseif(APPLE)
@@ -390,6 +468,16 @@ if(CPPPROJECT_BUILD_TESTS)
             CppProject::qwindowkit
             CppProject::qxlsx
     )
+    if(CPPPROJECT_BUILD_QML_APP)
+        target_link_libraries(
+            cppproject_qt_third_party_tests
+            PRIVATE CppProject::qwindowkit_quick
+        )
+        target_compile_definitions(
+            cppproject_qt_third_party_tests
+            PRIVATE CPPPROJECT_HAS_QWINDOWKIT_QUICK=1
+        )
+    endif()
     set_tests_properties(
         cppproject_qt_third_party_tests
         PROPERTIES LABELS qt_third_party

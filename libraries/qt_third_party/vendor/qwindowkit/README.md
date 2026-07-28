@@ -1,9 +1,8 @@
 # QWindowKit
 
-> This repository vendors a QWidget-focused subset containing only the Core
-> and Widgets modules. For the complete upstream package, including Qt Quick,
-> examples, documentation, and standalone installation support, use the
-> project linked below.
+> This repository vendors the Core, Widgets, and Qt Quick modules. Examples,
+> documentation, and standalone installation support are omitted; use the
+> complete upstream package linked below when those files are needed.
 
 Cross-platform window customization framework for Qt Widgets and Qt Quick.
 

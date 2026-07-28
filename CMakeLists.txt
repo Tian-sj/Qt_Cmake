@@ -27,8 +27,17 @@ include(ProjectOptions)
 
 # 可由 CMake Preset 或命令行覆盖的项目功能开关。
 option(BUILD_SHARED_LIBS "Build reusable libraries as shared libraries" OFF)
-option(CPPPROJECT_BUILD_GUI "Build the Qt desktop application" ON)
-option(CPPPROJECT_BUILD_QT_LIBRARIES "Build reusable libraries based on Qt" ${CPPPROJECT_BUILD_GUI})
+option(CPPPROJECT_BUILD_WIDGETS_APP "Build the Qt Widgets desktop application" ON)
+option(CPPPROJECT_BUILD_QML_APP "Build the Qt Quick/QML desktop application" OFF)
+set(cppproject_build_qt_libraries_default OFF)
+if(CPPPROJECT_BUILD_WIDGETS_APP OR CPPPROJECT_BUILD_QML_APP)
+    set(cppproject_build_qt_libraries_default ON)
+endif()
+option(
+    CPPPROJECT_BUILD_QT_LIBRARIES
+    "Build reusable libraries based on Qt"
+    ${cppproject_build_qt_libraries_default}
+)
 option(
     CPPPROJECT_ENABLE_QT_THIRD_PARTY
     "Provide QCustomPlot, QXlsx, and QWindowKit targets"
@@ -80,17 +89,25 @@ file(MAKE_DIRECTORY
 )
 
 # 注册码 SDK 本身依赖 Qt Core，因此不能用于完全关闭 Qt 的构建。
-if(CPPPROJECT_ENABLE_LICENSING AND NOT CPPPROJECT_BUILD_GUI)
-    message(FATAL_ERROR "CPPPROJECT_ENABLE_LICENSING requires CPPPROJECT_BUILD_GUI because the third-party SDK uses Qt Core")
+if(CPPPROJECT_ENABLE_LICENSING AND NOT CPPPROJECT_BUILD_WIDGETS_APP)
+    message(FATAL_ERROR "CPPPROJECT_ENABLE_LICENSING requires CPPPROJECT_BUILD_WIDGETS_APP because the third-party SDK uses Qt Core")
 endif()
-if(CPPPROJECT_BUILD_GUI AND NOT CPPPROJECT_ENABLE_QT_THIRD_PARTY)
+if(CPPPROJECT_BUILD_WIDGETS_APP AND NOT CPPPROJECT_ENABLE_QT_THIRD_PARTY)
     message(FATAL_ERROR
-        "CPPPROJECT_BUILD_GUI requires CPPPROJECT_ENABLE_QT_THIRD_PARTY "
+        "CPPPROJECT_BUILD_WIDGETS_APP requires CPPPROJECT_ENABLE_QT_THIRD_PARTY "
         "because the desktop window uses QWindowKit")
+endif()
+if(CPPPROJECT_BUILD_QML_APP AND NOT CPPPROJECT_ENABLE_QT_THIRD_PARTY)
+    message(FATAL_ERROR
+        "CPPPROJECT_BUILD_QML_APP requires CPPPROJECT_ENABLE_QT_THIRD_PARTY "
+        "because the QML window uses QWindowKit Quick")
 endif()
 
 # 纯 C++ 模式不会查找 Qt；Qt 库只需要 Core，桌面应用再按需增加 GUI 组件。
-if(CPPPROJECT_BUILD_QT_LIBRARIES OR CPPPROJECT_BUILD_GUI OR CPPPROJECT_ENABLE_QT_THIRD_PARTY)
+if(CPPPROJECT_BUILD_QT_LIBRARIES
+   OR CPPPROJECT_BUILD_WIDGETS_APP
+   OR CPPPROJECT_BUILD_QML_APP
+   OR CPPPROJECT_ENABLE_QT_THIRD_PARTY)
     find_package(Qt6 6.5 REQUIRED COMPONENTS Core)
 endif()
 if(CPPPROJECT_ENABLE_QT_THIRD_PARTY)
@@ -99,8 +116,14 @@ if(CPPPROJECT_ENABLE_QT_THIRD_PARTY)
         find_package(Qt6 REQUIRED COMPONENTS GuiPrivate WidgetsPrivate)
     endif()
 endif()
-if(CPPPROJECT_BUILD_GUI)
+if(CPPPROJECT_BUILD_WIDGETS_APP)
     find_package(Qt6 6.5 REQUIRED COMPONENTS Widgets LinguistTools)
+endif()
+if(CPPPROJECT_BUILD_QML_APP)
+    find_package(Qt6 6.5 REQUIRED COMPONENTS Qml Quick QuickControls2)
+    if(Qt6Quick_VERSION VERSION_GREATER_EQUAL "6.10.0")
+        find_package(Qt6 REQUIRED COMPONENTS QuickPrivate)
+    endif()
 endif()
 
 cppproject_create_project_options()
@@ -156,8 +179,11 @@ if(CPPPROJECT_BUILD_PLUGINS)
     add_subdirectory(plugins/example)
 endif()
 
-if(CPPPROJECT_BUILD_GUI)
-    add_subdirectory(apps/desktop)
+if(CPPPROJECT_BUILD_WIDGETS_APP)
+    add_subdirectory(apps/desktop_widgets)
+endif()
+if(CPPPROJECT_BUILD_QML_APP)
+    add_subdirectory(apps/desktop_qml)
 endif()
 
 # 安装后的库可通过 find_package(CppProjectTemplate CONFIG REQUIRED) 使用。

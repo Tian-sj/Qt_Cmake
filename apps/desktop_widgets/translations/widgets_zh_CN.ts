@@ -10,14 +10,14 @@
     </message>
 </context>
 <context>
-    <name>DesktopApplication</name>
+    <name>WidgetsApplication</name>
     <message>
-        <location filename="../application/desktop_application.cpp" line="35"/>
+        <location filename="../application/widgets_application.cpp" line="35"/>
         <source>Startup blocked</source>
         <translation>启动被阻止</translation>
     </message>
     <message>
-        <location filename="../application/desktop_application.cpp" line="36"/>
+        <location filename="../application/widgets_application.cpp" line="36"/>
         <source>The system clock is earlier than the last recorded run time.</source>
         <translation>系统时间早于上次记录的运行时间。</translation>
     </message>

@@ -10,7 +10,10 @@ cmake --build --preset local-dev
 ctest --preset local-dev
 ```
 
-不修改 GUI 时仍应运行 `core-only`，它会在 `-Werror` 下验证库、插件和模块测试。改动 C++ 文件后使用仓库根目录的 `.clang-format` 格式化；需要更严格检查时启用 `CPPPROJECT_ENABLE_CLANG_TIDY` 或 sanitizers 预设。
+修改 QML 前端时还应运行 `local-qml-dev`。不修改 GUI 时仍应运行 `core-only`，
+它会在 `-Werror` 下验证库、插件和模块测试。改动 C++ 文件后使用仓库根目录的
+`.clang-format` 格式化；需要更严格检查时启用 `CPPPROJECT_ENABLE_CLANG_TIDY`
+或 sanitizers 预设。
 
 ## 分支和评审
 

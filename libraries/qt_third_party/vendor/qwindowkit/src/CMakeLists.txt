@@ -131,3 +131,7 @@ add_subdirectory(core)
 if(QWINDOWKIT_BUILD_WIDGETS)
     add_subdirectory(widgets)
 endif()
+
+if(QWINDOWKIT_BUILD_QUICK)
+    add_subdirectory(quick)
+endif()

@@ -12,9 +12,9 @@ project(QWindowKit
 # ----------------------------------
 option(QWINDOWKIT_BUILD_STATIC "Build static libraries" OFF)
 option(QWINDOWKIT_BUILD_WIDGETS "Build widgets module" ON)
+option(QWINDOWKIT_BUILD_QUICK "Build quick module" OFF)
 
-# This vendored package is curated for QWidget desktop applications.
-set(QWINDOWKIT_BUILD_QUICK OFF)
+# This vendored package omits examples, docs, and standalone installation files.
 set(QWINDOWKIT_BUILD_EXAMPLES OFF)
 set(QWINDOWKIT_BUILD_DOCUMENTATIONS OFF)
 set(QWINDOWKIT_INSTALL OFF)

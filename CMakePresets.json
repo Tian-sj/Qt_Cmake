@@ -21,7 +21,8 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CPPPROJECT_BUILD_GUI": true,
+        "CPPPROJECT_BUILD_WIDGETS_APP": true,
+        "CPPPROJECT_BUILD_QML_APP": false,
         "CPPPROJECT_BUILD_QT_LIBRARIES": true,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
         "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
@@ -34,7 +35,36 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CPPPROJECT_BUILD_GUI": true,
+        "CPPPROJECT_BUILD_WIDGETS_APP": true,
+        "CPPPROJECT_BUILD_QML_APP": false,
+        "CPPPROJECT_BUILD_QT_LIBRARIES": true,
+        "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
+        "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
+        "CPPPROJECT_BUILD_TESTS": true
+      }
+    },
+    {
+      "name": "qml-dev",
+      "displayName": "Development (Qt Quick/QML)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPPPROJECT_BUILD_WIDGETS_APP": false,
+        "CPPPROJECT_BUILD_QML_APP": true,
+        "CPPPROJECT_BUILD_QT_LIBRARIES": true,
+        "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
+        "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
+        "CPPPROJECT_BUILD_TESTS": true
+      }
+    },
+    {
+      "name": "qml-release",
+      "displayName": "Release (Qt Quick/QML)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CPPPROJECT_BUILD_WIDGETS_APP": false,
+        "CPPPROJECT_BUILD_QML_APP": true,
         "CPPPROJECT_BUILD_QT_LIBRARIES": true,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
         "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
@@ -47,7 +77,8 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CPPPROJECT_BUILD_GUI": false,
+        "CPPPROJECT_BUILD_WIDGETS_APP": false,
+        "CPPPROJECT_BUILD_QML_APP": false,
         "CPPPROJECT_BUILD_QT_LIBRARIES": true,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
         "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
@@ -61,7 +92,8 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CPPPROJECT_BUILD_GUI": false,
+        "CPPPROJECT_BUILD_WIDGETS_APP": false,
+        "CPPPROJECT_BUILD_QML_APP": false,
         "CPPPROJECT_BUILD_QT_LIBRARIES": false,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": false,
         "CPPPROJECT_BUILD_PLUGINS": true,
@@ -82,6 +114,8 @@
   "buildPresets": [
     { "name": "dev", "configurePreset": "dev" },
     { "name": "release", "configurePreset": "release" },
+    { "name": "qml-dev", "configurePreset": "qml-dev" },
+    { "name": "qml-release", "configurePreset": "qml-release" },
     { "name": "qt-libraries", "configurePreset": "qt-libraries" },
     { "name": "core-only", "configurePreset": "core-only" },
     { "name": "sanitizers", "configurePreset": "sanitizers" }
@@ -90,6 +124,11 @@
     {
       "name": "dev",
       "configurePreset": "dev",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "qml-dev",
+      "configurePreset": "qml-dev",
       "output": { "outputOnFailure": true }
     },
     {
