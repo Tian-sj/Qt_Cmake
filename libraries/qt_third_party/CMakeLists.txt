@@ -54,13 +54,127 @@ function(cppproject_find_cached_qt_dependency output dependency)
     if(NOT cached_library)
         message(FATAL_ERROR
             "Prebuilt ${dependency} was not found in ${config_root}. "
-            "Configure once with CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=ON "
-            "and build the same configuration first.")
+            "Build once with CPPPROJECT_QT_THIRD_PARTY_MODE=SOURCE "
+            "for the same platform, toolchain, Qt version, linkage, and configuration.")
     endif()
     set(${output} "${cached_library}" PARENT_SCOPE)
 endfunction()
 
-if(CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE)
+function(cppproject_cached_qt_dependency_exists output dependency)
+    if(CMAKE_BUILD_TYPE STREQUAL "")
+        set(${output} FALSE PARENT_SCOPE)
+        return()
+    endif()
+
+    cppproject_qt_dependency_cache_root(cache_root "${dependency}")
+    find_library(
+        cached_library
+        NAMES ${ARGN}
+        PATHS "${cache_root}/${CMAKE_BUILD_TYPE}/lib"
+        NO_DEFAULT_PATH
+        NO_CACHE
+    )
+    if(cached_library)
+        set(${output} TRUE PARENT_SCOPE)
+    else()
+        set(${output} FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(cppproject_cached_qt_dependency_runtime_exists output dependency)
+    cppproject_qt_dependency_cache_root(cache_root "${dependency}")
+    find_file(
+        cached_runtime
+        NAMES ${ARGN}
+        PATHS "${cache_root}/${CMAKE_BUILD_TYPE}/bin"
+        NO_DEFAULT_PATH
+        NO_CACHE
+    )
+    if(cached_runtime)
+        set(${output} TRUE PARENT_SCOPE)
+    else()
+        set(${output} FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+
+set(cppproject_build_qt_third_party_from_source TRUE)
+if(CPPPROJECT_QT_THIRD_PARTY_MODE STREQUAL "PREBUILT")
+    set(cppproject_build_qt_third_party_from_source FALSE)
+elseif(CPPPROJECT_QT_THIRD_PARTY_MODE STREQUAL "AUTO")
+    cppproject_cached_qt_dependency_exists(
+        qcustomplot_cache_available qcustomplot qcustomplot)
+    cppproject_cached_qt_dependency_exists(
+        qxlsx_cache_available qxlsx QXlsxQt6)
+    cppproject_cached_qt_dependency_exists(
+        qwindowkit_core_cache_available qwindowkit QWKCore QWKCored)
+    cppproject_cached_qt_dependency_exists(
+        qwindowkit_widgets_cache_available qwindowkit QWKWidgets QWKWidgetsd)
+    if(CPPPROJECT_BUILD_QML_APP)
+        cppproject_cached_qt_dependency_exists(
+            qwindowkit_quick_cache_available qwindowkit QWKQuick QWKQuickd)
+    else()
+        set(qwindowkit_quick_cache_available TRUE)
+    endif()
+    if(WIN32 AND BUILD_SHARED_LIBS)
+        cppproject_cached_qt_dependency_runtime_exists(
+            qcustomplot_runtime_available qcustomplot qcustomplot.dll)
+        cppproject_cached_qt_dependency_runtime_exists(
+            qxlsx_runtime_available qxlsx QXlsxQt6.dll)
+        cppproject_cached_qt_dependency_runtime_exists(
+            qwindowkit_core_runtime_available qwindowkit QWKCore.dll QWKCored.dll)
+        cppproject_cached_qt_dependency_runtime_exists(
+            qwindowkit_widgets_runtime_available
+            qwindowkit
+            QWKWidgets.dll
+            QWKWidgetsd.dll
+        )
+        if(CPPPROJECT_BUILD_QML_APP)
+            cppproject_cached_qt_dependency_runtime_exists(
+                qwindowkit_quick_runtime_available
+                qwindowkit
+                QWKQuick.dll
+                QWKQuickd.dll
+            )
+        else()
+            set(qwindowkit_quick_runtime_available TRUE)
+        endif()
+    else()
+        set(qcustomplot_runtime_available TRUE)
+        set(qxlsx_runtime_available TRUE)
+        set(qwindowkit_core_runtime_available TRUE)
+        set(qwindowkit_widgets_runtime_available TRUE)
+        set(qwindowkit_quick_runtime_available TRUE)
+    endif()
+
+    cppproject_qt_dependency_cache_root(qwindowkit_cache_root qwindowkit)
+    set(qwindowkit_include_directory
+        "${qwindowkit_cache_root}/${CMAKE_BUILD_TYPE}/include")
+    set(qwindowkit_headers_available FALSE)
+    if(EXISTS "${qwindowkit_include_directory}/QWKWidgets/widgetwindowagent.h")
+        set(qwindowkit_headers_available TRUE)
+    endif()
+    if(CPPPROJECT_BUILD_QML_APP
+       AND NOT EXISTS "${qwindowkit_include_directory}/QWKQuick/quickwindowagent.h")
+        set(qwindowkit_headers_available FALSE)
+    endif()
+
+    if(qcustomplot_cache_available
+       AND qxlsx_cache_available
+       AND qwindowkit_core_cache_available
+       AND qwindowkit_widgets_cache_available
+       AND qwindowkit_quick_cache_available
+       AND qcustomplot_runtime_available
+       AND qxlsx_runtime_available
+       AND qwindowkit_core_runtime_available
+       AND qwindowkit_widgets_runtime_available
+       AND qwindowkit_quick_runtime_available
+       AND qwindowkit_headers_available)
+        set(cppproject_build_qt_third_party_from_source FALSE)
+    endif()
+endif()
+
+if(cppproject_build_qt_third_party_from_source)
+    message(STATUS "Qt third-party dependencies: bundled sources")
     add_library(
         cppproject_qcustomplot
         vendor/qcustomplot/qcustomplot.cpp
@@ -161,6 +275,15 @@ if(CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE)
     set(QWINDOWKIT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(QWINDOWKIT_BUILD_DOCUMENTATIONS OFF CACHE BOOL "" FORCE)
     set(QWINDOWKIT_INSTALL OFF CACHE BOOL "" FORCE)
+    mark_as_advanced(
+        FORCE
+        QWINDOWKIT_BUILD_STATIC
+        QWINDOWKIT_BUILD_WIDGETS
+        QWINDOWKIT_BUILD_QUICK
+        QWINDOWKIT_BUILD_EXAMPLES
+        QWINDOWKIT_BUILD_DOCUMENTATIONS
+        QWINDOWKIT_INSTALL
+    )
     add_subdirectory(vendor/qwindowkit qwindowkit)
 
     add_library(CppProject::qwindowkit ALIAS QWKWidgets)
@@ -216,6 +339,7 @@ if(CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE)
         )
     endif()
 else()
+    message(STATUS "Qt third-party dependencies: matching ABI cache")
     cppproject_find_cached_qt_dependency(
         qcustomplot_library
         qcustomplot

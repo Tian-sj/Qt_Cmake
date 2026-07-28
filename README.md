@@ -24,47 +24,54 @@ Widgets 和 QML 是两个独立前端，共享无 Qt 的 `app_core`。不需要�
   macOS 使用 AppleClang。
 - 开发 Qt 库或桌面程序时安装 Qt 6.5 或更高版本，建议 Qt 6.8 LTS。
 
-克隆仓库后先探测本机工具：
+### 使用 Qt Creator（推荐）
 
-```bash
-cmake -P scripts/setup-toolchain.cmake
-```
+1. 打开仓库根目录的 `CMakeLists.txt`。
+2. 选择安装了 Qt 6.5 或更高版本的 Desktop Kit。
+3. Qt Creator 询问是否导入 CMake Presets 时选择导入。
+4. 根据项目类型选择下表中的 Preset。
+5. 点击左下角的构建、运行按钮；在 Tests 视图中可以单独运行模块测试。
 
-脚本会生成不提交到 Git 的 `CMakeUserPresets.json`。Qt 或 Ninja 不在常规位置时：
+修改功能开关时，进入 **项目 > 构建设置 > Current Configuration**，修改
+`CPPPROJECT_` 开头的变量，然后点击 **Run CMake**。Qt 路径、编译器和调试器由
+Kit 管理，不需要写入项目文件。
 
-```bash
-cmake -DFORCE=ON -DQT_ROOT=<Qt安装目录> -DNINJA_PATH=<Ninja路径> -P scripts/setup-toolchain.cmake
-```
+### 使用 VS Code
 
-所有 `-D` 参数必须写在 `-P` 前面。
+1. 安装 Microsoft CMake Tools 扩展并打开仓库根目录。
+2. 从命令面板执行 **CMake: Scan for Compilers**。
+3. 执行 **CMake: Select Configure Preset**，选择下表中的 Preset。
+4. 在 CMake Tools 侧边栏点击 **Build**、**Run Tests**，或选择单独的构建目标。
+
+如果 VS Code 没有自动找到 Qt，在本机的 `CMakeUserPresets.json` 中为所选 Preset
+设置 `CMAKE_PREFIX_PATH`。该文件已被 Git 忽略，不会把个人 Qt 路径提交给其他人。
 
 ### 选择要开发的项目
 
 | 你要开发什么 | 使用的 Preset |
 |---|---|
-| Qt Widgets 程序 | `local-dev` |
-| Qt Quick/QML 程序 | `local-qml-dev` |
-| 只开发 Qt 库 | `local-qt-libraries` |
-| 纯 C++ 库或插件，不使用 Qt | `local-core-only` |
+| Qt Widgets 程序 | `dev` |
+| Qt Quick/QML 程序 | `qml-dev` |
+| 只开发 Qt 库 | `qt-libraries` |
+| 纯 C++ 库或插件，不使用 Qt | `core-only` |
+| 排查纯 C++ 内存问题 | `sanitizers` |
 
-例如开发 Widgets：
+`dev`、`release`、`qml-dev` 和 `qml-release` 会自动提供窗口所需的 QWindowKit。
+`qt-libraries` 默认不启用 GUI 三方库；Qt 库确实需要 QCustomPlot 或 QXlsx 时，再打开
+`CPPPROJECT_ENABLE_QT_THIRD_PARTY`。
+
+### 可选：生成本机 Preset
+
+IDE 已正确识别编译器和 Qt 时不需要执行这一步。需要为 VS Code、CI 或命令行一次性
+写入本机工具路径时，可以运行：
 
 ```bash
-cmake --preset local-dev
-cmake --build --preset local-dev
-ctest --preset local-dev
+cmake -P scripts/setup-toolchain.cmake
 ```
 
-开发 QML：
-
-```bash
-cmake --preset local-qml-dev
-cmake --build --preset local-qml-dev
-ctest --preset local-qml-dev
-```
-
-日常修改代码后通常只需要重复 `cmake --build` 和 `ctest`。新增文件、修改 CMake
-选项或切换 Qt 后，再执行一次 `cmake --preset`。
+脚本只探测环境并生成 `CMakeUserPresets.json`，不会编译项目。生成后在 IDE 中选择
+`local-dev`、`local-qml-dev`、`local-qt-libraries` 或 `local-core-only`。Qt 或
+Ninja 不在常规位置时，可以额外传入 `QT_ROOT`、`NINJA_PATH`；详细参数见脚本开头。
 
 ## 2. 先理解目录
 
@@ -213,12 +220,11 @@ target_link_libraries(my_widgets_window PRIVATE CppProject::qwindowkit_widgets)
 target_link_libraries(my_qml_window PRIVATE CppProject::qwindowkit_quick)
 ```
 
-第一次在某台机器、某种构建配置下使用时从源码编译：
+默认的 `AUTO` 模式不需要手动管理：
 
-```bash
-cmake --preset local-qml-dev -DCPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=ON
-cmake --build --preset local-qml-dev
-```
+- 找到完全匹配当前 ABI 的缓存时直接使用。
+- 缓存不存在或不完整时自动从仓库源码构建。
+- Qt Creator 或 VS Code 重新运行 CMake 后，会自动切换到已经生成的缓存。
 
 产物写入各依赖自己的：
 
@@ -231,15 +237,16 @@ prebuilt/
     └── symbols/
 ```
 
-以后可以关闭源码编译，直接读取匹配的 ABI 缓存：
+只有升级三方源码或排查缓存时才需要在 IDE 的 CMake 配置中强制指定：
 
-```bash
-cmake --preset local-qml-dev -DCPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=OFF
-cmake --build --preset local-qml-dev
-```
+| `CPPPROJECT_QT_THIRD_PARTY_MODE` | 行为 |
+|---|---|
+| `AUTO` | 有匹配缓存就使用，否则构建源码；日常推荐 |
+| `SOURCE` | 强制构建源码并更新当前 ABI 缓存 |
+| `PREBUILT` | 只允许使用缓存，缺失时立即报错 |
 
 缓存不能跨系统、架构、编译器、Qt 版本、静态/动态或 Debug/Release 混用。更换其中
-任何一项，都先重新执行一次源码构建。
+任何一项，`AUTO` 都会重新从源码生成对应缓存。
 
 QXlsx 使用 MIT，QWindowKit 使用 Apache-2.0。QCustomPlot 2.1.1 使用 GPLv3 或商业
 许可证，闭源分发前需要购买合适的商业授权。
@@ -314,8 +321,8 @@ GUI 流程还会验证：
 | `CPPPROJECT_BUILD_WIDGETS_APP` | `ON` | 构建 Qt Widgets 应用 |
 | `CPPPROJECT_BUILD_QML_APP` | `OFF` | 构建 Qt Quick/QML 应用 |
 | `CPPPROJECT_BUILD_QT_LIBRARIES` | 跟随桌面应用 | 构建可复用 Qt 库 |
-| `CPPPROJECT_ENABLE_QT_THIRD_PARTY` | 跟随 Qt 库 | 提供 Qt 三方 target |
-| `CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE` | `ON` | 否则读取本机 ABI 缓存 |
+| `CPPPROJECT_ENABLE_QT_THIRD_PARTY` | 跟随桌面应用 | 提供 Qt 三方 target |
+| `CPPPROJECT_QT_THIRD_PARTY_MODE` | `AUTO` | 自动使用 ABI 缓存或构建源码 |
 | `CPPPROJECT_BUILD_PLUGINS` | `OFF` | 构建示例运行时插件 |
 | `CPPPROJECT_BUILD_TESTS` | 顶层工程时 `ON` | 构建自动化测试 |
 | `CPPPROJECT_ENABLE_LICENSING` | `OFF` | 启用注册码 SDK 适配 |
@@ -326,6 +333,9 @@ GUI 流程还会验证：
 需要严格检查时显式加入
 `-DCPPPROJECT_WARNINGS_AS_ERRORS=ON`；日常 Preset 不默认开启，避免编译器版本变化
 把新出现的警告误判成工程无法构建。
+
+IDE 默认只需要关注应用、库、插件、测试和三方库开关。警告即错误、clang-tidy、
+Sanitizer、外部依赖根目录和 macOS 签名身份被标记为高级选项，需要时再显示。
 
 ## 11. 创建新项目时修改什么
 

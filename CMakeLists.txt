@@ -25,7 +25,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(ProjectOptions)
 
-# 可由 CMake Preset 或命令行覆盖的项目功能开关。
+# 可由 CMake Preset 或 IDE 的 CMake 配置界面覆盖的项目功能开关。
 option(BUILD_SHARED_LIBS "Build reusable libraries as shared libraries" OFF)
 option(CPPPROJECT_BUILD_WIDGETS_APP "Build the Qt Widgets desktop application" ON)
 option(CPPPROJECT_BUILD_QML_APP "Build the Qt Quick/QML desktop application" OFF)
@@ -38,15 +38,39 @@ option(
     "Build reusable libraries based on Qt"
     ${cppproject_build_qt_libraries_default}
 )
+set(cppproject_enable_qt_third_party_default OFF)
+if(CPPPROJECT_BUILD_WIDGETS_APP OR CPPPROJECT_BUILD_QML_APP)
+    set(cppproject_enable_qt_third_party_default ON)
+endif()
 option(
     CPPPROJECT_ENABLE_QT_THIRD_PARTY
     "Provide QCustomPlot, QXlsx, and QWindowKit targets"
-    ${CPPPROJECT_BUILD_QT_LIBRARIES}
+    ${cppproject_enable_qt_third_party_default}
 )
-option(
-    CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE
-    "Build bundled QCustomPlot and QXlsx sources instead of using their local binary caches"
-    ON
+set(
+    CPPPROJECT_QT_THIRD_PARTY_MODE
+    "AUTO"
+    CACHE STRING
+    "Qt third-party mode: AUTO uses a matching cache or builds sources, SOURCE always builds sources, PREBUILT requires a matching cache"
+)
+set_property(
+    CACHE CPPPROJECT_QT_THIRD_PARTY_MODE
+    PROPERTY STRINGS AUTO SOURCE PREBUILT
+)
+string(TOUPPER
+    "${CPPPROJECT_QT_THIRD_PARTY_MODE}"
+    cppproject_qt_third_party_mode
+)
+if(NOT cppproject_qt_third_party_mode MATCHES "^(AUTO|SOURCE|PREBUILT)$")
+    message(FATAL_ERROR
+        "CPPPROJECT_QT_THIRD_PARTY_MODE must be AUTO, SOURCE, or PREBUILT")
+endif()
+set(
+    CPPPROJECT_QT_THIRD_PARTY_MODE
+    "${cppproject_qt_third_party_mode}"
+    CACHE STRING
+    "Qt third-party mode: AUTO uses a matching cache or builds sources, SOURCE always builds sources, PREBUILT requires a matching cache"
+    FORCE
 )
 option(CPPPROJECT_BUILD_PLUGINS "Build the example runtime plugin" OFF)
 option(CPPPROJECT_BUILD_TESTS "Build unit tests" ${PROJECT_IS_TOP_LEVEL})
@@ -56,6 +80,12 @@ option(CPPPROJECT_ENABLE_CLANG_TIDY "Run clang-tidy while compiling" OFF)
 option(CPPPROJECT_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 set(CPPPROJECT_EXTERNAL_THIRD_PARTY_ROOT "" CACHE PATH
     "Optional shared third-party repository containing third_party.cmake")
+mark_as_advanced(
+    CPPPROJECT_WARNINGS_AS_ERRORS
+    CPPPROJECT_ENABLE_CLANG_TIDY
+    CPPPROJECT_ENABLE_SANITIZERS
+    CPPPROJECT_EXTERNAL_THIRD_PARTY_ROOT
+)
 
 # 共享依赖位于项目仓库之外，只注册按需加载函数，不默认引入任何库或 include 路径。
 if(NOT CPPPROJECT_EXTERNAL_THIRD_PARTY_ROOT STREQUAL "")
@@ -139,6 +169,7 @@ set(CPPPROJECT_APPLICATION_NAME "CppProjectTemplate" CACHE STRING "User-facing a
 set(CPPPROJECT_BUNDLE_IDENTIFIER "com.example.cppproject-template" CACHE STRING "macOS bundle identifier")
 if(APPLE)
     set(CPPPROJECT_CODESIGN_IDENTITY "-" CACHE STRING "macOS code-signing identity; '-' means ad hoc")
+    mark_as_advanced(CPPPROJECT_CODESIGN_IDENTITY)
 endif()
 
 # 生成只读的构建信息头，业务代码不需要直接读取 CMake 变量。

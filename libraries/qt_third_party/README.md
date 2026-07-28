@@ -22,6 +22,13 @@ but not generated binaries. Build outputs under each `vendor/*/prebuilt/`
 directory are ignored by Git and separated by operating system, architecture,
 compiler, Qt version, static/shared linkage, and build configuration.
 
+`CPPPROJECT_QT_THIRD_PARTY_MODE` controls how those binaries are selected:
+
+- `AUTO` uses a complete matching cache and otherwise builds the bundled source.
+- `SOURCE` always builds the bundled source and refreshes the matching cache.
+- `PREBUILT` requires a complete matching cache and fails during configuration
+  when one is unavailable.
+
 QCustomPlot 2.1.1 is the latest stable upstream release. Its official release
 page lists support through Qt 6.4; newer Qt releases may produce deprecation
 warnings. Closed-source distribution requires an appropriate QCustomPlot

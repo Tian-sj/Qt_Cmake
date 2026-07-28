@@ -94,7 +94,7 @@ jobs:
       - name: Test QML application
         run: ctest --preset local-qml-dev
       - name: Reconfigure QML from platform ABI cache
-        run: cmake --preset local-qml-dev -DCPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=OFF
+        run: cmake --preset local-qml-dev -DCPPPROJECT_QT_THIRD_PARTY_MODE=PREBUILT
       - name: Build QML from platform ABI cache
         run: cmake --build --preset local-qml-dev
       - name: Test QML from platform ABI cache
