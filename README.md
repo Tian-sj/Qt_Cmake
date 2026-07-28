@@ -293,7 +293,7 @@ target_link_libraries(
 |---|---|---|
 | Windows Server 2022 | MSVC 2022 + Qt 6.8 LTS | C++、插件、Widgets、QML、Qt 库、安装消费 |
 | Ubuntu 24.04 | GCC + Qt 6.8 LTS | C++、插件、Widgets、QML、Qt 库、安装消费 |
-| macOS | AppleClang + Qt 6.8 LTS | C++、插件、Widgets、QML、Qt 库、安装消费 |
+| macOS 14 | AppleClang + Qt 6.8 LTS | C++、插件、Widgets、QML、Qt 库、安装消费 |
 
 GUI 流程还会验证：
 

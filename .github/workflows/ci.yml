@@ -19,7 +19,7 @@ jobs:
         include:
           - os: ubuntu-24.04
             platform: Linux
-          - os: macos-latest
+          - os: macos-14
             platform: macOS
           - os: windows-2022
             platform: Windows
@@ -60,7 +60,7 @@ jobs:
         include:
           - os: ubuntu-24.04
             platform: Linux
-          - os: macos-latest
+          - os: macos-14
             platform: macOS
           - os: windows-2022
             platform: Windows
