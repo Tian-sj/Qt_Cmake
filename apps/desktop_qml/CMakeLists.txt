@@ -1,3 +1,8 @@
+set(cppproject_qml_import_paths ${QML_IMPORT_PATH} "${CMAKE_CURRENT_BINARY_DIR}")
+list(REMOVE_DUPLICATES cppproject_qml_import_paths)
+set(QML_IMPORT_PATH "${cppproject_qml_import_paths}" CACHE STRING
+    "QML module search paths used by IDE tooling" FORCE)
+
 qt_add_executable(cppproject_desktop_qml
     main.cpp
 )
