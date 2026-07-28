@@ -2,12 +2,14 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import CppProject.Desktop
 
 Window {
     id: root
 
     required property string startupMessage
     required property bool smokeTest
+    readonly property bool isMacOs: Qt.platform.os === "osx"
 
     width: 960
     height: 640
@@ -27,9 +29,11 @@ Window {
 
         windowAgent.setup(root)
         windowAgent.setTitleBar(titleBar)
-        windowAgent.setSystemButton(WindowAgent.Minimize, minimizeButton)
-        windowAgent.setSystemButton(WindowAgent.Maximize, maximizeButton)
-        windowAgent.setSystemButton(WindowAgent.Close, closeButton)
+        if (!root.isMacOs) {
+            windowAgent.setSystemButton(WindowAgent.Minimize, minimizeButton)
+            windowAgent.setSystemButton(WindowAgent.Maximize, maximizeButton)
+            windowAgent.setSystemButton(WindowAgent.Close, closeButton)
+        }
         root.visible = true
     }
 
@@ -44,7 +48,7 @@ Window {
 
         Label {
             anchors.left: parent.left
-            anchors.leftMargin: 16
+            anchors.leftMargin: root.isMacOs ? 78 : 16
             anchors.verticalCenter: parent.verticalCenter
             text: root.title
             color: "#202124"
@@ -52,6 +56,7 @@ Window {
         }
 
         Row {
+            visible: !root.isMacOs
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right

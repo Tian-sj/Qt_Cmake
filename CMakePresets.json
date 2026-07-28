@@ -54,7 +54,8 @@
         "CPPPROJECT_BUILD_QT_LIBRARIES": true,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
         "CPPPROJECT_QT_THIRD_PARTY_MODE": "AUTO",
-        "CPPPROJECT_BUILD_TESTS": true
+        "CPPPROJECT_BUILD_TESTS": true,
+        "QT_QML_GENERATE_QMLLS_INI": true
       }
     },
     {
@@ -68,7 +69,8 @@
         "CPPPROJECT_BUILD_QT_LIBRARIES": true,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
         "CPPPROJECT_QT_THIRD_PARTY_MODE": "AUTO",
-        "CPPPROJECT_BUILD_TESTS": true
+        "CPPPROJECT_BUILD_TESTS": true,
+        "QT_QML_GENERATE_QMLLS_INI": true
       }
     },
     {

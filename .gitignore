@@ -16,6 +16,7 @@ libraries/qt_third_party/vendor/*/prebuilt/
 .cache/
 .idea/
 .vscode/
+**/.qmlls.ini
 *.user
 *.swp
 *.swo
