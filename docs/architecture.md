@@ -1,69 +1,99 @@
-# 架构与模块边界
+# 工程边界
 
-## 依赖规则
+## 按交付物组织
 
-依赖方向是本模板最重要的约束：
+模板不强制所有项目使用同一种架构。目录对应实际交付物：
 
-1. `application` 定义用例、数据结构和 ports，只依赖 C++ 标准库。
-2. `platform` 实现 application ports，例如文件设置存储和平台目录解析。
-3. `src/frontend/qt` 是完整的 Qt 表现层，只做控件、翻译、主题和用户交互，不直接访问文件、数据库或专有 SDK。
-4. `src/backend/integrations/registration` 把专有注册码 SDK 的 `QString/QDateTime` 转成标准 C++ 类型。
-5. `apps/desktop` 是 composition root，负责创建实现并注入 application/gui。
-6. `precision_countdown` 是独立纯 C++ 模块，不依赖 application 或 Qt。
+| 目录 | 交付物 | 使用者 |
+|---|---|---|
+| `libraries/` | 纯 C++ 或 Qt 静态库/动态库 | 其他 CMake target 或外部项目 |
+| `plugins/` | 运行时加载的 MODULE | 插件宿主 |
+| `apps/` | 可执行程序和安装包 | 最终用户 |
 
-禁止出现以下依赖：
+只有代码确实被多个交付物共同使用时，才提取成新的 library。不要为了目录对称创建
+空接口、manager、repository 或 factory。
 
-- application → platform/integrations/gui/Qt
-- platform → gui
-- GUI 直接读取数据库、配置文件或调用 third-party SDK
-- 公共头文件暴露 private include 路径
-- 用全局单例代替构造函数注入
+## Library 边界
 
-## 目录职责
+每个 library 自己拥有：
+
+- `include/`：稳定公开 API。
+- `src/`：私有实现。
+- `tests/`：只验证该模块行为的测试。
+- `CMakeLists.txt`：target、依赖、安装和测试声明。
+
+公共头文件只能包含调用者真正需要的依赖。第三方 SDK、私有 include 路径、警告选项
+和项目内部宏不能向消费者传播。
+
+安装必须包含库、公开头文件和 CMake Package。`tests/consumer` 必须只通过安装目录
+执行 `find_package`，用来发现缺失头文件、错误的传递依赖和不可重定位路径。
+
+静态库适合源码团队内部和单一工具链。动态 C++ 库需要维护符号可见性、版本和 ABI，
+并要求消费者使用兼容编译器与运行库。
+
+## Qt Library 边界
+
+Qt 库与普通 C++ 库使用相同的 `include/src/tests/CMakeLists.txt` 结构，但只在
+`CPPPROJECT_BUILD_QT_LIBRARIES` 开启时参与构建：
 
 ```text
-apps/desktop/                              桌面程序入口与依赖组装
-cmake/                                     可复用 CMake 模块和生成头模板
-docs/                                      架构和开发文档
-scripts/                                   环境、构建、部署辅助脚本
-src/backend/application/                   纯 C++ 用例与抽象接口
-src/backend/modules/precision_countdown/   独立纯 C++ 模块示例
-src/backend/platform/                      文件、路径、时间等系统实现
-src/backend/integrations/registration/     专有 SDK 防腐层
-src/frontend/qt/application/               Qt 启动流程和界面偏好
-src/frontend/qt/views/                     窗口的 .hpp/.cpp/.ui
-src/frontend/qt/widgets/                   自定义 Qt 控件
-src/frontend/qt/resources/                 qrc、样式和图片
-src/frontend/qt/translations/              Qt 翻译源文件
-src/frontend/qt/assets/                    字体和应用图标
-vendor/registration_code/                  当前项目专用 SDK 头文件和二进制
-tests/                                     按后端模块镜像组织的测试
+Qt application ──> Qt library ──> pure C++ library
+external Qt app ──┘
 ```
 
-## 新增业务模块
+- 公开 API 使用 `QObject`、`QString` 等类型时，公开链接 `Qt6::Core`。
+- 仅实现内部使用 Qt 时，Qt target 应保持私有依赖。
+- Qt 库可以依赖纯 C++ 库；纯 C++ 库不得反向依赖 Qt。
+- 每个 Qt 库独立启用 `AUTOMOC`，不要全局开启自动生成。
+- 安装包通过 `find_dependency(Qt6)` 向外部消费者恢复传递依赖。
 
-新增功能时按以下顺序处理：
+QCustomPlot、QXlsx 和 QWindowKit 属于第三方 Qt 库，不进入任何业务 library 的源码
+目录。源码模式把二进制写入各依赖自己的 `prebuilt/<ABI>/<配置>` 缓存；预编译模式
+只创建 imported target。缓存键必须包含平台、架构、编译器、Qt 版本、静态/动态和
+Debug/Release，不同键之间不得混用。桌面窗口直接依赖 `CppProject::qwindowkit`，
+纯 C++ library 不感知窗口框架。
 
-1. 在 application 定义输入、输出和 port；不要引入 Qt 类型。
-2. 为用例编写无 Qt 单元测试，使用 fake port 验证行为。
-3. 在 platform 或独立 integration 中实现 port，并添加集成测试。
-4. 在 `apps/desktop/main.cpp` 组装实现。
-5. 最后在 GUI 中调用用例并显示结果。
+## Plugin 边界
 
-独立、边界稳定的大功能可以使用 `src/backend/modules/<module>/include/qtcpp/<module>` 与 `src/backend/modules/<module>/src` 结构，并提供命名空间 target，例如 `QtCpp::<module>`。只有实际存在多个实现或测试替身需求时才创建接口，避免无意义的抽象层。
+需要跨工具链或运行时发现实现时，使用 C ABI：
 
-## 并发规则
+```text
+host ── cppproject_plugin_get_api(abi_version) ──> plugin
+     <──────── function table ───────────────
+```
 
-- 后台工作不得直接操作 QWidget；通过 queued signal/slot 或 GUI 线程调度器回到主线程。
-- 回调注册必须有明确的生命周期句柄。
+插件协议必须遵守：
+
+- 入口使用 `extern "C"`。
+- API 包含明确 ABI 版本。
+- 边界只使用固定宽度整数、C struct、指针和函数指针。
+- 不跨边界传递 STL、Qt 对象或异常。
+- 分配和释放由同一个模块完成。
+- 插件加载、符号查找、错误 ABI 和初始化必须有自动化测试。
+
+如果宿主与插件严格使用同一个编译器、运行库和 Qt 版本，可以在 C ABI 之上约定更丰富
+的 C++ 接口，但基础发现入口仍建议保持 C ABI。
+
+## Qt 应用边界
+
+Qt 桌面应用使用：
+
+```text
+CppProject::desktop_ui ──> CppProject::app_core
+    │
+    └── apps/desktop/main.cpp 负责对象创建和依赖组装
+```
+
+- `apps/desktop` 是 Qt 桌面应用唯一的开发根目录。
+- `desktop_ui` 负责控件、翻译、主题和用户交互。
+- 非 UI 业务进入 `app_core` 或独立 library。
+- 专属于应用的 SDK 适配放在 `apps/desktop/integrations`。
+- 公共 library 不因桌面应用的私有 SDK 而引入 Qt。
+
+## 并发与错误
+
+- 后台线程不得直接操作 QWidget，应通过 queued signal/slot 返回 GUI 线程。
 - 不在持锁状态执行外部回调。
-- application 的端口实现需明确线程安全承诺，默认不要假设线程安全。
-
-`PrecisionCountdown` 的回调在内部工作线程执行，其 `Signal` 在发布前复制订阅者列表，因此不会持锁调用用户代码。
-
-## 错误与配置
-
-- 可恢复业务错误通过明确的状态/结果返回，例如 `ApplicationStatus` 和 `LicenseResult`。
-- 无法继续的基础设施错误使用异常传到 composition root，由入口统一记录并退出。
-- 业务配置由 application port 管理；字体、语言、主题属于 GUI 偏好，可留在 Qt 表现层。
+- 回调连接必须有明确生命周期。
+- 可恢复错误使用状态或结果返回；无法继续的启动错误传到入口统一处理。
 - 不在 CMake 或源码中保存个人路径、密钥、令牌和服务器地址。

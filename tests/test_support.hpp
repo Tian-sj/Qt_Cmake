@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace qtcpp::test {
+namespace cppproject::test {
 
 class Suite final {
 public:
@@ -53,4 +53,4 @@ void require_equal(const Actual& actual, const Expected& expected, const std::st
     }
 }
 
-} // namespace qtcpp::test
+} // namespace cppproject::test

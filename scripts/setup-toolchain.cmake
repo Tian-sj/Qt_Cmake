@@ -119,7 +119,7 @@ function(make_configure_preset output name parent ninja compiler qt_prefix envir
     endif()
     if(NOT external_third_party_root STREQUAL "")
         json_quote(value "${external_third_party_root}")
-        string(JSON cache SET "${cache}" QTCPP_EXTERNAL_THIRD_PARTY_ROOT "${value}")
+        string(JSON cache SET "${cache}" CPPPROJECT_EXTERNAL_THIRD_PARTY_ROOT "${value}")
     endif()
 
     set(preset "{}")
@@ -339,7 +339,7 @@ endif()
 set(external_third_party_root "")
 set(third_party_candidates
     "${THIRD_PARTY_ROOT}"
-    "$ENV{QTCPP_THIRD_PARTY_ROOT}"
+    "$ENV{CPPPROJECT_THIRD_PARTY_ROOT}"
     "$ENV{THIRD_PARTY_ROOT}"
     "${project_root}/../third_party"
 )
@@ -356,7 +356,7 @@ if(NOT "${THIRD_PARTY_ROOT}" STREQUAL "" AND external_third_party_root STREQUAL 
         "THIRD_PARTY_ROOT 无效：${THIRD_PARTY_ROOT}；目录中必须存在 third_party.cmake。")
 endif()
 
-# 始终生成纯 C++ 预设；只有找到 Qt 时才生成 GUI 开发和发布预设。
+# 始终生成纯 C++ 预设；找到 Qt 时再生成 Qt 库、GUI 开发和发布预设。
 set(configure_presets "[]")
 set(build_presets "[]")
 set(test_presets "[]")
@@ -367,13 +367,23 @@ make_configure_preset(
 string(JSON configure_presets SET "${configure_presets}" 0 "${core_preset}")
 
 if(NOT qt_prefix STREQUAL "")
-    list(APPEND preset_names local-dev local-release)
+    list(APPEND preset_names local-qt-libraries local-dev local-release)
+    make_configure_preset(
+        qt_libraries_preset
+        local-qt-libraries
+        qt-libraries
+        "${ninja}"
+        "${preset_compiler}"
+        "${qt_prefix}"
+        "${environment}"
+    )
     make_configure_preset(
         dev_preset local-dev dev "${ninja}" "${preset_compiler}" "${qt_prefix}" "${environment}")
     make_configure_preset(
         release_preset local-release release "${ninja}" "${preset_compiler}" "${qt_prefix}" "${environment}")
-    string(JSON configure_presets SET "${configure_presets}" 1 "${dev_preset}")
-    string(JSON configure_presets SET "${configure_presets}" 2 "${release_preset}")
+    string(JSON configure_presets SET "${configure_presets}" 1 "${qt_libraries_preset}")
+    string(JSON configure_presets SET "${configure_presets}" 2 "${dev_preset}")
+    string(JSON configure_presets SET "${configure_presets}" 3 "${release_preset}")
 endif()
 
 set(index 0)

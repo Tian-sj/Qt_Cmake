@@ -1,12 +1,12 @@
-#include "qtcpp/application/application_service.hpp"
-#include "qtcpp/gui/gui_application.hpp"
-#include "qtcpp/platform/file_settings_store.hpp"
-#include "qtcpp/platform/platform_paths.hpp"
-#include "qtcpp/platform/system_clock.hpp"
-#include "qtcpp/project_config.hpp"
+#include "cppproject/app_core/application_service.hpp"
+#include "cppproject/app_core/file_settings_store.hpp"
+#include "cppproject/app_core/platform_paths.hpp"
+#include "cppproject/app_core/system_clock.hpp"
+#include "cppproject/desktop/desktop_application.hpp"
+#include "cppproject/project_config.hpp"
 
-#if defined(QTCPP_ENABLE_LICENSING)
-#include "qtcpp/integrations/registration/registration_license_gateway.hpp"
+#if defined(CPPPROJECT_ENABLE_LICENSING)
+#include "integrations/registration_license_gateway.hpp"
 #endif
 
 #include <exception>
@@ -18,24 +18,24 @@
 int main(int argc, char* argv[]) {
     try {
         // main 是唯一组合根：在这里选择具体实现并通过构造函数注入应用层。
-        const auto settings_file = qtcpp::platform::application_config_directory(
-                                       {.organization = qtcpp::build::organization,
-                                        .application_name = qtcpp::build::application_name}) /
+        const auto settings_file = cppproject::app_core::application_config_directory(
+                                       {.organization = cppproject::build::organization,
+                                        .application_name = cppproject::build::application_name}) /
                                    "settings.conf";
 
-        qtcpp::platform::FileSettingsStore settings{settings_file};
-        qtcpp::platform::SystemClock clock;
+        cppproject::app_core::FileSettingsStore settings{settings_file};
+        cppproject::app_core::SystemClock clock;
 
-#if defined(QTCPP_ENABLE_LICENSING)
-        const auto secret = std::string{qtcpp::build::organization} + "_" +
-                            std::string{qtcpp::build::application_name};
-        qtcpp::integrations::registration::RegistrationLicenseGateway license_gateway{secret};
-        qtcpp::application::ApplicationService application{settings, clock, &license_gateway};
+#if defined(CPPPROJECT_ENABLE_LICENSING)
+        const auto secret = std::string{cppproject::build::organization} + "_" +
+                            std::string{cppproject::build::application_name};
+        cppproject::desktop::RegistrationLicenseGateway license_gateway{secret};
+        cppproject::app_core::ApplicationService application{settings, clock, &license_gateway};
 #else
-        qtcpp::application::ApplicationService application{settings, clock};
+        cppproject::app_core::ApplicationService application{settings, clock};
 #endif
 
-        qtcpp::gui::GuiApplication gui{argc, argv, application};
+        cppproject::desktop::DesktopApplication gui{argc, argv, application};
         return gui.run();
     } catch (const std::exception& exception) {
         std::cerr << "Fatal startup error: " << exception.what() << '\n';

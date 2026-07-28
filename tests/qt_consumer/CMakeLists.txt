@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.25)
+
+project(CppProjectTemplateQtConsumer LANGUAGES CXX)
+
+enable_testing()
+find_package(CppProjectTemplate CONFIG REQUIRED)
+
+add_executable(cppproject_qt_package_consumer main.cpp)
+target_compile_features(cppproject_qt_package_consumer PRIVATE cxx_std_20)
+target_link_libraries(cppproject_qt_package_consumer PRIVATE CppProject::qt_status)
+
+add_test(NAME cppproject_qt_package_consumer COMMAND cppproject_qt_package_consumer)

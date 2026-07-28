@@ -10,7 +10,7 @@ cmake --build --preset local-dev
 ctest --preset local-dev
 ```
 
-不修改 GUI 时仍应运行 `core-only`，它会在 `-Werror` 下验证纯 C++ 边界。改动 C++ 文件后使用仓库根目录的 `.clang-format` 格式化；需要更严格检查时启用 `QTCPP_ENABLE_CLANG_TIDY` 或 sanitizers 预设。
+不修改 GUI 时仍应运行 `core-only`，它会在 `-Werror` 下验证库、插件和模块测试。改动 C++ 文件后使用仓库根目录的 `.clang-format` 格式化；需要更严格检查时启用 `CPPPROJECT_ENABLE_CLANG_TIDY` 或 sanitizers 预设。
 
 ## 分支和评审
 
@@ -24,7 +24,9 @@ ctest --preset local-dev
 
 - 新行为有自动化测试；缺陷修复包含能复现问题的测试。
 - Windows MSVC、macOS 和 Linux CI 通过，三者都使用 Ninja。
-- application/platform 公共接口没有 Qt 类型泄漏。
+- library 公共接口没有私有依赖或 Qt 类型泄漏。
+- 安装后的 `find_package` consumer 测试通过。
+- 插件变更通过真实动态加载和 ABI 协商测试。
 - 新增文本已更新英文/简体中文 TS 文件，文件编码为 UTF-8。
 - CMake target 使用显式 source、target include 和 target link 声明。
 - 文档与实际命令、选项和目录保持一致。

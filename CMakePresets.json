@@ -21,8 +21,11 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "QTCPP_BUILD_GUI": true,
-        "QTCPP_BUILD_TESTS": true
+        "CPPPROJECT_BUILD_GUI": true,
+        "CPPPROJECT_BUILD_QT_LIBRARIES": true,
+        "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
+        "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
+        "CPPPROJECT_BUILD_TESTS": true
       }
     },
     {
@@ -31,19 +34,39 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "QTCPP_BUILD_GUI": true,
-        "QTCPP_BUILD_TESTS": true
+        "CPPPROJECT_BUILD_GUI": true,
+        "CPPPROJECT_BUILD_QT_LIBRARIES": true,
+        "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
+        "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
+        "CPPPROJECT_BUILD_TESTS": true
+      }
+    },
+    {
+      "name": "qt-libraries",
+      "displayName": "Reusable Qt libraries without GUI application",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPPPROJECT_BUILD_GUI": false,
+        "CPPPROJECT_BUILD_QT_LIBRARIES": true,
+        "CPPPROJECT_ENABLE_QT_THIRD_PARTY": true,
+        "CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE": true,
+        "CPPPROJECT_BUILD_PLUGINS": false,
+        "CPPPROJECT_BUILD_TESTS": true
       }
     },
     {
       "name": "core-only",
-      "displayName": "Pure C++ without Qt",
+      "displayName": "Libraries and plugins without Qt",
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "QTCPP_BUILD_GUI": false,
-        "QTCPP_BUILD_TESTS": true,
-        "QTCPP_WARNINGS_AS_ERRORS": true
+        "CPPPROJECT_BUILD_GUI": false,
+        "CPPPROJECT_BUILD_QT_LIBRARIES": false,
+        "CPPPROJECT_ENABLE_QT_THIRD_PARTY": false,
+        "CPPPROJECT_BUILD_PLUGINS": true,
+        "CPPPROJECT_BUILD_TESTS": true,
+        "CPPPROJECT_WARNINGS_AS_ERRORS": true
       }
     },
     {
@@ -51,14 +74,15 @@
       "displayName": "Pure C++ with sanitizers",
       "inherits": "core-only",
       "cacheVariables": {
-        "QTCPP_WARNINGS_AS_ERRORS": false,
-        "QTCPP_ENABLE_SANITIZERS": true
+        "CPPPROJECT_WARNINGS_AS_ERRORS": false,
+        "CPPPROJECT_ENABLE_SANITIZERS": true
       }
     }
   ],
   "buildPresets": [
     { "name": "dev", "configurePreset": "dev" },
     { "name": "release", "configurePreset": "release" },
+    { "name": "qt-libraries", "configurePreset": "qt-libraries" },
     { "name": "core-only", "configurePreset": "core-only" },
     { "name": "sanitizers", "configurePreset": "sanitizers" }
   ],
@@ -66,6 +90,11 @@
     {
       "name": "dev",
       "configurePreset": "dev",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "qt-libraries",
+      "configurePreset": "qt-libraries",
       "output": { "outputOnFailure": true }
     },
     {

@@ -1,0 +1,31 @@
+QMainWindow, QWidget, QDialog {
+    font: inherit;
+    background-color: #ffffff;
+}
+
+#windowTitleBar {
+    background-color: #f3f4f6;
+    border-bottom: 1px solid #d8dbe0;
+}
+
+#windowTitleLabel {
+    color: #202124;
+    font-weight: 600;
+}
+
+#windowMinimizeButton,
+#windowMaximizeButton,
+#windowCloseButton {
+    background: transparent;
+    border: none;
+}
+
+#windowMinimizeButton:hover,
+#windowMaximizeButton:hover {
+    background-color: #e2e4e8;
+}
+
+#windowCloseButton:hover {
+    color: #ffffff;
+    background-color: #c42b1c;
+}

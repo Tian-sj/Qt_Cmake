@@ -28,6 +28,14 @@ jobs:
         run: cmake --build --preset local-core-only
       - name: Test
         run: ctest --preset local-core-only
+      - name: Install libraries and CMake package
+        run: cmake --install build/local-core-only --prefix build/install-test
+      - name: Configure external consumer
+        run: cmake -S tests/consumer -B build/consumer-test -G Ninja -DCMAKE_PREFIX_PATH=${{ github.workspace }}/build/install-test
+      - name: Build external consumer
+        run: cmake --build build/consumer-test
+      - name: Test external consumer
+        run: ctest --test-dir build/consumer-test --output-on-failure
 
   gui:
     name: Qt GUI (${{ matrix.os }})
@@ -54,3 +62,17 @@ jobs:
         run: cmake --build --preset local-dev
       - name: Test
         run: ctest --preset local-dev
+      - name: Configure reusable Qt libraries
+        run: cmake --preset local-qt-libraries
+      - name: Build reusable Qt libraries
+        run: cmake --build --preset local-qt-libraries
+      - name: Test reusable Qt libraries
+        run: ctest --preset local-qt-libraries
+      - name: Install reusable Qt libraries
+        run: cmake --install build/local-qt-libraries --prefix build/qt-install-test
+      - name: Configure external Qt consumer
+        run: cmake -S tests/qt_consumer -B build/qt-consumer-test -G Ninja -DCMAKE_PREFIX_PATH="${{ github.workspace }}/build/qt-install-test"
+      - name: Build external Qt consumer
+        run: cmake --build build/qt-consumer-test
+      - name: Test external Qt consumer
+        run: ctest --test-dir build/qt-consumer-test --output-on-failure

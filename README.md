@@ -1,244 +1,19 @@
 # Qt / C++ 跨平台工程模板
 
-这是一个以纯 C++ 业务层为核心、Qt Widgets 仅作为桌面界面的工程模板。它统一使用 CMake + Ninja，支持 Windows（MSVC）、macOS（AppleClang）和 Linux（GCC/Clang），也可以完全关闭 Qt 构建。
+面向 Windows、macOS 和 Linux 的 C++20 工程模板，同一套构建基础支持四种交付物：
 
-## 设计目标
-
-- application、modules 和 platform 不包含 Qt 头文件或 Qt 类型。
-- GUI 只能通过 application 的公开接口调用业务能力。
-- 系统能力通过 platform 实现，专有 SDK 通过 integrations 接入，不能反向污染业务层。
-- 所有 target 显式声明源码、include 可见性和依赖，不使用递归 `GLOB`。
-- 正式运行文件统一写入根目录 `bin/`；缓存、中间文件和测试仍隔离在 `build/`。
-- UTF-8、C++20、警告策略、测试、格式化和 CI 在三平台保持一致。
-
-```mermaid
-flowchart LR
-    Desktop["apps/desktop<br/>组合根"] --> GUI["src/frontend/qt<br/>Qt 表现层"]
-    Desktop --> Platform["src/backend/platform<br/>纯 C++ 系统实现"]
-    GUI --> App["src/backend/application<br/>纯 C++ 用例与 ports"]
-    Platform --> App
-    Desktop -. 可选 .-> License["backend/integrations/registration<br/>隔离专有 Qt SDK"]
-    License --> App
-    Timer["precision_countdown<br/>独立纯 C++ 模块"]
-```
-
-详细边界和新增模块规则见 [docs/architecture.md](docs/architecture.md)。
-
-## 项目结构与文件职责
-
-```text
-Qt_Cmake/
-├── apps/desktop/                  # 桌面程序入口与依赖组装
-├── bin/                           # 自动生成的程序运行目录，不提交 Git
-├── cmake/                         # 项目级 CMake 公共模块
-├── docs/                          # 架构等设计文档
-├── scripts/                       # 跨平台环境初始化脚本
-├── src/
-│   ├── backend/                   # 与界面无关的 C++ 后端
-│   │   ├── application/           # 用例编排、业务门面和抽象端口
-│   │   ├── modules/               # 可独立开发和测试的业务模块
-│   │   ├── platform/              # 文件、时间、路径等系统能力实现
-│   │   └── integrations/          # 第三方 SDK 或外部服务适配
-│   └── frontend/qt/               # Qt 表现层
-│       ├── application/           # GUI 生命周期与界面状态
-│       ├── include/               # Qt 前端对外公开接口
-│       ├── views/                 # 窗口、对话框及对应 .ui
-│       ├── widgets/               # 可复用自定义控件
-│       ├── resources/             # 编译进 Qt Resource System 的资源
-│       ├── translations/          # Qt 翻译源文件
-│       └── assets/                # 打包使用的字体和应用图标
-├── vendor/                        # 随当前项目管理的专用 SDK
-├── tests/                         # 与生产模块对应的自动化测试
-├── CMakeLists.txt                 # 工程入口、版本和全局构建选项
-├── CMakePresets.json              # 可提交、跨平台共享的构建预设
-├── CMakeUserPresets.json          # 自动生成的本机预设，不提交 Git
-├── CONTRIBUTING.md                # 团队协作与提交规范
-└── README.md                      # 环境、架构和使用入口
-```
-
-### 根目录
-
-| 文件或目录 | 职责 |
-|---|---|
-| `CMakeLists.txt` | 声明工程、C++ 标准、构建选项、Git 版本，并组织 `vendor`、`src`、`apps` 和 `tests`。这里只放项目级配置，不直接堆业务源码。 |
-| `CMakePresets.json` | 保存团队共享的 configure、build 和 test 预设，所有平台统一使用 Ninja。 |
-| `CMakeUserPresets.json` | 由环境脚本生成，保存当前机器的 Qt、Ninja 和编译器路径。该文件包含本机绝对路径，已被 Git 忽略。 |
-| `CONTRIBUTING.md` | 约定分支、提交、格式化、测试和评审流程，供多人协作时统一执行。 |
-| `docs/architecture.md` | 记录模块边界、依赖方向和扩展规则；README 负责快速使用，设计细节放在这里。 |
-
-### `apps/desktop`：程序组合根
-
-| 文件 | 职责 |
-|---|---|
-| `main.cpp` | 创建 application、platform、integration 和 GUI 对象，注入依赖并启动程序。只做组装，不实现业务逻辑或复杂界面逻辑。 |
-| `CMakeLists.txt` | 定义最终桌面可执行文件，链接前端和后端 target，并配置安装、部署和平台属性。 |
-| `app.rc.in` | Windows 可执行文件资源模板，写入版本、产品名称和 `.ico` 图标。 |
-
-组合根是唯一允许同时了解前端和后端具体实现的位置。这样更换 Qt 界面、文件存储或第三方 SDK 时，不需要修改业务核心。
-
-### `src/backend/application`：应用层
-
-| 文件 | 职责 |
-|---|---|
-| `ports.hpp` | 定义业务所需的抽象端口，例如设置存储、时钟和授权能力；不能依赖 Qt 或具体 SDK。 |
-| `application_service.hpp/.cpp` | 对外提供稳定的业务用例接口，负责流程编排，不负责窗口、文件格式或操作系统 API。 |
-| `CMakeLists.txt` | 定义纯 C++ application target 及公开头文件边界。 |
-
-这里是前后端之间的契约。Qt 前端只调用应用层公开接口；platform 和 integrations 负责实现应用层定义的端口。
-
-### `src/backend/platform`：系统能力实现
-
-| 文件 | 职责 |
-|---|---|
-| `file_settings_store.hpp/.cpp` | 设置存储端口的文件实现，处理持久化读写。 |
-| `platform_paths.hpp/.cpp` | 封装 Windows、macOS 和 Linux 的路径差异。 |
-| `system_clock.hpp` | 系统时钟端口的实现。 |
-| `CMakeLists.txt` | 定义 platform target，并声明其对 application 接口的依赖。 |
-
-新增文件存储、数据库、日志落盘或操作系统服务实现时，应放在此层，而不是写进窗口类或应用层。
-
-### `src/backend/modules`：独立业务模块
-
-当前 `precision_countdown/` 是高精度倒计时模块：
-
-- `include/qtcpp/precision_countdown/`：公开 API 和轻量信号机制。
-- `src/precision_countdown.cpp`：模块内部实现。
-- `CMakeLists.txt`：独立 target，可被 GUI、CLI 或测试单独链接。
-
-适合放入这里的代码应具备明确业务边界、尽量不依赖 Qt，并能独立测试。新模块使用相同的 `include/ + src/ + CMakeLists.txt` 结构。
-
-### `src/backend/integrations` 与 `vendor`：专用 SDK 隔离
-
-| 目录 | 职责 |
-|---|---|
-| `src/backend/integrations/registration/` | 将注册码 SDK 转换为 application 层的 `LicenseGateway` 接口，第三方类型不能越过此边界。 |
-| `vendor/registration_code/include/` | 保存专用 SDK 公开头文件。 |
-| `vendor/registration_code/lib/mac/` | 保存 macOS 动态库。 |
-| `vendor/registration_code/lib/win/` | 保存 Windows MSVC 使用的 `.lib` 和运行时 `.dll`。 |
-| `vendor/registration_code/CMakeLists.txt` | 将平台二进制包装为可链接的 CMake target。 |
-
-`vendor` 只保存当前项目必须随源码管理、且无法通过共享依赖仓库稳定获得的专用产物，不放项目自身业务代码。Linux 当前没有对应的注册码 SDK，因此该功能在 Linux 默认关闭。
-
-### `src/frontend/qt`：Qt 表现层
-
-| 目录 | 职责 |
-|---|---|
-| `include/qtcpp/gui/` | Qt 前端对组合根公开的最小接口，例如 `GuiApplication`。内部窗口头文件不从这里暴露。 |
-| `application/` | 管理 GUI 生命周期、窗口创建和纯界面状态；`ui_settings` 只处理 UI 偏好，不承载核心业务。 |
-| `views/` | 每个窗口或对话框的 `.hpp`、`.cpp`、`.ui` 放在一起，便于按界面并行开发。 |
-| `widgets/` | 多个界面可复用的自定义 Qt 控件。只被单个窗口使用的细节优先留在对应 view 内。 |
-| `resources/` | `resource.qrc`、样式表和运行期图片；这些文件会编译进 Qt 资源系统，通过 `:/` 路径访问。 |
-| `translations/` | Qt Linguist 使用的 `.ts` 翻译源文件。 |
-| `assets/` | 应用打包阶段使用的字体和平台图标；与运行期 `qrc` 资源分开管理。 |
-| `CMakeLists.txt` | 定义 Qt 前端 target，启用 AUTOUIC/AUTOMOC/AUTORCC，并显式列出源码、资源和 Qt 依赖。 |
-
-Qt 层只负责展示、收集输入和调用 application 用例。业务判断、持久化和平台 API 不应进入 `views` 或 `widgets`。
-
-### `tests`：自动化测试
-
-测试目录按生产模块镜像组织：
-
-- `application/`：验证业务用例编排和端口交互。
-- `platform/`：验证文件存储等系统能力实现。
-- `precision_countdown/`：验证独立业务模块。
-- `test_support.hpp`：多个测试共用的最小辅助代码。
-- `CMakeLists.txt`：定义测试可执行文件并注册到 CTest。
-
-新增生产模块时，应同步新增对应测试目录。核心业务优先使用纯 C++ 测试，避免为了测试业务逻辑而启动 Qt GUI。
-
-### `cmake`：构建公共模块
-
-| 文件 | 职责 |
-|---|---|
-| `GitVersion.cmake` | 从最近的 Git Tag 解析主、次、修订版本，并计算提交数、短哈希和 dirty 状态。 |
-| `ProjectOptions.cmake` | 集中管理 UTF-8、警告、sanitizer、clang-tidy 等可复用编译策略。 |
-| `project_config.hpp.in` | 生成包含项目名、组织名和 Git 版本信息的 C++ 配置头文件。 |
-
-平台和编译器判断应尽量封装在这里或具体 target 中，不要把大量条件分支散落到每一级 `CMakeLists.txt`。
-
-### `scripts`：跨平台开发脚本
-
-| 文件 | 职责 |
-|---|---|
-| `setup-toolchain.cmake` | 全平台唯一的环境初始化脚本：查找 Ninja、Qt、编译器和共享第三方库目录，并生成 `CMakeUserPresets.json`。 |
-
-macOS、Linux、Windows 和 CI 均直接通过 `cmake -P` 调用该文件，不再维护 `.sh`、`.ps1` 或 Python 包装脚本。
-
-### 外部共享第三方库
-
-项目支持使用仓库外的共享依赖目录，例如当前机器上的 `/Users/tian_sj/Code/third_party`。它与仓库内目录职责不同：
-
-| 位置 | 职责 |
-|---|---|
-| `Qt_Cmake/vendor/` | 当前项目随源码管理的专用 SDK，目前保存注册码库。 |
-| `../third_party/` | 多个项目共享的通用库，例如 Asio、Boost、fmt、QXlsx、OpenSSL。绝对路径不提交 Git。 |
-
-`setup-toolchain.cmake` 会自动检测项目同级的 `../third_party`，并把真实路径写入本机 `CMakeUserPresets.json` 的 `QTCPP_EXTERNAL_THIRD_PARTY_ROOT`。根 CMake 随后加载其中的 `third_party.cmake`，使具体模块可以按需声明依赖：
-
-```cmake
-# 只在真正使用该库的模块 CMakeLists.txt 中加载，不能在根目录一次性引入全部依赖。
-include_third_party(asio nlohmann)
-target_link_libraries(my_module PRIVATE asio nlohmann)
-```
-
-预编译包仍应先加载目录配置，再使用包自身提供的标准 target：
-
-```cmake
-include_third_party(fmt)
-find_package(fmt CONFIG REQUIRED)
-target_link_libraries(my_module PRIVATE fmt::fmt)
-```
-
-共享目录不存在时项目仍可正常构建；只有实际模块使用其中的库时才要求配置该目录。
-
-### 新代码放置规则
-
-| 要新增的内容 | 放置位置 |
-|---|---|
-| 业务用例或前后端契约 | `src/backend/application/` |
-| 独立、可复用的纯 C++ 业务能力 | `src/backend/modules/<module>/` |
-| 文件、数据库、日志、系统 API 实现 | `src/backend/platform/` |
-| 第三方 SDK 或外部服务接入 | `src/backend/integrations/<integration>/` |
-| 当前项目专用的预编译 SDK | `vendor/<sdk>/` |
-| Qt 窗口或对话框 | `src/frontend/qt/views/` |
-| 可复用 Qt 控件 | `src/frontend/qt/widgets/` |
-| 样式、运行期图片和 Qt 资源 | `src/frontend/qt/resources/` |
-| 应用图标、打包字体等发布资产 | `src/frontend/qt/assets/` |
-| 新桌面程序、CLI 或服务入口 | `apps/<application>/` |
-| 对应模块测试 | `tests/<module>/` |
-
-新增依赖时必须保持方向：`frontend -> application <- platform/integrations`。application 不能反向包含 Qt、操作系统实现或第三方 SDK 头文件。
-
-## 环境要求
-
-| 平台 | 编译器 | Qt Kit |
+| 交付物 | CMake 形式 | 示例 |
 |---|---|---|
-| Windows x64 | Visual Studio 2022 MSVC | Qt 6.5+ `msvc2022_64` |
-| macOS | AppleClang | Qt 6.5+ `macos` |
-| Linux x64 | GCC 或 Clang | Qt 6.5+ `gcc_64` 或发行版 Qt 6 |
+| 提供给其他项目使用的功能模块 | `STATIC` 或 `SHARED` library | `libraries/precision_countdown` |
+| 基于 Qt 的可复用库 | `STATIC` 或 `SHARED` Qt library | `libraries/qt_status` |
+| 被宿主运行时加载的插件 | `MODULE` library + C ABI | `plugins/example` |
+| Qt 桌面应用 | Qt Widgets executable | `apps/desktop` |
 
-所有平台只需要 CMake 3.25+、Ninja 和对应的 C++ 编译器；构建 GUI 时再安装 Qt 6。环境发现脚本本身使用 CMake，不依赖 Python。
+所有模块使用 CMake、Ninja、CMake Presets、CTest 和同一套警告/分析器配置。
 
-## 构建输出目录
+## 快速开始
 
-正式运行目录位于项目根目录，所有 Preset 共用同一个 `bin/`：
-
-```text
-Qt_Cmake/
-├── bin/                         # 正式程序、运行时动态库和运行资源
-└── build/<preset>/
-    ├── lib/                     # 静态库、Windows 导入库等链接产物
-    ├── symbols/                 # MSVC PDB 调试符号
-    └── tests/bin/               # 测试程序，不进入正式 bin
-```
-
-Windows 构建完成后会自动调用 `windeployqt`，将当前程序实际依赖的 Qt DLL 和插件复制到根目录 `bin/`；启用注册码模块时，其运行时 DLL 也会复制到这里。静态库、测试程序、源码和编译中间文件不会进入 `bin/`。macOS 的运行时资源位于 `bin/<应用名>.app` 内部，Linux 保持标准的可执行文件与系统动态库查找方式。
-
-因为多个 Preset 共用这个目录，切换 Debug/Release 或 Qt Kit 后应重新构建；`bin/` 始终表示最近一次构建生成的本机运行环境。
-
-## 首次配置
-
-macOS、Linux 和 Windows 使用同一条初始化命令：
+需要 CMake 3.25+、Ninja、对应平台的 C++ 编译器。构建桌面应用还需要 Qt 6.5+。
 
 ```bash
 cmake -P scripts/setup-toolchain.cmake
@@ -247,23 +22,82 @@ cmake --build --preset local-dev
 ctest --preset local-dev
 ```
 
-脚本会自动发现 Ninja、Qt 6、编译器和项目同级的 `../third_party`，并生成本机专用的 `CMakeUserPresets.json`。Windows 还会通过 `vswhere` 和 `VsDevCmd.bat` 获取 MSVC x64 与 Windows SDK 环境。生成文件包含本机绝对路径，已加入 `.gitignore`，不能提交 Git。
-
-已有 `CMakeUserPresets.json` 时，使用 `FORCE` 重新生成：
+环境脚本会生成已被 Git 忽略的 `CMakeUserPresets.json`。重新探测环境：
 
 ```bash
 cmake -DFORCE=ON -P scripts/setup-toolchain.cmake
 ```
 
-工具安装在非常规位置时，通过 CMake 变量指定：
+工具安装在非常规位置时可以显式指定：
 
 ```bash
-cmake -DFORCE=ON -DQT_ROOT=<Qt前缀> -DNINJA_PATH=<Ninja路径> -DTHIRD_PARTY_ROOT=<共享库路径> -P scripts/setup-toolchain.cmake
+cmake -DFORCE=ON \
+  -DQT_ROOT=<Qt前缀> \
+  -DNINJA_PATH=<Ninja路径> \
+  -DTHIRD_PARTY_ROOT=<共享库路径> \
+  -P scripts/setup-toolchain.cmake
 ```
 
-所有 `-D` 参数必须写在 `-P` 前面。可用参数包括 `FORCE`、`QT_ROOT`、`NINJA_PATH`、`THIRD_PARTY_ROOT` 和用于修改生成位置的 `OUTPUT`。
+所有 `-D` 参数必须位于 `-P` 前。
 
-## 完全不使用 Qt
+## 项目结构
+
+```text
+Qt_Cmake/
+├── apps/
+│   └── desktop/                   # Qt 桌面应用的唯一开发根目录
+│       ├── application/           # QApplication 生命周期和界面设置
+│       ├── views/                 # 窗口、对话框和 Designer UI
+│       ├── widgets/               # 应用私有控件
+│       ├── resources/             # 样式与 Qt Resource
+│       ├── assets/                # 字体和应用图标
+│       ├── translations/          # Qt 翻译
+│       ├── integrations/          # 应用专属第三方 SDK 适配
+│       └── main.cpp               # 依赖组装和程序入口
+├── libraries/
+│   ├── app_core/                  # 无 Qt 的应用核心、配置和端口
+│   │   ├── include/               # 对外公开头文件
+│   │   ├── src/                   # 私有实现
+│   │   └── tests/                 # 该库自己的测试
+│   ├── precision_countdown/       # 独立纯 C++ 功能模块示例
+│   ├── qt_status/                 # 可安装、可独立测试的 Qt 库示例
+│   └── qt_third_party/            # Qt 三方源码与本地二进制缓存
+├── plugins/
+│   ├── api/                       # 稳定的宿主/插件 C ABI
+│   └── example/                   # MODULE 插件及动态加载测试
+├── tests/
+│   ├── consumer/                  # 安装后 find_package 消费测试
+│   ├── qt_consumer/               # 安装后的 Qt 库消费测试
+│   └── test_support.hpp           # 轻量测试辅助
+├── cmake/                         # 公共构建、测试和包配置
+├── scripts/                       # 跨平台工具链发现
+└── vendor/                        # 必须随项目分发的专有 SDK
+```
+
+目录按“交付物”划分，不按 manager、repository、platform 等技术层级无限拆分。
+
+## 构建模式
+
+| Preset | 内容 |
+|---|---|
+| `local-dev` | Qt Debug 应用、所有库和库测试 |
+| `local-release` | Qt Release 应用、所有库和库测试 |
+| `local-qt-libraries` | 只构建可复用 Qt 库，不构建桌面应用 |
+| `local-core-only` | 本机纯 C++ 库、插件和全部测试 |
+| `core-only` | 通用纯 C++ 库、插件和全部测试 |
+| `sanitizers` | ASan + UBSan 的库和插件测试 |
+
+各 Preset 的产物相互隔离：
+
+```text
+build/<preset>/
+├── bin/                           # 应用和测试外的运行文件
+├── lib/                           # 库与插件
+├── symbols/                       # 调试符号
+└── tests/bin/                     # 测试程序
+```
+
+不用 Qt 时：
 
 ```bash
 cmake --preset core-only
@@ -271,48 +105,237 @@ cmake --build --preset core-only
 ctest --preset core-only
 ```
 
-该预设不会执行 `find_package(Qt6)`，可用于服务端、CLI、单元测试和纯 C++ CI。
+## 开发独立功能模块
 
-## 可选注册码模块
+一个可复用模块包含自己的公开头文件、实现、测试和 CMake：
 
-注册码 SDK 默认关闭：
+```text
+libraries/my_module/
+├── include/cppproject/my_module/
+├── src/
+├── tests/
+└── CMakeLists.txt
+```
+
+参考 `libraries/precision_countdown` 创建模块，然后在根 `CMakeLists.txt` 中添加：
+
+```cmake
+add_subdirectory(libraries/my_module)
+```
+
+模块应提供命名 target：
+
+```cmake
+add_library(cppproject_my_module)
+add_library(CppProject::my_module ALIAS cppproject_my_module)
+```
+
+只编译和测试单个模块：
 
 ```bash
-cmake --preset local-dev -DQTCPP_ENABLE_LICENSING=ON
+cmake --preset core-only
+cmake --build --preset core-only --target cppproject_precision_countdown_tests
+ctest --test-dir build/core-only -L precision_countdown --output-on-failure
+```
+
+默认生成静态库。需要动态库时使用标准 CMake 开关：
+
+```bash
+cmake --preset core-only -DBUILD_SHARED_LIBS=ON
+```
+
+动态 C++ 库要求消费者使用兼容的编译器、标准库和运行库。需要跨工具链稳定接口时，
+优先使用下一节的 C ABI 插件形式。
+
+## 开发 Qt 库
+
+Qt 库仍放在 `libraries/`，与 Qt 桌面应用分开。参考 `libraries/qt_status`：
+
+```text
+libraries/qt_status/
+├── include/cppproject/qt_status/  # 会安装的 QObject API
+├── src/
+├── tests/
+└── CMakeLists.txt
+```
+
+只构建和测试 Qt 库：
+
+```bash
+cmake --preset local-qt-libraries
+cmake --build --preset local-qt-libraries
+ctest --test-dir build/local-qt-libraries -L qt_status --output-on-failure
+```
+
+该示例支持 `QObject`、属性、signals/slots 和 `AUTOMOC`，并导出
+`CppProject::qt_status`。公开头文件使用 Qt 类型，所以 `Qt6::Core` 是合理的公开依赖；
+不使用 Qt 的业务逻辑仍应放在普通 C++ library 中。
+
+### QCustomPlot、QXlsx 和 QWindowKit
+
+仓库固定包含 QCustomPlot 2.1.1、QXlsx 1.5.1.1 和 QWindowKit 1.5.0 源码，
+并提供稳定 target：
+
+```cmake
+target_link_libraries(
+    my_qt_library
+    PRIVATE
+        CppProject::qcustomplot
+        CppProject::qxlsx
+        CppProject::qwindowkit
+)
+```
+
+第一次按源码构建：
+
+```bash
+cmake --preset local-qt-libraries \
+  -DCPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=ON
+cmake --build --preset local-qt-libraries
+```
+
+生成的库不会提交到 Git，而是保存在各自源码目录的 `prebuilt/` 中：
+
+```text
+vendor/<库>/prebuilt/
+└── <系统-架构>/<编译器-版本>/<Qt版本>/<static|shared>/<配置>/
+    ├── lib/
+    ├── bin/                        # Windows 动态库
+    └── symbols/
+```
+
+以后关闭源码编译，CMake 会从相同 ABI 路径查找库：
+
+```bash
+cmake --preset local-qt-libraries \
+  -DCPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE=OFF
+cmake --build --preset local-qt-libraries
+```
+
+Debug、Release、静态和动态模式必须分别预编译一次。修改第三方源码、编译器版本或
+Qt 版本后，也需要重新生成对应缓存。普通的增量构建本身不会重复编译未修改源码。
+
+QXlsx 使用 MIT 许可证，QWindowKit 使用 Apache-2.0。QCustomPlot 2.1.1 使用
+GPLv3 或商业许可证；闭源分发前需要取得合适的商业授权。其官方稳定版标注支持到
+Qt 6.4，在更新的 Qt 上可能出现弃用警告。
+
+## 安装并提供给其他项目
+
+库、公开头文件和 CMake Package 会一起安装：
+
+```bash
+cmake --preset release -DCPPPROJECT_BUILD_GUI=OFF
+cmake --build --preset release
+cmake --install build/release --prefix <安装目录>
+```
+
+其他项目可以直接消费：
+
+```cmake
+find_package(CppProjectTemplate CONFIG REQUIRED)
+
+target_link_libraries(
+    my_application
+    PRIVATE
+        CppProject::app_core
+        CppProject::precision_countdown
+        CppProject::plugin_api
+        CppProject::qt_status # 仅安装了 Qt 库的构建中存在
+)
+```
+
+`tests/consumer` 是一个真正独立的项目，用于验证安装后的头文件、库和
+`find_package` 配置，而不是偷偷依赖源码目录。
+
+## 开发运行时插件
+
+插件使用 `MODULE` library，不要求宿主在链接阶段依赖插件本体：
+
+```bash
+cmake --preset core-only
+cmake --build --preset core-only --target cppproject_example_plugin
+ctest --test-dir build/core-only -R example_plugin --output-on-failure
+```
+
+公共协议位于 `plugins/api/include/cppproject/plugin/plugin_api.h`，提供：
+
+- 固定宽度整数 ABI 版本。
+- `extern "C"` 插件入口。
+- 宿主回调表。
+- 插件初始化和关闭函数。
+- Windows/macOS/Linux 导出定义。
+
+插件边界不要暴露 STL、Qt 类型或 C++ 异常。对象的创建与销毁应由同一动态库完成。
+示例测试会实际使用 `LoadLibrary` 或 `dlopen` 加载插件、查找入口并验证 ABI 协商。
+
+新增插件时复制 `plugins/example`，修改插件名称和实现即可。
+
+## 开发 Qt 桌面应用
+
+Qt 应用继续保持简单的前后端依赖：
+
+```text
+CppProject::desktop_ui  ──>  CppProject::app_core
+        │
+        └── apps/desktop/main.cpp 创建对象并启动应用
+```
+
+- 主窗口通过 `QWK::WidgetWindowAgent` 使用 QWindowKit 的跨平台无边框窗口实现。
+- 非 UI、可测试的逻辑放入 `libraries/app_core` 或新的独立 library。
+- 窗口、对话框、控件、主题和翻译放入 `apps/desktop`。
+- `main.cpp` 只创建对象和连接依赖。
+- 桌面 UI 不直接访问配置文件、数据库或第三方 SDK。
+
+macOS 应用位于 `build/<preset>/bin/<应用名>.app`。Windows 会在构建后调用
+`windeployqt` 部署所需的 Qt DLL 和插件。
+
+## 常用选项
+
+| 选项 | 默认值 | 作用 |
+|---|---:|---|
+| `BUILD_SHARED_LIBS` | `OFF` | 将可复用库构建为动态库 |
+| `CPPPROJECT_BUILD_GUI` | `ON` | 构建 Qt 桌面应用 |
+| `CPPPROJECT_BUILD_QT_LIBRARIES` | 跟随 GUI | 构建可复用 Qt 库 |
+| `CPPPROJECT_ENABLE_QT_THIRD_PARTY` | 跟随 Qt 库 | 提供 QCustomPlot、QXlsx 和 QWindowKit target |
+| `CPPPROJECT_BUILD_QT_THIRD_PARTY_FROM_SOURCE` | `ON` | 否则从每个库的本地二进制缓存加载 |
+| `CPPPROJECT_BUILD_PLUGINS` | `OFF` | 构建示例运行时插件 |
+| `CPPPROJECT_BUILD_TESTS` | 顶层工程时 `ON` | 构建模块和插件测试 |
+| `CPPPROJECT_ENABLE_LICENSING` | `OFF` | 启用桌面应用注册码适配 |
+| `CPPPROJECT_WARNINGS_AS_ERRORS` | `OFF` | 将警告视为错误 |
+| `CPPPROJECT_ENABLE_CLANG_TIDY` | `OFF` | 编译时运行 clang-tidy |
+| `CPPPROJECT_ENABLE_SANITIZERS` | `OFF` | 启用 ASan 和 UBSan |
+
+## 第三方依赖和注册码
+
+`vendor/` 保存必须随项目分发的专用 SDK。共享通用依赖可以放在仓库同级的
+`../third_party`，由环境脚本写入本机 Preset。
+
+注册码适配属于桌面应用，而不是公开 `app_core` library。Windows 和 macOS 可以启用：
+
+```bash
+cmake --preset local-dev -DCPPPROJECT_ENABLE_LICENSING=ON
 cmake --build --preset local-dev
 ```
 
-SDK 的 Qt 类型只存在于 `src/backend/integrations/registration`。仓库目前只有 Windows 和 macOS SDK 二进制，因此 Linux 必须保持关闭，或由团队提供实现同一 `LicenseGateway` port 的 Linux integration。
+Linux 未附带对应 SDK，应保持关闭或替换 `apps/desktop/integrations` 中的实现。
 
-## Git 自动版本
+## 版本、CI 与模板定制
 
-版本从最近的 `vMAJOR.MINOR.PATCH` Tag 提取，构建号为当前 `HEAD` 的提交数，同时写入短提交哈希和 dirty 状态：
+版本从最近的 `vMAJOR.MINOR.PATCH` Git Tag 解析：
 
 ```bash
 git tag v1.2.0
 ```
 
-无 Git 元数据或没有合法 Tag 时回退到 `1.0.0`，源码包和浅克隆仍可构建。生成头文件位于 build 目录的 `generated/qtcpp/project_config.hpp`。
+没有 Git 元数据或合法 Tag 时回退到 `1.0.0`。CI 会在 Windows、macOS 和 Linux
+验证纯 C++ 库、Qt 库、独立模块、动态插件、外部消费者以及 Qt GUI。
 
-## 常用质量开关
+开始新项目时：
 
-```bash
-cmake --preset core-only -DQTCPP_ENABLE_SANITIZERS=ON
-cmake --preset local-dev -DQTCPP_ENABLE_CLANG_TIDY=ON
-cmake --preset local-dev -DQTCPP_WARNINGS_AS_ERRORS=ON
-```
+1. 修改根 `CMakeLists.txt` 中的项目名和应用元数据。
+2. 保留需要的 `apps/`、`libraries/`、`plugins/`，删除不用的示例。
+3. 将 `CppProject`、`cppproject` 命名空间和 include 前缀替换为产品名称。
+4. 替换应用图标、字体和可选专有 SDK。
 
-提交前至少执行构建、`ctest` 和 `clang-format`。团队协作约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-## 定制模板
-
-新项目至少修改根 `CMakeLists.txt` 中的：
-
-- `project(QtCppTemplate ...)`
-- `QTCPP_ORGANIZATION`
-- `QTCPP_APPLICATION_NAME`
-- `QTCPP_BUNDLE_IDENTIFIER`
-- macOS 发布签名使用的 `QTCPP_CODESIGN_IDENTITY`（默认 `-` 为本地 ad-hoc 签名）
-- `src/frontend/qt/assets/icons/` 和可选注册码 SDK
-
-不要把业务代码写进 `src/frontend/qt/` 或 `main.cpp`；`main.cpp` 只负责组装依赖并启动应用。
+架构取舍见 [docs/architecture.md](docs/architecture.md)，提交规范见
+[CONTRIBUTING.md](CONTRIBUTING.md)。

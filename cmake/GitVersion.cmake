@@ -3,7 +3,7 @@ include_guard(GLOBAL)
 
 # 从最近的 vMAJOR.MINOR.PATCH Tag、当前提交数和 Git 状态生成应用版本。
 # Git 不可用或源码包不含 .git 时使用稳定的 1.0.0.0 回退值。
-function(qtcpp_resolve_git_version)
+function(cppproject_resolve_git_version)
     set(version_major 1)
     set(version_minor 0)
     set(version_patch 0)
@@ -85,15 +85,15 @@ function(qtcpp_resolve_git_version)
     endif()
 
     # 函数作用域中的结果显式导出给根 CMakeLists.txt 和配置头模板。
-    set(QTCPP_VERSION_MAJOR "${version_major}" PARENT_SCOPE)
-    set(QTCPP_VERSION_MINOR "${version_minor}" PARENT_SCOPE)
-    set(QTCPP_VERSION_PATCH "${version_patch}" PARENT_SCOPE)
-    set(QTCPP_VERSION_BUILD "${version_build}" PARENT_SCOPE)
-    set(QTCPP_VERSION_BUILD_RC "${version_build_rc}" PARENT_SCOPE)
-    set(QTCPP_VERSION_SEMVER "${version_semver}" PARENT_SCOPE)
-    set(QTCPP_VERSION_FULL "${version_full}" PARENT_SCOPE)
-    set(QTCPP_GIT_HASH "${git_hash}" PARENT_SCOPE)
-    set(QTCPP_GIT_DIRTY "${git_dirty}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_MAJOR "${version_major}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_MINOR "${version_minor}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_PATCH "${version_patch}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_BUILD "${version_build}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_BUILD_RC "${version_build_rc}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_SEMVER "${version_semver}" PARENT_SCOPE)
+    set(CPPPROJECT_VERSION_FULL "${version_full}" PARENT_SCOPE)
+    set(CPPPROJECT_GIT_HASH "${git_hash}" PARENT_SCOPE)
+    set(CPPPROJECT_GIT_DIRTY "${git_dirty}" PARENT_SCOPE)
 
     message(STATUS "Version: ${version_full} (${git_hash})")
 endfunction()

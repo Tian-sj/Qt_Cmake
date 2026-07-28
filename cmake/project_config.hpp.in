@@ -3,21 +3,21 @@
 // 此文件由 CMake configure_file() 生成，禁止直接修改 build 目录中的副本。
 #include <string_view>
 
-#cmakedefine01 QTCPP_GIT_DIRTY
+#cmakedefine01 CPPPROJECT_GIT_DIRTY
 
-namespace qtcpp::build {
+namespace cppproject::build {
 
-inline constexpr std::string_view application_name{"@QTCPP_APPLICATION_NAME@"};
-inline constexpr std::string_view organization{"@QTCPP_ORGANIZATION@"};
-inline constexpr std::string_view version{"@QTCPP_VERSION_FULL@"};
-inline constexpr std::string_view semantic_version{"@QTCPP_VERSION_SEMVER@"};
-inline constexpr std::string_view git_hash{"@QTCPP_GIT_HASH@"};
-inline constexpr int version_major{@QTCPP_VERSION_MAJOR@};
-inline constexpr int version_minor{@QTCPP_VERSION_MINOR@};
-inline constexpr int version_patch{@QTCPP_VERSION_PATCH@};
-inline constexpr int version_build{@QTCPP_VERSION_BUILD@};
-inline constexpr bool git_dirty{QTCPP_GIT_DIRTY != 0};
+inline constexpr std::string_view application_name{"@CPPPROJECT_APPLICATION_NAME@"};
+inline constexpr std::string_view organization{"@CPPPROJECT_ORGANIZATION@"};
+inline constexpr std::string_view version{"@CPPPROJECT_VERSION_FULL@"};
+inline constexpr std::string_view semantic_version{"@CPPPROJECT_VERSION_SEMVER@"};
+inline constexpr std::string_view git_hash{"@CPPPROJECT_GIT_HASH@"};
+inline constexpr int version_major{@CPPPROJECT_VERSION_MAJOR@};
+inline constexpr int version_minor{@CPPPROJECT_VERSION_MINOR@};
+inline constexpr int version_patch{@CPPPROJECT_VERSION_PATCH@};
+inline constexpr int version_build{@CPPPROJECT_VERSION_BUILD@};
+inline constexpr bool git_dirty{CPPPROJECT_GIT_DIRTY != 0};
 
-}  // namespace qtcpp::build
+}  // namespace cppproject::build
 
-#undef QTCPP_GIT_DIRTY
+#undef CPPPROJECT_GIT_DIRTY

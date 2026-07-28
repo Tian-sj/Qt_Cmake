@@ -1,0 +1,5 @@
+﻿<RCC>
+    <qresource prefix="/GUI">
+        <file>css/Light/desktop-theme.css</file>
+    </qresource>
+</RCC>
