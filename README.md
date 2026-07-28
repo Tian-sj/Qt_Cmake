@@ -323,6 +323,10 @@ GUI 流程还会验证：
 | `CPPPROJECT_ENABLE_CLANG_TIDY` | `OFF` | 编译时执行 clang-tidy |
 | `CPPPROJECT_ENABLE_SANITIZERS` | `OFF` | 启用 ASan 和 UBSan |
 
+需要严格检查时显式加入
+`-DCPPPROJECT_WARNINGS_AS_ERRORS=ON`；日常 Preset 不默认开启，避免编译器版本变化
+把新出现的警告误判成工程无法构建。
+
 ## 11. 创建新项目时修改什么
 
 1. 修改根 `CMakeLists.txt` 的项目名、组织名、应用名和 Bundle ID。

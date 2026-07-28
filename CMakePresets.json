@@ -97,8 +97,7 @@
         "CPPPROJECT_BUILD_QT_LIBRARIES": false,
         "CPPPROJECT_ENABLE_QT_THIRD_PARTY": false,
         "CPPPROJECT_BUILD_PLUGINS": true,
-        "CPPPROJECT_BUILD_TESTS": true,
-        "CPPPROJECT_WARNINGS_AS_ERRORS": true
+        "CPPPROJECT_BUILD_TESTS": true
       }
     },
     {
